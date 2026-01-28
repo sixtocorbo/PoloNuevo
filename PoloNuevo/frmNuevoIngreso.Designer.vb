@@ -134,7 +134,6 @@ Partial Class frmNuevoIngreso
         'cmbRecluso
         '
         Me.cmbRecluso.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-        Me.cmbRecluso.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
         Me.cmbRecluso.Enabled = False
         Me.cmbRecluso.FormattingEnabled = True
         Me.cmbRecluso.Location = New System.Drawing.Point(22, 69)
