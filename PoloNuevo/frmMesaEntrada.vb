@@ -199,9 +199,9 @@ Public Class frmMesaEntrada
                               .OrderBy(Function(m) m.FechaMovimiento) _
                               .Select(Function(m) New With {
                                   .IdMov = m.Id,
-                                  .Fecha = m.FechaMovimiento,
+                                  .FechaMovimiento = m.FechaMovimiento,
                                   .Origen = m.Origen,
-                                  .Destino = m.Destino,
+                                  .MovidoA = m.Destino,
                                   .Tipo = If(m.EsSalida,
                                              "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
                                              "ENTRADA / PASE")
@@ -211,6 +211,15 @@ Public Class frmMesaEntrada
             dgvMovimientos.DataSource = historial
 
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
+            If dgvMovimientos.Columns("FechaMovimiento") IsNot Nothing Then
+                dgvMovimientos.Columns("FechaMovimiento").HeaderText = "Fecha mov."
+                dgvMovimientos.Columns("FechaMovimiento").Width = 120
+                dgvMovimientos.Columns("FechaMovimiento").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            End If
+            If dgvMovimientos.Columns("MovidoA") IsNot Nothing Then
+                dgvMovimientos.Columns("MovidoA").HeaderText = "Movido a"
+                dgvMovimientos.Columns("MovidoA").Width = 180
+            End If
             If dgvMovimientos.Columns("Tipo") IsNot Nothing Then dgvMovimientos.Columns("Tipo").Width = 300
         End Using
     End Sub
@@ -346,9 +355,9 @@ Public Class frmMesaEntrada
             Else
                 rowMov = dgvMovimientos.Rows(dgvMovimientos.Rows.Count - 1)
             End If
-            _impFecha = rowMov.Cells("Fecha").Value.ToString()
+            _impFecha = rowMov.Cells("FechaMovimiento").Value.ToString()
             _impOrigen = rowMov.Cells("Origen").Value.ToString()
-            _impDestino = rowMov.Cells("Destino").Value.ToString()
+            _impDestino = rowMov.Cells("MovidoA").Value.ToString()
         Else
             _impFecha = DateTime.Now.ToString()
             _impOrigen = "SIN DATOS"
