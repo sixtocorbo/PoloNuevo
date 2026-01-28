@@ -352,6 +352,9 @@ Partial Class frmMesaEntrada
         Me.lblHistorial.TabIndex = 2
         Me.lblHistorial.Text = "Historial de Movimientos (Trazabilidad)"
         '
+        'PrintDocument1
+        '
+        '
         'PrintDialog1
         '
         Me.PrintDialog1.UseEXDialog = True

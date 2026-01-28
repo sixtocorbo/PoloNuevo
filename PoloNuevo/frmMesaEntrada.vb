@@ -237,16 +237,28 @@ Public Class frmMesaEntrada
         End If
     End Sub
 
+    ' =========================================================
+    ' BOTÓN EDITAR / VER DETALLE
+    ' =========================================================
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
+        ' 1. Validar que haya algo seleccionado
         If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Seleccione un documento de la lista para ver su detalle o editar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
+
+        ' 2. Obtener el ID oculto de la grilla
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
 
-        ' Reutilizamos el formulario de Ingreso pero pasándole ID (necesitarás adaptar su constructor si quieres editar)
-        ' Por ahora, asumimos que solo abre nuevo o podrías crear frmEditarIngreso
-        MessageBox.Show("Funcionalidad de Edición Completa pendiente de implementar en frmNuevoIngreso.", "Aviso")
+        ' 3. Abrir el formulario en MODO EDICIÓN (Usando el constructor con ID)
+        ' Al pasarle idDoc, el formulario sabe que debe buscar los datos, el archivo adjunto y el recluso vinculado.
+        Dim frm As New frmNuevoIngreso(idDoc)
+
+        If frm.ShowDialog() = DialogResult.OK Then
+            ' Si el usuario guardó cambios, refrescamos todo
+            CargarMesa()
+            CargarHistorial(idDoc)
+        End If
     End Sub
 
     ' =========================================================

@@ -1,252 +1,208 @@
-﻿Public Class frmNuevoIngreso
+﻿Imports System.IO
 
+Public Class frmNuevoIngreso
+
+    ' Variables de Estado
     Private _idDocumentoEditar As Integer = 0
-    Private Const PLACEHOLDER As String = "Escriba para buscar..."
 
-    Private Class ItemRecluso
-        Public Property Id As Integer
-        Public Property Texto As String
-    End Class
+    ' Variables para Archivo Digital
+    Private _archivoBytes As Byte() = Nothing
+    Private _archivoNombre As String = ""
+    Private _archivoExt As String = ""
 
-    Private _listaCompleta As List(Of ItemRecluso)
+    ' =========================================================
+    ' CONSTRUCTORES (NUEVO vs EDITAR)
+    ' =========================================================
 
+    ' Constructor 1: NUEVO INGRESO
     Public Sub New()
         InitializeComponent()
         _idDocumentoEditar = 0
+        Me.Text = "Nuevo Ingreso Documental"
     End Sub
 
+    ' Constructor 2: EDITAR EXISTENTE
     Public Sub New(idDocumento As Integer)
         InitializeComponent()
         _idDocumentoEditar = idDocumento
+        Me.Text = "Editar / Detalle de Documento"
+        btnGuardar.Text = "GUARDAR CAMBIOS"
+        btnGuardar.BackColor = Color.SlateGray
     End Sub
 
+    ' =========================================================
+    ' CARGA INICIAL
+    ' =========================================================
     Private Sub frmNuevoIngreso_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        CargarTiposDocumento() ' <--- NUEVO: Cargar los tipos (Oficio, Nota, etc)
-        CargarListaMaestra()
+        CargarListas()
 
         If _idDocumentoEditar > 0 Then
-            ConfigurarModoEdicion()
+            CargarDatosEdicion()
         End If
     End Sub
 
-    ' --- MÉTODO NUEVO PARA CARGAR EL COMBO DE TIPOS ---
-    Private Sub CargarTiposDocumento()
+    Private Sub CargarListas()
         Using db As New PoloNuevoEntities()
-            ' Cargamos todos los tipos ordenados alfabéticamente
-            Dim tipos = db.TiposDocumento.OrderBy(Function(t) t.Nombre).ToList()
-
-            cmbTipo.DataSource = tipos
+            ' 1. Tipos de Documento
+            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
 
-            ' Intentamos seleccionar "OFICIO" por defecto si existe, sino el primero
-            Dim oficio = tipos.FirstOrDefault(Function(t) t.Nombre.Contains("OFICIO"))
-            If oficio IsNot Nothing Then
-                cmbTipo.SelectedValue = oficio.Id
-            End If
+            ' 2. Reclusos (Para el buscador)
+            ' Cargamos nombre y cédula para facilitar la búsqueda
+            Dim listaPresos = db.Reclusos _
+                                .Select(Function(r) New With {
+                                    .Id = r.Id,
+                                    .Texto = r.Nombre & " (" & r.Cedula & ")"
+                                }) _
+                                .OrderBy(Function(r) r.Texto) _
+                                .ToList()
+
+            cmbRecluso.DataSource = listaPresos
+            cmbRecluso.DisplayMember = "Texto"
+            cmbRecluso.ValueMember = "Id"
+            cmbRecluso.SelectedIndex = -1 ' Arrancar vacío
         End Using
     End Sub
 
-    Private Sub CargarListaMaestra()
-        Using db As New PoloNuevoEntities()
-            _listaCompleta = db.Reclusos _
-                               .Select(Function(r) New ItemRecluso With {
-                                   .Id = r.Id,
-                                   .Texto = r.Nombre & " (" & r.Cedula & ")"
-                               }) _
-                               .OrderBy(Function(x) x.Texto) _
-                               .ToList()
-        End Using
-        cmbReclusos.DataSource = Nothing
-    End Sub
+    ' =========================================================
+    ' LÓGICA DE EDICIÓN (CARGAR DATOS)
+    ' =========================================================
+    Private Sub CargarDatosEdicion()
+        Try
+            Using db As New PoloNuevoEntities()
+                Dim doc = db.Documentos.Find(_idDocumentoEditar)
+                If doc IsNot Nothing Then
+                    ' Datos Básicos
+                    txtNumero.Text = doc.ReferenciaExterna
+                    txtAsunto.Text = doc.Descripcion
+                    cmbTipo.SelectedValue = doc.TipoDocumentoId
 
-    ' --- LÓGICA DE BÚSQUEDA ---
-    Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
-        If txtBuscarRecluso.Text = PLACEHOLDER OrElse txtBuscarRecluso.ForeColor = Color.Gray Then Return
-        FiltrarReclusos(txtBuscarRecluso.Text)
-    End Sub
+                    ' Recluso Vinculado
+                    If doc.ReclusoId.HasValue Then
+                        chkVincular.Checked = True
+                        cmbRecluso.Enabled = True
+                        cmbRecluso.SelectedValue = doc.ReclusoId.Value
+                    Else
+                        chkVincular.Checked = False
+                        cmbRecluso.Enabled = False
+                    End If
 
-    Private Sub FiltrarReclusos(texto As String)
-        If _listaCompleta Is Nothing Then Return
-
-        Dim filtro = texto.Trim().ToLower()
-        If String.IsNullOrEmpty(filtro) Then
-            cmbReclusos.DataSource = Nothing
-            Return
-        End If
-
-        Dim palabras = filtro.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
-        Dim listaFiltrada = _listaCompleta.Where(Function(item)
-                                                     Dim itemTexto = item.Texto.ToLower()
-                                                     Return palabras.All(Function(p) itemTexto.Contains(p))
-                                                 End Function) _
-                                          .Take(30) _
-                                          .ToList()
-
-        cmbReclusos.DataSource = listaFiltrada
-        cmbReclusos.DisplayMember = "Texto"
-        cmbReclusos.ValueMember = "Id"
-
-        If listaFiltrada.Count > 0 Then
-            cmbReclusos.DroppedDown = True
-        End If
-    End Sub
-
-    Private Sub txtBuscarRecluso_GotFocus(sender As Object, e As EventArgs) Handles txtBuscarRecluso.GotFocus
-        If txtBuscarRecluso.Text = PLACEHOLDER Then
-            txtBuscarRecluso.Text = ""
-            txtBuscarRecluso.ForeColor = Color.Black
-        End If
-    End Sub
-
-    Private Sub txtBuscarRecluso_LostFocus(sender As Object, e As EventArgs) Handles txtBuscarRecluso.LostFocus
-        If String.IsNullOrWhiteSpace(txtBuscarRecluso.Text) Then
-            txtBuscarRecluso.Text = PLACEHOLDER
-            txtBuscarRecluso.ForeColor = Color.Gray
-        End If
-    End Sub
-
-    ' Teclado en buscador
-    Private Sub txtBuscarRecluso_KeyDown(sender As Object, e As KeyEventArgs) Handles txtBuscarRecluso.KeyDown
-        If cmbReclusos.Items.Count = 0 Then Return
-        If e.KeyCode = Keys.Down Then
-            e.Handled = True
-            If cmbReclusos.SelectedIndex < cmbReclusos.Items.Count - 1 Then cmbReclusos.SelectedIndex += 1
-        ElseIf e.KeyCode = Keys.Up Then
-            e.Handled = True
-            If cmbReclusos.SelectedIndex > 0 Then cmbReclusos.SelectedIndex -= 1
-        ElseIf e.KeyCode = Keys.Enter Then
-            e.Handled = True
-            e.SuppressKeyPress = True
-            cmbReclusos.DroppedDown = False
-            btnGuardar.Focus()
-        End If
-    End Sub
-
-    ' --- MODO EDICIÓN ---
-    Private Sub ConfigurarModoEdicion()
-        Me.Text = "Editar Ingreso / Detalle"
-        btnGuardar.Text = "GUARDAR CAMBIOS"
-
-        Using db As New PoloNuevoEntities()
-            Dim doc = db.Documentos.Find(_idDocumentoEditar)
-            If doc IsNot Nothing Then
-                dtpFecha.Value = doc.FechaCarga
-                txtReferencia.Text = doc.ReferenciaExterna
-                txtAsunto.Text = doc.Descripcion
-
-                ' Seleccionamos el TIPO correcto en el combo
-                cmbTipo.SelectedValue = doc.TipoDocumentoId
-
-                If doc.ReclusoId.HasValue Then
-                    chkVincular.Checked = True
-                    ' Cargar el combo con ese solo ítem para que se vea
-                    Dim item = _listaCompleta.FirstOrDefault(Function(x) x.Id = doc.ReclusoId)
-                    If item IsNot Nothing Then
-                        cmbReclusos.DataSource = New List(Of ItemRecluso) From {item}
-                        cmbReclusos.DisplayMember = "Texto"
-                        cmbReclusos.ValueMember = "Id"
-                        cmbReclusos.SelectedValue = doc.ReclusoId
-
-                        txtBuscarRecluso.Text = item.Texto
-                        txtBuscarRecluso.ForeColor = Color.Black
+                    ' Archivo Adjunto
+                    If doc.Extension <> ".phy" Then
+                        lblArchivoNombre.Text = "Archivo actual: " & doc.NombreArchivo
+                        lblArchivoNombre.ForeColor = Color.Blue
+                        btnAdjuntar.Text = "Reemplazar..."
+                    Else
+                        lblArchivoNombre.Text = "Registro Físico (Sin digitalizar)"
                     End If
                 End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Error al cargar datos para editar: " & ex.Message)
+        End Try
+    End Sub
 
-                Dim primerMov = db.MovimientosDocumentos _
-                                  .Where(Function(m) m.DocumentoId = _idDocumentoEditar) _
-                                  .OrderBy(Function(m) m.FechaMovimiento) _
-                                  .FirstOrDefault()
-                If primerMov IsNot Nothing Then txtOrigen.Text = primerMov.Origen
+    ' =========================================================
+    ' INTERFAZ (CHECKBOX Y ADJUNTAR)
+    ' =========================================================
+    Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
+        cmbRecluso.Enabled = chkVincular.Checked
+        If Not chkVincular.Checked Then cmbRecluso.SelectedIndex = -1
+    End Sub
+
+    Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "Archivos|*.pdf;*.jpg;*.jpeg;*.png;*.doc;*.docx"
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Try
+                    _archivoBytes = File.ReadAllBytes(ofd.FileName)
+                    _archivoNombre = Path.GetFileName(ofd.FileName)
+                    _archivoExt = Path.GetExtension(ofd.FileName)
+
+                    lblArchivoNombre.Text = _archivoNombre
+                    lblArchivoNombre.ForeColor = Color.Green
+                Catch ex As Exception
+                    MessageBox.Show("Error: " & ex.Message)
+                End Try
             End If
         End Using
     End Sub
 
+    ' =========================================================
+    ' GUARDAR (INSERT O UPDATE)
+    ' =========================================================
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        If String.IsNullOrWhiteSpace(txtOrigen.Text) Then
-            MessageBox.Show("Falta el Origen.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ' Validaciones
+        If txtNumero.Text.Trim = "" Or txtAsunto.Text.Trim = "" Then
+            MessageBox.Show("Faltan datos obligatorios (Número o Asunto).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
-        If String.IsNullOrWhiteSpace(txtAsunto.Text) Then
-            MessageBox.Show("Falta el Asunto.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+        If chkVincular.Checked And cmbRecluso.SelectedIndex = -1 Then
+            MessageBox.Show("Marcó 'Vincular' pero no seleccionó al recluso.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Try
             Using db As New PoloNuevoEntities()
+                Dim doc As Documentos
+
                 If _idDocumentoEditar = 0 Then
-                    ' --- NUEVO ---
-                    Dim doc As New Documentos()
-                    LlenarObjeto(doc) ' Ahora pasamos el objeto sin la DB porque el ID viene del combo
-
-                    doc.FechaCarga = dtpFecha.Value
-                    doc.NombreArchivo = "Reg_" & DateTime.Now.Ticks
-                    doc.Contenido = New Byte() {0}
-                    doc.Extension = ".phy"
-
+                    ' --- MODO NUEVO ---
+                    doc = New Documentos()
+                    doc.FechaCarga = DateTime.Now
                     db.Documentos.Add(doc)
-                    db.SaveChanges()
+                Else
+                    ' --- MODO EDICIÓN ---
+                    doc = db.Documentos.Find(_idDocumentoEditar)
+                End If
 
+                ' Asignar valores comunes
+                doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
+                doc.ReferenciaExterna = txtNumero.Text.Trim()
+                doc.Descripcion = txtAsunto.Text.Trim()
+
+                ' Asignar Recluso
+                If chkVincular.Checked Then
+                    doc.ReclusoId = Convert.ToInt32(cmbRecluso.SelectedValue)
+                Else
+                    doc.ReclusoId = Nothing
+                End If
+
+                ' Asignar Archivo (Solo si se subió uno nuevo)
+                If _archivoBytes IsNot Nothing Then
+                    doc.Contenido = _archivoBytes
+                    doc.NombreArchivo = _archivoNombre
+                    doc.Extension = _archivoExt
+                ElseIf _idDocumentoEditar = 0 Then
+                    ' Si es nuevo y no subieron nada, es físico
+                    doc.Extension = ".phy"
+                    doc.NombreArchivo = "Fisico"
+                End If
+                ' NOTA: Si es edición y _archivoBytes es Nothing, mantenemos el archivo viejo (no lo tocamos)
+
+                db.SaveChanges()
+
+                ' Si es NUEVO, creamos el movimiento inicial automático
+                If _idDocumentoEditar = 0 Then
                     Dim mov As New MovimientosDocumentos()
                     mov.DocumentoId = doc.Id
-                    mov.FechaMovimiento = dtpFecha.Value
-                    mov.Origen = txtOrigen.Text.Trim()
+                    mov.FechaMovimiento = DateTime.Now
+                    mov.Origen = "EXTERNO / RECEPCIÓN"
+                    mov.Destino = "MESA DE ENTRADA"
                     mov.EsSalida = False
                     db.MovimientosDocumentos.Add(mov)
                     db.SaveChanges()
-
-                    MessageBox.Show("Ingreso creado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Else
-                    ' --- EDITAR ---
-                    Dim doc = db.Documentos.Find(_idDocumentoEditar)
-                    If doc IsNot Nothing Then
-                        LlenarObjeto(doc) ' Actualizamos tipo, asunto, ref
-
-                        Dim primerMov = db.MovimientosDocumentos _
-                                          .Where(Function(m) m.DocumentoId = _idDocumentoEditar) _
-                                          .OrderBy(Function(m) m.FechaMovimiento) _
-                                          .FirstOrDefault()
-                        If primerMov IsNot Nothing Then
-                            primerMov.Origen = txtOrigen.Text.Trim()
-                            primerMov.FechaMovimiento = dtpFecha.Value
-                        End If
-                        db.SaveChanges()
-                        MessageBox.Show("Actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    End If
                 End If
 
+                MessageBox.Show("Guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error: " & ex.Message)
+            MessageBox.Show("Error al guardar: " & ex.Message)
         End Try
-    End Sub
-
-    ' Método auxiliar para llenar los datos
-    Private Sub LlenarObjeto(doc As Documentos)
-        doc.Descripcion = txtAsunto.Text.Trim()
-        doc.ReferenciaExterna = txtReferencia.Text.Trim()
-
-        ' AQUÍ LA CORRECCIÓN: Tomamos el ID del combo
-        If cmbTipo.SelectedValue IsNot Nothing Then
-            doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
-        Else
-            ' Si por alguna razón falla, valor por defecto 1 (seguridad)
-            doc.TipoDocumentoId = 1
-        End If
-
-        If chkVincular.Checked AndAlso cmbReclusos.SelectedValue IsNot Nothing Then
-            doc.ReclusoId = Convert.ToInt32(cmbReclusos.SelectedValue)
-        Else
-            doc.ReclusoId = Nothing
-        End If
-    End Sub
-
-    Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
-        Dim activo = chkVincular.Checked
-        txtBuscarRecluso.Enabled = activo
-        cmbReclusos.Enabled = activo
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click

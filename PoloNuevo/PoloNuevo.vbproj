@@ -277,6 +277,9 @@
     <EmbeddedResource Include="frmMesaEntrada.resx">
       <DependentUpon>frmMesaEntrada.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmNuevoIngreso.resx">
+      <DependentUpon>frmNuevoIngreso.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmReclusos.resx">
       <DependentUpon>frmReclusos.vb</DependentUpon>
     </EmbeddedResource>

@@ -17,211 +17,249 @@ Partial Class frmNuevoIngreso
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.lblFecha = New System.Windows.Forms.Label()
-        Me.dtpFecha = New System.Windows.Forms.DateTimePicker()
-        Me.lblOrigen = New System.Windows.Forms.Label()
-        Me.txtOrigen = New System.Windows.Forms.TextBox()
-
-        ' --- NUEVO CONTROL PARA TIPO ---
+        Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.lblTitulo = New System.Windows.Forms.Label()
         Me.lblTipo = New System.Windows.Forms.Label()
         Me.cmbTipo = New System.Windows.Forms.ComboBox()
-        ' -------------------------------
-
-        Me.lblReferencia = New System.Windows.Forms.Label()
-        Me.txtReferencia = New System.Windows.Forms.TextBox()
+        Me.lblNumero = New System.Windows.Forms.Label()
+        Me.txtNumero = New System.Windows.Forms.TextBox()
         Me.lblAsunto = New System.Windows.Forms.Label()
         Me.txtAsunto = New System.Windows.Forms.TextBox()
+        Me.grpVinculacion = New System.Windows.Forms.GroupBox()
+        Me.cmbRecluso = New System.Windows.Forms.ComboBox()
         Me.chkVincular = New System.Windows.Forms.CheckBox()
-        Me.txtBuscarRecluso = New System.Windows.Forms.TextBox()
-        Me.cmbReclusos = New System.Windows.Forms.ComboBox()
+        Me.grpArchivo = New System.Windows.Forms.GroupBox()
+        Me.lblArchivoNombre = New System.Windows.Forms.Label()
+        Me.btnAdjuntar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.pnlTop.SuspendLayout()
+        Me.grpVinculacion.SuspendLayout()
+        Me.grpArchivo.SuspendLayout()
         Me.SuspendLayout()
         '
-        'lblFecha
+        'pnlTop
         '
-        Me.lblFecha.AutoSize = True
-        Me.lblFecha.Location = New System.Drawing.Point(20, 20)
-        Me.lblFecha.Name = "lblFecha"
-        Me.lblFecha.Size = New System.Drawing.Size(40, 13)
-        Me.lblFecha.Text = "Fecha:"
+        Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.lblTitulo)
+        Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
+        Me.pnlTop.Location = New System.Drawing.Point(0, 0)
+        Me.pnlTop.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.pnlTop.Name = "pnlTop"
+        Me.pnlTop.Size = New System.Drawing.Size(750, 77)
+        Me.pnlTop.TabIndex = 0
         '
-        'dtpFecha
+        'lblTitulo
         '
-        Me.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpFecha.Location = New System.Drawing.Point(23, 37)
-        Me.dtpFecha.Name = "dtpFecha"
-        Me.dtpFecha.Size = New System.Drawing.Size(120, 20)
+        Me.lblTitulo.AutoSize = True
+        Me.lblTitulo.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.lblTitulo.ForeColor = System.Drawing.Color.DimGray
+        Me.lblTitulo.Location = New System.Drawing.Point(18, 23)
+        Me.lblTitulo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblTitulo.Name = "lblTitulo"
+        Me.lblTitulo.Size = New System.Drawing.Size(230, 32)
+        Me.lblTitulo.TabIndex = 0
+        Me.lblTitulo.Text = "Detalle del Ingreso"
         '
-        'lblOrigen
+        'lblTipo
         '
-        Me.lblOrigen.AutoSize = True
-        Me.lblOrigen.Location = New System.Drawing.Point(160, 20)
-        Me.lblOrigen.Name = "lblOrigen"
-        Me.lblOrigen.Size = New System.Drawing.Size(148, 13)
-        Me.lblOrigen.Text = "Origen (¿De dónde viene?):"
-        '
-        'txtOrigen
-        '
-        Me.txtOrigen.Location = New System.Drawing.Point(163, 37)
-        Me.txtOrigen.Name = "txtOrigen"
-        Me.txtOrigen.Size = New System.Drawing.Size(240, 20)
-
-        ' 
-        ' lblTipo (NUEVO)
-        ' 
         Me.lblTipo.AutoSize = True
-        Me.lblTipo.Location = New System.Drawing.Point(20, 70)
+        Me.lblTipo.Location = New System.Drawing.Point(38, 108)
+        Me.lblTipo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTipo.Name = "lblTipo"
-        Me.lblTipo.Size = New System.Drawing.Size(31, 13)
+        Me.lblTipo.Size = New System.Drawing.Size(43, 20)
+        Me.lblTipo.TabIndex = 1
         Me.lblTipo.Text = "Tipo:"
-        ' 
-        ' cmbTipo (NUEVO)
-        ' 
+        '
+        'cmbTipo
+        '
         Me.cmbTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbTipo.FormattingEnabled = True
-        Me.cmbTipo.Location = New System.Drawing.Point(23, 86)
+        Me.cmbTipo.Location = New System.Drawing.Point(42, 132)
+        Me.cmbTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(120, 21)
-
+        Me.cmbTipo.Size = New System.Drawing.Size(298, 28)
+        Me.cmbTipo.TabIndex = 2
         '
-        'lblReferencia (MOVIDO A LA DERECHA)
+        'lblNumero
         '
-        Me.lblReferencia.AutoSize = True
-        Me.lblReferencia.Location = New System.Drawing.Point(160, 70)
-        Me.lblReferencia.Name = "lblReferencia"
-        Me.lblReferencia.Size = New System.Drawing.Size(125, 13)
-        Me.lblReferencia.Text = "Nro. / Referencia:"
+        Me.lblNumero.AutoSize = True
+        Me.lblNumero.Location = New System.Drawing.Point(375, 108)
+        Me.lblNumero.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblNumero.Name = "lblNumero"
+        Me.lblNumero.Size = New System.Drawing.Size(124, 20)
+        Me.lblNumero.TabIndex = 3
+        Me.lblNumero.Text = "Nro. Referencia:"
         '
-        'txtReferencia
+        'txtNumero
         '
-        Me.txtReferencia.Location = New System.Drawing.Point(163, 86)
-        Me.txtReferencia.Name = "txtReferencia"
-        Me.txtReferencia.Size = New System.Drawing.Size(240, 20)
+        Me.txtNumero.Location = New System.Drawing.Point(380, 134)
+        Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtNumero.Name = "txtNumero"
+        Me.txtNumero.Size = New System.Drawing.Size(298, 26)
+        Me.txtNumero.TabIndex = 4
         '
         'lblAsunto
         '
         Me.lblAsunto.AutoSize = True
-        Me.lblAsunto.Location = New System.Drawing.Point(20, 120) ' Bajamos un poco
+        Me.lblAsunto.Location = New System.Drawing.Point(38, 192)
+        Me.lblAsunto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblAsunto.Name = "lblAsunto"
-        Me.lblAsunto.Size = New System.Drawing.Size(43, 13)
-        Me.lblAsunto.Text = "Asunto / Descripción:"
+        Me.lblAsunto.Size = New System.Drawing.Size(64, 20)
+        Me.lblAsunto.TabIndex = 5
+        Me.lblAsunto.Text = "Asunto:"
         '
         'txtAsunto
         '
-        Me.txtAsunto.Location = New System.Drawing.Point(23, 137)
+        Me.txtAsunto.Location = New System.Drawing.Point(42, 217)
+        Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
-        Me.txtAsunto.Size = New System.Drawing.Size(380, 50)
+        Me.txtAsunto.Size = New System.Drawing.Size(636, 90)
+        Me.txtAsunto.TabIndex = 6
+        '
+        'grpVinculacion
+        '
+        Me.grpVinculacion.Controls.Add(Me.cmbRecluso)
+        Me.grpVinculacion.Controls.Add(Me.chkVincular)
+        Me.grpVinculacion.Location = New System.Drawing.Point(42, 338)
+        Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpVinculacion.Name = "grpVinculacion"
+        Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpVinculacion.Size = New System.Drawing.Size(638, 123)
+        Me.grpVinculacion.TabIndex = 7
+        Me.grpVinculacion.TabStop = False
+        Me.grpVinculacion.Text = "Asociación"
+        '
+        'cmbRecluso
+        '
+        Me.cmbRecluso.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.cmbRecluso.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.cmbRecluso.Enabled = False
+        Me.cmbRecluso.FormattingEnabled = True
+        Me.cmbRecluso.Location = New System.Drawing.Point(22, 69)
+        Me.cmbRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.cmbRecluso.Name = "cmbRecluso"
+        Me.cmbRecluso.Size = New System.Drawing.Size(583, 28)
+        Me.cmbRecluso.TabIndex = 1
         '
         'chkVincular
         '
         Me.chkVincular.AutoSize = True
-        Me.chkVincular.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkVincular.ForeColor = System.Drawing.Color.SteelBlue
-        Me.chkVincular.Location = New System.Drawing.Point(23, 200)
+        Me.chkVincular.Location = New System.Drawing.Point(22, 31)
+        Me.chkVincular.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkVincular.Name = "chkVincular"
-        Me.chkVincular.Size = New System.Drawing.Size(166, 17)
-        Me.chkVincular.Text = "¿Vincular a un Recluso?"
+        Me.chkVincular.Size = New System.Drawing.Size(185, 24)
+        Me.chkVincular.TabIndex = 0
+        Me.chkVincular.Text = "¿Vincular a Recluso?"
         Me.chkVincular.UseVisualStyleBackColor = True
         '
-        'txtBuscarRecluso
+        'grpArchivo
         '
-        Me.txtBuscarRecluso.BackColor = System.Drawing.Color.LemonChiffon
-        Me.txtBuscarRecluso.Enabled = False
-        Me.txtBuscarRecluso.ForeColor = System.Drawing.Color.Gray
-        Me.txtBuscarRecluso.Location = New System.Drawing.Point(23, 225)
-        Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(380, 20)
-        Me.txtBuscarRecluso.Text = "Escriba para buscar..."
+        Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
+        Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
+        Me.grpArchivo.Location = New System.Drawing.Point(42, 485)
+        Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpArchivo.Name = "grpArchivo"
+        Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpArchivo.Size = New System.Drawing.Size(638, 108)
+        Me.grpArchivo.TabIndex = 8
+        Me.grpArchivo.TabStop = False
+        Me.grpArchivo.Text = "Archivo Digital"
         '
-        'cmbReclusos
+        'lblArchivoNombre
         '
-        Me.cmbReclusos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cmbReclusos.Enabled = False
-        Me.cmbReclusos.FormattingEnabled = True
-        Me.cmbReclusos.Location = New System.Drawing.Point(23, 251)
-        Me.cmbReclusos.Name = "cmbReclusos"
-        Me.cmbReclusos.Size = New System.Drawing.Size(380, 21)
-        Me.cmbReclusos.MaxDropDownItems = 10
-        Me.cmbReclusos.IntegralHeight = False
+        Me.lblArchivoNombre.AutoSize = True
+        Me.lblArchivoNombre.ForeColor = System.Drawing.Color.DimGray
+        Me.lblArchivoNombre.Location = New System.Drawing.Point(195, 46)
+        Me.lblArchivoNombre.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblArchivoNombre.Name = "lblArchivoNombre"
+        Me.lblArchivoNombre.Size = New System.Drawing.Size(93, 20)
+        Me.lblArchivoNombre.TabIndex = 1
+        Me.lblArchivoNombre.Text = "Sin adjunto."
+        '
+        'btnAdjuntar
+        '
+        Me.btnAdjuntar.Location = New System.Drawing.Point(22, 38)
+        Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAdjuntar.Name = "btnAdjuntar"
+        Me.btnAdjuntar.Size = New System.Drawing.Size(150, 35)
+        Me.btnAdjuntar.TabIndex = 0
+        Me.btnAdjuntar.Text = "Examinar..."
+        Me.btnAdjuntar.UseVisualStyleBackColor = True
         '
         'btnGuardar
         '
         Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnGuardar.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(238, 300)
+        Me.btnGuardar.Location = New System.Drawing.Point(410, 615)
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(165, 40)
-        Me.btnGuardar.Text = "GUARDAR INGRESO"
+        Me.btnGuardar.Size = New System.Drawing.Size(270, 62)
+        Me.btnGuardar.TabIndex = 9
+        Me.btnGuardar.Text = "GUARDAR"
         Me.btnGuardar.UseVisualStyleBackColor = False
         '
         'btnCancelar
         '
-        Me.btnCancelar.Location = New System.Drawing.Point(23, 300)
+        Me.btnCancelar.Location = New System.Drawing.Point(42, 615)
+        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(100, 40)
+        Me.btnCancelar.Size = New System.Drawing.Size(150, 62)
+        Me.btnCancelar.TabIndex = 10
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.ForeColor = System.Drawing.Color.DimGray
-        Me.Label1.Location = New System.Drawing.Point(298, 201)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(105, 13)
-        Me.Label1.Text = "(Buscar por nombre)"
-        '
         'frmNuevoIngreso
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(434, 360) ' Un poco más alto
-        Me.Controls.Add(Me.Label1)
+        Me.ClientSize = New System.Drawing.Size(750, 709)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
-        Me.Controls.Add(Me.cmbReclusos)
-        Me.Controls.Add(Me.txtBuscarRecluso)
-        Me.Controls.Add(Me.chkVincular)
+        Me.Controls.Add(Me.grpArchivo)
+        Me.Controls.Add(Me.grpVinculacion)
         Me.Controls.Add(Me.txtAsunto)
         Me.Controls.Add(Me.lblAsunto)
-        Me.Controls.Add(Me.txtReferencia)
-        Me.Controls.Add(Me.lblReferencia)
-        Me.Controls.Add(Me.cmbTipo) ' NUEVO
-        Me.Controls.Add(Me.lblTipo) ' NUEVO
-        Me.Controls.Add(Me.txtOrigen)
-        Me.Controls.Add(Me.lblOrigen)
-        Me.Controls.Add(Me.dtpFecha)
-        Me.Controls.Add(Me.lblFecha)
+        Me.Controls.Add(Me.txtNumero)
+        Me.Controls.Add(Me.lblNumero)
+        Me.Controls.Add(Me.cmbTipo)
+        Me.Controls.Add(Me.lblTipo)
+        Me.Controls.Add(Me.pnlTop)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmNuevoIngreso"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Mesa de Entrada: Nuevo Registro"
+        Me.Text = "Gestión de Ingreso"
+        Me.pnlTop.ResumeLayout(False)
+        Me.pnlTop.PerformLayout()
+        Me.grpVinculacion.ResumeLayout(False)
+        Me.grpVinculacion.PerformLayout()
+        Me.grpArchivo.ResumeLayout(False)
+        Me.grpArchivo.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
 
-    Friend WithEvents lblFecha As System.Windows.Forms.Label
-    Friend WithEvents dtpFecha As System.Windows.Forms.DateTimePicker
-    Friend WithEvents lblOrigen As System.Windows.Forms.Label
-    Friend WithEvents txtOrigen As System.Windows.Forms.TextBox
-    Friend WithEvents lblReferencia As System.Windows.Forms.Label
-    Friend WithEvents txtReferencia As System.Windows.Forms.TextBox
-    Friend WithEvents lblAsunto As System.Windows.Forms.Label
-    Friend WithEvents txtAsunto As System.Windows.Forms.TextBox
-    Friend WithEvents chkVincular As System.Windows.Forms.CheckBox
-    Friend WithEvents txtBuscarRecluso As System.Windows.Forms.TextBox
-    Friend WithEvents cmbReclusos As System.Windows.Forms.ComboBox
-    Friend WithEvents btnGuardar As System.Windows.Forms.Button
-    Friend WithEvents btnCancelar As System.Windows.Forms.Button
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents pnlTop As System.Windows.Forms.Panel
+    Friend WithEvents lblTitulo As System.Windows.Forms.Label
     Friend WithEvents lblTipo As System.Windows.Forms.Label
     Friend WithEvents cmbTipo As System.Windows.Forms.ComboBox
+    Friend WithEvents lblNumero As System.Windows.Forms.Label
+    Friend WithEvents txtNumero As System.Windows.Forms.TextBox
+    Friend WithEvents lblAsunto As System.Windows.Forms.Label
+    Friend WithEvents txtAsunto As System.Windows.Forms.TextBox
+    Friend WithEvents grpVinculacion As System.Windows.Forms.GroupBox
+    Friend WithEvents chkVincular As System.Windows.Forms.CheckBox
+    Friend WithEvents cmbRecluso As System.Windows.Forms.ComboBox
+    Friend WithEvents grpArchivo As System.Windows.Forms.GroupBox
+    Friend WithEvents btnAdjuntar As System.Windows.Forms.Button
+    Friend WithEvents lblArchivoNombre As System.Windows.Forms.Label
+    Friend WithEvents btnGuardar As System.Windows.Forms.Button
+    Friend WithEvents btnCancelar As System.Windows.Forms.Button
 End Class
