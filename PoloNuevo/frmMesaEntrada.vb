@@ -1,9 +1,10 @@
-﻿Imports System.Drawing.Printing ' <--- IMPORTANTE: NECESARIO PARA IMPRIMIR
+﻿Imports System.IO
+Imports System.Drawing.Printing
 
 Public Class frmMesaEntrada
 
     ' =========================================================
-    ' VARIABLES PARA IMPRESIÓN
+    ' VARIABLES GLOBALES PARA IMPRESIÓN
     ' =========================================================
     Private _impReferencia As String
     Private _impAsunto As String
@@ -32,10 +33,12 @@ Public Class frmMesaEntrada
         Try
             Using db As New PoloNuevoEntities()
 
-                ' 1. Consulta Base: Solo documentos Físicos (.phy)
-                Dim query = db.Documentos.Where(Function(d) d.Extension = ".phy")
+                ' 1. CONSULTA BASE
+                ' Traemos TODO lo que NO sea una foto de perfil ("ARCHIVO")
+                ' Esto incluye los registros físicos (.phy) y los nuevos digitales (.pdf, .jpg)
+                Dim query = db.Documentos.Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' 2. Filtro Pendientes
+                ' 2. Filtro Pendientes (Documentos con Entrada pero sin Salida)
                 If chkPendientes.Checked Then
                     query = query.Where(Function(d) d.MovimientosDocumentos.Count() = 1)
                 End If
@@ -46,6 +49,7 @@ Public Class frmMesaEntrada
                     Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
                     For Each palabra In palabras
                         Dim termino = palabra
+                        ' Busca en Referencia, Tipo, Descripción (Asunto) y Nombre del Recluso
                         query = query.Where(Function(d) d.ReferenciaExterna.Contains(termino) Or
                                                         d.TiposDocumento.Nombre.Contains(termino) Or
                                                         d.Descripcion.Contains(termino) Or
@@ -68,7 +72,8 @@ Public Class frmMesaEntrada
                                      .Referencia = d.TiposDocumento.Nombre & " " & d.ReferenciaExterna,
                                      .Asunto = d.Descripcion,
                                      .Recluso = If(d.Reclusos IsNot Nothing, d.Reclusos.Nombre, "Sin Vincular"),
-                                     .Estado = If(d.MovimientosDocumentos.Count() = 1, "PENDIENTE", "MOVIDO")
+                                     .Estado = If(d.MovimientosDocumentos.Count() = 1, "PENDIENTE", "MOVIDO"),
+                                     .Digital = If(d.Extension <> ".phy", "SI", "NO") ' Para saber si tiene adjunto
                                  }) _
                                  .Take(200) _
                                  .ToList()
@@ -81,6 +86,7 @@ Public Class frmMesaEntrada
                 ConfigurarColumnas()
                 ColorearPendientes()
 
+                ' Limpiar detalles si la lista quedó vacía
                 If lista.Count = 0 Then dgvMovimientos.DataSource = Nothing
             End Using
         Catch ex As Exception
@@ -111,6 +117,12 @@ Public Class frmMesaEntrada
                 .Columns("Recluso").Width = 180
             End If
 
+            If .Columns("Digital") IsNot Nothing Then
+                .Columns("Digital").Width = 50
+                .Columns("Digital").HeaderText = "Dig."
+                .Columns("Digital").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            End If
+
             If .Columns("Estado") IsNot Nothing Then
                 .Columns("Estado").Width = 90
                 .Columns("Estado").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
@@ -127,9 +139,15 @@ Public Class frmMesaEntrada
         If dgvMesa.Columns("Estado") Is Nothing Then Return
 
         For Each row As DataGridViewRow In dgvMesa.Rows
+            ' PENDIENTES EN ROJO
             If row.Cells("Estado").Value.ToString() = "PENDIENTE" Then
                 row.DefaultCellStyle.ForeColor = Color.DarkRed
                 row.DefaultCellStyle.BackColor = Color.MistyRose
+            End If
+            ' DIGITALES EN AZULITO (Opcional, para destacar)
+            If dgvMesa.Columns("Digital") IsNot Nothing AndAlso row.Cells("Digital").Value.ToString() = "SI" Then
+                row.Cells("Digital").Style.ForeColor = Color.Blue
+                row.Cells("Digital").Style.Font = New Font("Segoe UI", 8, FontStyle.Bold)
             End If
         Next
     End Sub
@@ -226,13 +244,50 @@ Public Class frmMesaEntrada
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
 
-        Dim frm As New frmNuevoIngreso(idDoc)
-        If frm.ShowDialog() = DialogResult.OK Then
-            CargarMesa()
-            CargarHistorial(idDoc)
-        End If
+        ' Reutilizamos el formulario de Ingreso pero pasándole ID (necesitarás adaptar su constructor si quieres editar)
+        ' Por ahora, asumimos que solo abre nuevo o podrías crear frmEditarIngreso
+        MessageBox.Show("Funcionalidad de Edición Completa pendiente de implementar en frmNuevoIngreso.", "Aviso")
     End Sub
 
+    ' =========================================================
+    ' DIGITALIZACIÓN (VER DOCUMENTO)
+    ' =========================================================
+    Private Sub btnVerDigital_Click(sender As Object, e As EventArgs) Handles btnVerDigital.Click
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+
+        Try
+            Using db As New PoloNuevoEntities()
+                Dim doc = db.Documentos.Find(idDoc)
+
+                If doc IsNot Nothing AndAlso doc.Contenido IsNot Nothing AndAlso doc.Contenido.Length > 0 Then
+
+                    ' 1. Crear ruta temporal segura
+                    Dim extension As String = If(String.IsNullOrEmpty(doc.Extension), ".dat", doc.Extension)
+                    Dim tempPath As String = Path.Combine(Path.GetTempPath(), "Doc_" & doc.Id & extension)
+
+                    ' 2. Escribir el archivo
+                    File.WriteAllBytes(tempPath, doc.Contenido)
+
+                    ' 3. Abrir con programa predeterminado
+                    Process.Start(tempPath)
+
+                Else
+                    MessageBox.Show("Este es un registro físico histórico. No tiene archivo digital adjunto.", "Sin Adjunto", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("No se pudo abrir el archivo: " & ex.Message)
+        End Try
+    End Sub
+
+    ' =========================================================
+    ' CORRECCIÓN DE MOVIMIENTOS
+    ' =========================================================
     Private Sub EditarMovimiento()
         If dgvMovimientos.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione una línea del historial abajo.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -258,41 +313,36 @@ Public Class frmMesaEntrada
     End Sub
 
     ' =========================================================
-    ' LÓGICA DE IMPRESIÓN (RECIBOS / PASES)
+    ' IMPRESIÓN (RECIBO DE PASE)
     ' =========================================================
     Private Sub btnImprimirRecibo_Click(sender As Object, e As EventArgs) Handles btnImprimirRecibo.Click
-        ' 1. Validar
         If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione un documento de la lista principal.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
-        ' 2. Capturar datos del Documento
+        ' Capturar Datos Doc
         Dim row = dgvMesa.SelectedRows(0)
         _impReferencia = row.Cells("Referencia").Value.ToString()
         _impAsunto = row.Cells("Asunto").Value.ToString()
 
-        ' 3. Capturar datos del Movimiento (intentamos imprimir el seleccionado abajo, o el último)
+        ' Capturar Datos Movimiento (Seleccionado o Último)
         If dgvMovimientos.Rows.Count > 0 Then
             Dim rowMov As DataGridViewRow
             If dgvMovimientos.SelectedRows.Count > 0 Then
                 rowMov = dgvMovimientos.SelectedRows(0)
             Else
-                ' Si no hay seleccionado abajo, tomamos el último
                 rowMov = dgvMovimientos.Rows(dgvMovimientos.Rows.Count - 1)
             End If
-
             _impFecha = rowMov.Cells("Fecha").Value.ToString()
             _impOrigen = rowMov.Cells("Origen").Value.ToString()
             _impDestino = rowMov.Cells("Destino").Value.ToString()
         Else
-            ' Caso raro: Documento sin movimientos
             _impFecha = DateTime.Now.ToString()
             _impOrigen = "SIN DATOS"
             _impDestino = "SIN DATOS"
         End If
 
-        ' 4. Imprimir
         If PrintDialog1.ShowDialog() = DialogResult.OK Then
             PrintDocument1.Print()
         End If
@@ -309,7 +359,7 @@ Public Class frmMesaEntrada
         Dim margenIzq As Integer = 50
         Dim y As Integer = 50
 
-        ' --- ENCABEZADO ---
+        ' ENCABEZADO
         g.DrawString("UNIDAD N° 4 - SANTIAGO VÁZQUEZ", fuenteTitulo, pincel, margenIzq, y)
         y += 30
         g.DrawString("CONSTANCIA DE PASE / MOVIMIENTO", fuenteSub, pincel, margenIzq, y)
@@ -317,7 +367,7 @@ Public Class frmMesaEntrada
         g.DrawLine(Pens.Black, margenIzq, y + 20, 750, y + 20)
         y += 40
 
-        ' --- DATOS DEL DOCUMENTO ---
+        ' DATOS DOC
         g.DrawString("DOCUMENTO: " & _impReferencia, fuenteSub, pincel, margenIzq, y)
         y += 25
         g.DrawString("ASUNTO: ", fuenteNormal, pincel, margenIzq, y)
@@ -329,7 +379,7 @@ Public Class frmMesaEntrada
         g.DrawLine(Pens.Gray, margenIzq, y, 750, y)
         y += 20
 
-        ' --- DETALLES DEL PASE ---
+        ' DATOS MOV
         g.DrawString("FECHA MOVIMIENTO: " & _impFecha, fuenteNormal, pincel, margenIzq, y)
         y += 30
         g.DrawString("ORIGEN: " & _impOrigen, fuenteNormal, pincel, margenIzq, y)
@@ -337,15 +387,14 @@ Public Class frmMesaEntrada
         g.DrawString("DESTINO: " & _impDestino, fuenteSub, pincel, margenIzq, y)
         y += 50
 
-        ' --- TALÓN DE FIRMA ---
+        ' FIRMA
         Dim rectFirma As New Rectangle(margenIzq, y, 700, 150)
         g.DrawRectangle(Pens.Black, rectFirma)
-
         g.DrawString("RECIBIDO POR:", fuenteNormal, pincel, margenIzq + 10, y + 10)
         g.DrawString("FIRMA Y ACLARACIÓN:", fuenteNormal, pincel, margenIzq + 10, y + 100)
         g.DrawString("FECHA: ______ / ______ / ___________", fuenteNormal, pincel, margenIzq + 400, y + 100)
 
-        ' --- PIE ---
+        ' PIE
         y += 170
         g.DrawString("Emitido por Sistema POLO el " & DateTime.Now.ToString(), fuenteChica, Brushes.Gray, margenIzq, y)
         g.DrawString("Operador: " & _impUsuario, fuenteChica, Brushes.Gray, margenIzq, y + 15)

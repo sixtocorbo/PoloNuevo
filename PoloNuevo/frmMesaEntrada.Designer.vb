@@ -19,6 +19,7 @@ Partial Class frmMesaEntrada
     Private Sub InitializeComponent()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.btnVerDigital = New System.Windows.Forms.Button()
         Me.btnImprimirRecibo = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.grpFiltros = New System.Windows.Forms.GroupBox()
@@ -53,6 +54,7 @@ Partial Class frmMesaEntrada
         'pnlTop
         '
         Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.btnVerDigital)
         Me.pnlTop.Controls.Add(Me.btnImprimirRecibo)
         Me.pnlTop.Controls.Add(Me.btnEditar)
         Me.pnlTop.Controls.Add(Me.grpFiltros)
@@ -66,6 +68,21 @@ Partial Class frmMesaEntrada
         Me.pnlTop.Size = New System.Drawing.Size(1512, 185)
         Me.pnlTop.TabIndex = 0
         '
+        'btnVerDigital
+        '
+        Me.btnVerDigital.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVerDigital.BackColor = System.Drawing.Color.SteelBlue
+        Me.btnVerDigital.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnVerDigital.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnVerDigital.ForeColor = System.Drawing.Color.White
+        Me.btnVerDigital.Location = New System.Drawing.Point(280, 18)
+        Me.btnVerDigital.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVerDigital.Name = "btnVerDigital"
+        Me.btnVerDigital.Size = New System.Drawing.Size(210, 54)
+        Me.btnVerDigital.TabIndex = 6
+        Me.btnVerDigital.Text = "👁 VER DIGITAL"
+        Me.btnVerDigital.UseVisualStyleBackColor = False
+        '
         'btnImprimirRecibo
         '
         Me.btnImprimirRecibo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -73,7 +90,7 @@ Partial Class frmMesaEntrada
         Me.btnImprimirRecibo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnImprimirRecibo.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnImprimirRecibo.ForeColor = System.Drawing.Color.White
-        Me.btnImprimirRecibo.Location = New System.Drawing.Point(502, 18)
+        Me.btnImprimirRecibo.Location = New System.Drawing.Point(500, 18)
         Me.btnImprimirRecibo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImprimirRecibo.Name = "btnImprimirRecibo"
         Me.btnImprimirRecibo.Size = New System.Drawing.Size(210, 54)
@@ -204,7 +221,7 @@ Partial Class frmMesaEntrada
         Me.btnPase.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPase.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnPase.ForeColor = System.Drawing.Color.White
-        Me.btnPase.Location = New System.Drawing.Point(939, 18)
+        Me.btnPase.Location = New System.Drawing.Point(940, 18)
         Me.btnPase.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnPase.Name = "btnPase"
         Me.btnPase.Size = New System.Drawing.Size(270, 54)
@@ -335,9 +352,6 @@ Partial Class frmMesaEntrada
         Me.lblHistorial.TabIndex = 2
         Me.lblHistorial.Text = "Historial de Movimientos (Trazabilidad)"
         '
-        'PrintDocument1
-        '
-        '
         'PrintDialog1
         '
         Me.PrintDialog1.UseEXDialog = True
@@ -388,6 +402,7 @@ Partial Class frmMesaEntrada
     Friend WithEvents chkPendientes As System.Windows.Forms.CheckBox
     Friend WithEvents btnCorregirMov As System.Windows.Forms.Button
     Friend WithEvents btnImprimirRecibo As System.Windows.Forms.Button
+    Friend WithEvents btnVerDigital As System.Windows.Forms.Button
     Friend WithEvents PrintDocument1 As System.Drawing.Printing.PrintDocument
     Friend WithEvents PrintDialog1 As System.Windows.Forms.PrintDialog
 End Class
