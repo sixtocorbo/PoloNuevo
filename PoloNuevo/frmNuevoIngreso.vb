@@ -32,6 +32,7 @@ Public Class frmNuevoIngreso
 
     Public Sub New(idDocumento As Integer)
         InitializeComponent()
+        ApplyModernUi()
         _idDocumentoEditar = idDocumento
         Me.Text = "Editar / Detalle de Documento"
         btnGuardar.Text = "GUARDAR CAMBIOS"
@@ -227,5 +228,96 @@ Public Class frmNuevoIngreso
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         Me.Close()
     End Sub
+    Private Sub ApplyModernUi()
+        ' --- Form base ---
+        Me.SuspendLayout()
+        Me.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point)
+        Me.BackColor = Color.White
+        Me.DoubleBuffered = True
 
+        ' Si querés que “respire” más (opcional)
+        Me.Padding = New Padding(16)
+
+        ' Si querés que se adapte mejor a distintas pantallas (recomendado)
+        Me.FormBorderStyle = FormBorderStyle.Sizable
+        Me.MaximizeBox = False
+        Me.MinimumSize = New Size(780, 820)
+
+        Me.AcceptButton = btnGuardar
+        Me.CancelButton = btnCancelar
+
+        ' --- Top bar ---
+        pnlTop.BackColor = Color.FromArgb(245, 246, 248)
+        pnlTop.Padding = New Padding(16, 16, 16, 12)
+        pnlTop.Height = 64
+
+        lblTitulo.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold, GraphicsUnit.Point)
+        lblTitulo.ForeColor = Color.FromArgb(55, 55, 55)
+
+        ' --- Labels ---
+        For Each lbl In New Label() {lblTipo, lblNumero, lblAsunto}
+            lbl.ForeColor = Color.FromArgb(70, 70, 70)
+        Next
+
+        ' --- Inputs (bordes + anclajes) ---
+        cmbTipo.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        txtNumero.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        txtAsunto.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+
+        txtNumero.BorderStyle = BorderStyle.FixedSingle
+        txtAsunto.BorderStyle = BorderStyle.FixedSingle
+        txtBuscarRecluso.BorderStyle = BorderStyle.FixedSingle
+
+        ' --- GroupBoxes ---
+        StyleGroupBox(grpVinculacion)
+        StyleGroupBox(grpArchivo)
+
+        ' --- Vinculación: que “llene” y no quede enano ---
+        lstReclusos.BorderStyle = BorderStyle.FixedSingle
+        lstReclusos.IntegralHeight = False
+        lstReclusos.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
+
+        txtBuscarRecluso.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+
+        ' --- Archivo ---
+        btnAdjuntar.FlatStyle = FlatStyle.Flat
+        btnAdjuntar.FlatAppearance.BorderSize = 1
+        btnAdjuntar.FlatAppearance.BorderColor = Color.FromArgb(210, 210, 210)
+        btnAdjuntar.BackColor = Color.White
+        btnAdjuntar.ForeColor = Color.FromArgb(60, 60, 60)
+        btnAdjuntar.Cursor = Cursors.Hand
+
+        lblArchivoNombre.ForeColor = Color.FromArgb(110, 110, 110)
+
+        ' --- Botones ---
+        StylePrimaryButton(btnGuardar)
+        StyleSecondaryButton(btnCancelar)
+
+        Me.ResumeLayout(True)
+    End Sub
+
+    Private Sub StyleGroupBox(g As GroupBox)
+        g.ForeColor = Color.FromArgb(70, 70, 70)
+        ' Hace que el texto del GroupBox no “muerda” el contenido
+        g.Padding = New Padding(10, 26, 10, 10)
+    End Sub
+
+    Private Sub StylePrimaryButton(b As Button)
+        b.FlatStyle = FlatStyle.Flat
+        b.FlatAppearance.BorderSize = 0
+        b.BackColor = Color.FromArgb(46, 125, 50) ' verde prolijo
+        b.ForeColor = Color.White
+        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold, GraphicsUnit.Point)
+        b.Cursor = Cursors.Hand
+    End Sub
+
+    Private Sub StyleSecondaryButton(b As Button)
+        b.FlatStyle = FlatStyle.Flat
+        b.FlatAppearance.BorderSize = 1
+        b.FlatAppearance.BorderColor = Color.FromArgb(210, 210, 210)
+        b.BackColor = Color.White
+        b.ForeColor = Color.FromArgb(60, 60, 60)
+        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Regular, GraphicsUnit.Point)
+        b.Cursor = Cursors.Hand
+    End Sub
 End Class
