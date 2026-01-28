@@ -199,9 +199,9 @@ Public Class frmMesaEntrada
                               .OrderBy(Function(m) m.FechaMovimiento) _
                               .Select(Function(m) New With {
                                   .IdMov = m.Id,
-                                  .FechaMovimiento = m.FechaMovimiento,
+                                  .Fecha = m.FechaMovimiento,
                                   .Origen = m.Origen,
-                                  .MovidoA = m.Destino,
+                                  .Destino = If(String.IsNullOrWhiteSpace(m.Destino), "SIN DESTINO", m.Destino),
                                   .Tipo = If(m.EsSalida,
                                              "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
                                              "ENTRADA / PASE")
@@ -211,14 +211,14 @@ Public Class frmMesaEntrada
             dgvMovimientos.DataSource = historial
 
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
-            If dgvMovimientos.Columns("FechaMovimiento") IsNot Nothing Then
-                dgvMovimientos.Columns("FechaMovimiento").HeaderText = "Fecha mov."
-                dgvMovimientos.Columns("FechaMovimiento").Width = 120
-                dgvMovimientos.Columns("FechaMovimiento").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            If dgvMovimientos.Columns("Fecha") IsNot Nothing Then
+                dgvMovimientos.Columns("Fecha").HeaderText = "Fecha mov."
+                dgvMovimientos.Columns("Fecha").Width = 120
+                dgvMovimientos.Columns("Fecha").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
-            If dgvMovimientos.Columns("MovidoA") IsNot Nothing Then
-                dgvMovimientos.Columns("MovidoA").HeaderText = "Movido a"
-                dgvMovimientos.Columns("MovidoA").Width = 180
+            If dgvMovimientos.Columns("Destino") IsNot Nothing Then
+                dgvMovimientos.Columns("Destino").HeaderText = "Destino"
+                dgvMovimientos.Columns("Destino").Width = 180
             End If
             If dgvMovimientos.Columns("Tipo") IsNot Nothing Then dgvMovimientos.Columns("Tipo").Width = 300
         End Using
@@ -355,9 +355,9 @@ Public Class frmMesaEntrada
             Else
                 rowMov = dgvMovimientos.Rows(dgvMovimientos.Rows.Count - 1)
             End If
-            _impFecha = rowMov.Cells("FechaMovimiento").Value.ToString()
+            _impFecha = rowMov.Cells("Fecha").Value.ToString()
             _impOrigen = rowMov.Cells("Origen").Value.ToString()
-            _impDestino = rowMov.Cells("MovidoA").Value.ToString()
+            _impDestino = rowMov.Cells("Destino").Value.ToString()
         Else
             _impFecha = DateTime.Now.ToString()
             _impOrigen = "SIN DATOS"
