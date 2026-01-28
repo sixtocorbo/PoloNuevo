@@ -201,7 +201,7 @@ Public Class frmMesaEntrada
                                   .IdMov = m.Id,
                                   .Fecha = m.FechaMovimiento,
                                   .Origen = m.Origen,
-                                  .Destino = If(String.IsNullOrWhiteSpace(m.Destino), "SIN DESTINO", m.Destino),
+                                  .Destino = If(m.Destino Is Nothing OrElse m.Destino = "", "SIN DESTINO", m.Destino),
                                   .Tipo = If(m.EsSalida,
                                              "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
                                              "ENTRADA / PASE")
