@@ -74,6 +74,7 @@ Partial Class frmNuevoIngreso
         '
         'cmbTipo
         '
+        Me.cmbTipo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmbTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbTipo.FormattingEnabled = True
         Me.cmbTipo.Location = New System.Drawing.Point(42, 132)
@@ -94,6 +95,7 @@ Partial Class frmNuevoIngreso
         '
         'txtNumero
         '
+        Me.txtNumero.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNumero.Location = New System.Drawing.Point(380, 134)
         Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNumero.Name = "txtNumero"
@@ -112,6 +114,8 @@ Partial Class frmNuevoIngreso
         '
         'txtAsunto
         '
+        Me.txtAsunto.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtAsunto.Location = New System.Drawing.Point(42, 217)
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
@@ -121,6 +125,8 @@ Partial Class frmNuevoIngreso
         '
         'grpVinculacion
         '
+        Me.grpVinculacion.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpVinculacion.Controls.Add(Me.lstReclusos)
         Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
         Me.grpVinculacion.Controls.Add(Me.chkVincular)
@@ -135,6 +141,8 @@ Partial Class frmNuevoIngreso
         '
         'txtBuscarRecluso
         '
+        Me.txtBuscarRecluso.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBuscarRecluso.Enabled = False
         Me.txtBuscarRecluso.Location = New System.Drawing.Point(22, 69)
         Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -144,6 +152,8 @@ Partial Class frmNuevoIngreso
         '
         'lstReclusos
         '
+        Me.lstReclusos.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstReclusos.Enabled = False
         Me.lstReclusos.FormattingEnabled = True
         Me.lstReclusos.ItemHeight = 20
@@ -166,6 +176,8 @@ Partial Class frmNuevoIngreso
         '
         'grpArchivo
         '
+        Me.grpArchivo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
         Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
         Me.grpArchivo.Location = New System.Drawing.Point(42, 548)
@@ -200,6 +212,7 @@ Partial Class frmNuevoIngreso
         '
         'btnGuardar
         '
+        Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -214,6 +227,7 @@ Partial Class frmNuevoIngreso
         '
         'btnCancelar
         '
+        Me.btnCancelar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancelar.Location = New System.Drawing.Point(42, 680)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
@@ -226,6 +240,7 @@ Partial Class frmNuevoIngreso
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScroll = True
         Me.ClientSize = New System.Drawing.Size(750, 775)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
