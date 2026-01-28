@@ -65,28 +65,37 @@ Public Class frmNuevoIngreso
                                         .OrderBy(Function(r) r.Texto) _
                          .ToList()
 
-            ActualizarComboReclusos(_listaCompletaReclusos)
+            ActualizarListaReclusos(_listaCompletaReclusos)
         End Using
     End Sub
 
-    ' Método para refrescar el DataSource del combo sin perder el foco
-    Private Sub ActualizarComboReclusos(items As List(Of ReclusoItem))
-        cmbRecluso.DataSource = Nothing
-        cmbRecluso.DataSource = items
-        cmbRecluso.DisplayMember = "Texto"
-        cmbRecluso.ValueMember = "Id"
-        cmbRecluso.SelectedIndex = -1
+    ' Método para refrescar el DataSource de la lista sin perder el foco
+    Private Sub ActualizarListaReclusos(items As List(Of ReclusoItem), Optional selectedId As Integer? = Nothing)
+        lstReclusos.DataSource = Nothing
+        lstReclusos.DataSource = items
+        lstReclusos.DisplayMember = "Texto"
+        lstReclusos.ValueMember = "Id"
+        If selectedId.HasValue Then
+            lstReclusos.SelectedValue = selectedId.Value
+        Else
+            lstReclusos.SelectedIndex = -1
+        End If
     End Sub
 
     ' =========================================================
     ' LÓGICA DEL BUSCADOR TIPO GOOGLE
     ' =========================================================
-    Private Sub cmbRecluso_TextUpdate(sender As Object, e As EventArgs) Handles cmbRecluso.TextUpdate
-        Dim textoBusqueda As String = cmbRecluso.Text.ToLower()
+    Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
+        Dim textoBusqueda As String = txtBuscarRecluso.Text.Trim().ToLower()
+        Dim selectedId As Integer? = Nothing
+
+        If lstReclusos.SelectedValue IsNot Nothing Then
+            selectedId = Convert.ToInt32(lstReclusos.SelectedValue)
+        End If
 
         ' Si no hay texto, mostramos todo
         If String.IsNullOrWhiteSpace(textoBusqueda) Then
-            ActualizarComboReclusos(_listaCompletaReclusos)
+            ActualizarListaReclusos(_listaCompletaReclusos, selectedId)
         Else
             ' Lógica Google: separar por espacios y verificar que el ítem contenga TODAS las palabras
             Dim palabras = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
@@ -95,14 +104,7 @@ Public Class frmNuevoIngreso
                                                              Return palabras.All(Function(p) r.Texto.ToLower().Contains(p))
                                                          End Function).ToList()
 
-            ' Actualizar ítems manteniendo el texto que el usuario está escribiendo
-            cmbRecluso.DataSource = filtrados
-            cmbRecluso.DisplayMember = "Texto"
-            cmbRecluso.ValueMember = "Id"
-
-            cmbRecluso.Text = textoBusqueda
-            cmbRecluso.SelectionStart = textoBusqueda.Length
-            cmbRecluso.DroppedDown = True
+            ActualizarListaReclusos(filtrados, selectedId)
         End If
     End Sub
 
@@ -120,11 +122,13 @@ Public Class frmNuevoIngreso
 
                     If doc.ReclusoId.HasValue Then
                         chkVincular.Checked = True
-                        cmbRecluso.Enabled = True
-                        cmbRecluso.SelectedValue = doc.ReclusoId.Value
+                        txtBuscarRecluso.Enabled = True
+                        lstReclusos.Enabled = True
+                        ActualizarListaReclusos(_listaCompletaReclusos, doc.ReclusoId.Value)
                     Else
                         chkVincular.Checked = False
-                        cmbRecluso.Enabled = False
+                        txtBuscarRecluso.Enabled = False
+                        lstReclusos.Enabled = False
                     End If
 
                     If doc.Extension <> ".phy" Then
@@ -142,8 +146,12 @@ Public Class frmNuevoIngreso
     End Sub
 
     Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
-        cmbRecluso.Enabled = chkVincular.Checked
-        If Not chkVincular.Checked Then cmbRecluso.SelectedIndex = -1
+        txtBuscarRecluso.Enabled = chkVincular.Checked
+        lstReclusos.Enabled = chkVincular.Checked
+        If Not chkVincular.Checked Then
+            txtBuscarRecluso.Text = ""
+            ActualizarListaReclusos(_listaCompletaReclusos)
+        End If
     End Sub
 
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
@@ -180,8 +188,8 @@ Public Class frmNuevoIngreso
                 doc.ReferenciaExterna = txtNumero.Text.Trim()
                 doc.Descripcion = txtAsunto.Text.Trim()
 
-                If chkVincular.Checked And cmbRecluso.SelectedValue IsNot Nothing Then
-                    doc.ReclusoId = Convert.ToInt32(cmbRecluso.SelectedValue)
+                If chkVincular.Checked And lstReclusos.SelectedValue IsNot Nothing Then
+                    doc.ReclusoId = Convert.ToInt32(lstReclusos.SelectedValue)
                 Else
                     doc.ReclusoId = Nothing
                 End If
