@@ -199,28 +199,34 @@ Public Class frmMesaEntrada
                               .OrderBy(Function(m) m.FechaMovimiento) _
                               .Select(Function(m) New With {
                                   .IdMov = m.Id,
-                                  .Fecha = m.FechaMovimiento,
                                   .Origen = m.Origen,
-                                  .Destino = If(m.Destino Is Nothing OrElse m.Destino = "", "SIN DESTINO", m.Destino),
                                   .Tipo = If(m.EsSalida,
                                              "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
-                                             "ENTRADA / PASE")
+                                             "ENTRADA / PASE"),
+                                  .Destino = If(m.Destino Is Nothing OrElse m.Destino = "", "SIN DESTINO", m.Destino),
+                                  .Fecha = m.FechaMovimiento
                               }) _
                               .ToList()
 
             dgvMovimientos.DataSource = historial
 
+            ' Configuración visual de las columnas (ajustada al nuevo orden)
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
+
+            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then
+                dgvMovimientos.Columns("Tipo").Width = 300
+            End If
+
+            If dgvMovimientos.Columns("Destino") IsNot Nothing Then
+                dgvMovimientos.Columns("Destino").HeaderText = "Destino"
+                dgvMovimientos.Columns("Destino").Width = 180
+            End If
+
             If dgvMovimientos.Columns("Fecha") IsNot Nothing Then
                 dgvMovimientos.Columns("Fecha").HeaderText = "Fecha mov."
                 dgvMovimientos.Columns("Fecha").Width = 120
                 dgvMovimientos.Columns("Fecha").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
-            If dgvMovimientos.Columns("Destino") IsNot Nothing Then
-                dgvMovimientos.Columns("Destino").HeaderText = "Destino"
-                dgvMovimientos.Columns("Destino").Width = 180
-            End If
-            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then dgvMovimientos.Columns("Tipo").Width = 300
         End Using
     End Sub
 
