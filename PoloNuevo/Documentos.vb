@@ -20,6 +20,7 @@ Partial Public Class Documentos
     Public Property Extension As String
     Public Property FechaCarga As Nullable(Of Date)
     Public Property ReferenciaExterna As String
+    Public Property FechaVencimiento As Nullable(Of Date)
 
     Public Overridable Property Reclusos As Reclusos
     Public Overridable Property TiposDocumento As TiposDocumento

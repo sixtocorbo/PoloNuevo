@@ -34,6 +34,10 @@ Partial Class frmNuevoIngreso
         Me.btnAdjuntar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
+        ' --- NUEVOS CONTROLES ---
+        Me.chkVencimiento = New System.Windows.Forms.CheckBox()
+        Me.dtpVencimiento = New System.Windows.Forms.DateTimePicker()
+
         Me.pnlTop.SuspendLayout()
         Me.grpVinculacion.SuspendLayout()
         Me.grpArchivo.SuspendLayout()
@@ -123,6 +127,27 @@ Partial Class frmNuevoIngreso
         Me.txtAsunto.Size = New System.Drawing.Size(636, 90)
         Me.txtAsunto.TabIndex = 6
         '
+        ' --- NUEVO: CHECKBOX VENCIMIENTO ---
+        '
+        Me.chkVencimiento.AutoSize = True
+        Me.chkVencimiento.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.chkVencimiento.ForeColor = System.Drawing.Color.DarkOrange
+        Me.chkVencimiento.Location = New System.Drawing.Point(42, 320)
+        Me.chkVencimiento.Name = "chkVencimiento"
+        Me.chkVencimiento.Size = New System.Drawing.Size(320, 29)
+        Me.chkVencimiento.TabIndex = 7
+        Me.chkVencimiento.Text = "¿Requiere Respuesta / Vence?"
+        Me.chkVencimiento.UseVisualStyleBackColor = True
+        '
+        ' --- NUEVO: DATEPICKER VENCIMIENTO ---
+        '
+        Me.dtpVencimiento.Format = System.Windows.Forms.DateTimePickerFormat.Short
+        Me.dtpVencimiento.Location = New System.Drawing.Point(350, 318)
+        Me.dtpVencimiento.Name = "dtpVencimiento"
+        Me.dtpVencimiento.Size = New System.Drawing.Size(150, 26)
+        Me.dtpVencimiento.TabIndex = 8
+        Me.dtpVencimiento.Visible = False ' Oculto por defecto
+        '
         'grpVinculacion
         '
         Me.grpVinculacion.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -130,12 +155,13 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.Controls.Add(Me.lstReclusos)
         Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
         Me.grpVinculacion.Controls.Add(Me.chkVincular)
-        Me.grpVinculacion.Location = New System.Drawing.Point(42, 338)
+        ' Ajustamos un poco la posición Y para que entre lo nuevo
+        Me.grpVinculacion.Location = New System.Drawing.Point(42, 360)
         Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Name = "grpVinculacion"
         Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Size = New System.Drawing.Size(638, 190)
-        Me.grpVinculacion.TabIndex = 7
+        Me.grpVinculacion.TabIndex = 9
         Me.grpVinculacion.TabStop = False
         Me.grpVinculacion.Text = "Asociación"
         '
@@ -180,12 +206,12 @@ Partial Class frmNuevoIngreso
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
         Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
-        Me.grpArchivo.Location = New System.Drawing.Point(42, 548)
+        Me.grpArchivo.Location = New System.Drawing.Point(42, 560) ' Bajamos un poco Y
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Size = New System.Drawing.Size(638, 108)
-        Me.grpArchivo.TabIndex = 8
+        Me.grpArchivo.TabIndex = 10
         Me.grpArchivo.TabStop = False
         Me.grpArchivo.Text = "Archivo Digital"
         '
@@ -217,22 +243,22 @@ Partial Class frmNuevoIngreso
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(410, 680)
+        Me.btnGuardar.Location = New System.Drawing.Point(410, 690)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(270, 62)
-        Me.btnGuardar.TabIndex = 9
+        Me.btnGuardar.TabIndex = 11
         Me.btnGuardar.Text = "GUARDAR"
         Me.btnGuardar.UseVisualStyleBackColor = False
         '
         'btnCancelar
         '
         Me.btnCancelar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCancelar.Location = New System.Drawing.Point(42, 680)
+        Me.btnCancelar.Location = New System.Drawing.Point(42, 690)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(150, 62)
-        Me.btnCancelar.TabIndex = 10
+        Me.btnCancelar.TabIndex = 12
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
         '
@@ -241,7 +267,10 @@ Partial Class frmNuevoIngreso
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(750, 775)
+        Me.ClientSize = New System.Drawing.Size(750, 780)
+        ' AGREGAMOS LOS CONTROLES AL FORMULARIO
+        Me.Controls.Add(Me.dtpVencimiento)
+        Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
         Me.Controls.Add(Me.grpArchivo)
@@ -288,4 +317,7 @@ Partial Class frmNuevoIngreso
     Friend WithEvents lblArchivoNombre As System.Windows.Forms.Label
     Friend WithEvents btnGuardar As System.Windows.Forms.Button
     Friend WithEvents btnCancelar As System.Windows.Forms.Button
+    ' Declaraciones de los nuevos controles
+    Friend WithEvents chkVencimiento As System.Windows.Forms.CheckBox
+    Friend WithEvents dtpVencimiento As System.Windows.Forms.DateTimePicker
 End Class

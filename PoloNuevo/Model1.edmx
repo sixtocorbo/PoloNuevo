@@ -67,6 +67,7 @@
           <Property Name="Extension" Type="nvarchar" MaxLength="10" />
           <Property Name="FechaCarga" Type="datetime" />
           <Property Name="ReferenciaExterna" Type="nvarchar" MaxLength="100" />
+          <Property Name="FechaVencimiento" Type="datetime" />
         </EntityType>
         <EntityType Name="Estados">
           <Key>
@@ -773,6 +774,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <NavigationProperty Name="Reclusos" Relationship="Self.FK_Documentos_Reclusos" FromRole="Documentos" ToRole="Reclusos" />
           <NavigationProperty Name="TiposDocumento" Relationship="Self.FK_Documentos_Tipos" FromRole="Documentos" ToRole="TiposDocumento" />
           <NavigationProperty Name="MovimientosDocumentos" Relationship="Self.FK_Movimientos_Documentos" FromRole="Documentos" ToRole="MovimientosDocumentos" />
+          <Property Name="FechaVencimiento" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Estados">
           <Key>
@@ -1459,6 +1461,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySetMapping Name="Documentos">
             <EntityTypeMapping TypeName="PoloNuevoModel.Documentos">
               <MappingFragment StoreEntitySet="Documentos">
+                <ScalarProperty Name="FechaVencimiento" ColumnName="FechaVencimiento" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
                 <ScalarProperty Name="TipoDocumentoId" ColumnName="TipoDocumentoId" />

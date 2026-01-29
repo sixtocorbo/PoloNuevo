@@ -13,9 +13,6 @@ Public Class frmMesaEntrada
     Private _impFecha As String
     Private _impUsuario As String = "Operador de Mesa"
 
-    ' =========================================================
-    ' CARGA INICIAL
-    ' =========================================================
     Private Sub frmMesaEntrada_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarGrillaMovimientos()
         CargarMesa()
@@ -34,11 +31,9 @@ Public Class frmMesaEntrada
             Using db As New PoloNuevoEntities()
 
                 ' 1. CONSULTA BASE
-                ' Traemos TODO lo que NO sea una foto de perfil ("ARCHIVO")
-                ' Esto incluye los registros físicos (.phy) y los nuevos digitales (.pdf, .jpg)
                 Dim query = db.Documentos.Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' 2. Filtro Pendientes (Documentos con Entrada pero sin Salida)
+                ' 2. Filtro Pendientes
                 If chkPendientes.Checked Then
                     query = query.Where(Function(d) d.MovimientosDocumentos.Count() = 1)
                 End If
@@ -49,7 +44,6 @@ Public Class frmMesaEntrada
                     Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
                     For Each palabra In palabras
                         Dim termino = palabra
-                        ' Busca en Referencia, Tipo, Descripción (Asunto) y Nombre del Recluso
                         query = query.Where(Function(d) d.ReferenciaExterna.Contains(termino) Or
                                                         d.TiposDocumento.Nombre.Contains(termino) Or
                                                         d.Descripcion.Contains(termino) Or
@@ -73,7 +67,8 @@ Public Class frmMesaEntrada
                                      .Asunto = d.Descripcion,
                                      .Recluso = If(d.Reclusos IsNot Nothing, d.Reclusos.Nombre, "Sin Vincular"),
                                      .Estado = If(d.MovimientosDocumentos.Count() = 1, "PENDIENTE", "MOVIDO"),
-                                     .Digital = If(d.Extension <> ".phy", "SI", "NO") ' Para saber si tiene adjunto
+                                     .Digital = If(d.Extension <> ".phy", "SI", "NO"),
+                                     .Vencimiento = d.FechaVencimiento ' <--- NUEVO CAMPO CARGADO
                                  }) _
                                  .Take(200) _
                                  .ToList()
@@ -83,6 +78,8 @@ Public Class frmMesaEntrada
 
                 ' 7. Configuración Visual
                 If dgvMesa.Columns("Id") IsNot Nothing Then dgvMesa.Columns("Id").Visible = False
+                If dgvMesa.Columns("Vencimiento") IsNot Nothing Then dgvMesa.Columns("Vencimiento").Visible = False ' Lo ocultamos, solo es para colorear
+
                 ConfigurarColumnas()
                 ColorearPendientes()
 
@@ -94,66 +91,95 @@ Public Class frmMesaEntrada
         End Try
     End Sub
 
-    ' =========================================================
-    ' DISEÑO DE COLUMNAS
-    ' =========================================================
     Private Sub ConfigurarColumnas()
         If dgvMesa.Columns.Count = 0 Then Return
 
         With dgvMesa
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
-
             If .Columns("Fecha") IsNot Nothing Then
                 .Columns("Fecha").Width = 85
                 .Columns("Fecha").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
-
             If .Columns("Referencia") IsNot Nothing Then
                 .Columns("Referencia").Width = 140
                 .Columns("Referencia").HeaderText = "Tipo y Nro."
             End If
-
             If .Columns("Recluso") IsNot Nothing Then
                 .Columns("Recluso").Width = 180
             End If
-
             If .Columns("Digital") IsNot Nothing Then
                 .Columns("Digital").Width = 50
                 .Columns("Digital").HeaderText = "Dig."
                 .Columns("Digital").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
-
             If .Columns("Estado") IsNot Nothing Then
                 .Columns("Estado").Width = 90
                 .Columns("Estado").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
                 .Columns("Estado").DefaultCellStyle.Font = New Font("Segoe UI", 8, FontStyle.Bold)
             End If
-
             If .Columns("Asunto") IsNot Nothing Then
                 .Columns("Asunto").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             End If
         End With
     End Sub
 
+    ' =========================================================
+    ' COLOREAR FILAS (LÓGICA ACTUALIZADA DE ALERTAS)
+    ' =========================================================
     Private Sub ColorearPendientes()
         If dgvMesa.Columns("Estado") Is Nothing Then Return
 
+        Dim fechaHoy As Date = DateTime.Now.Date
+
         For Each row As DataGridViewRow In dgvMesa.Rows
-            ' PENDIENTES EN ROJO
-            If row.Cells("Estado").Value.ToString() = "PENDIENTE" Then
-                row.DefaultCellStyle.ForeColor = Color.DarkRed
-                row.DefaultCellStyle.BackColor = Color.MistyRose
+
+            ' 1. Verificamos Vencimientos (Prioridad Alta)
+            Dim tieneVencimiento As Boolean = False
+
+            ' Verificamos que la columna exista y el valor no sea nulo
+            If dgvMesa.Columns("Vencimiento") IsNot Nothing AndAlso row.Cells("Vencimiento").Value IsNot Nothing Then
+                Dim fechaVenc As Date = Convert.ToDateTime(row.Cells("Vencimiento").Value)
+                tieneVencimiento = True
+
+                Dim diasRestantes As Integer = (fechaVenc - fechaHoy).TotalDays
+
+                If diasRestantes < 0 Then
+                    ' VENCIDO: Fondo Rojo Intenso, Letra Blanca
+                    row.DefaultCellStyle.BackColor = Color.Firebrick
+                    row.DefaultCellStyle.ForeColor = Color.White
+                    row.Cells("Referencia").Value = "(VENCIDO) " & row.Cells("Referencia").Value.ToString()
+
+                ElseIf diasRestantes <= 5 Then
+                    ' ALERTA (Faltan 5 días o menos): Fondo Naranja, Letra Negra
+                    row.DefaultCellStyle.BackColor = Color.Orange
+                    row.DefaultCellStyle.ForeColor = Color.Black
+                End If
             End If
-            ' DIGITALES EN AZULITO (Opcional, para destacar)
+
+            ' 2. Si no tiene alerta de vencimiento, aplicamos el color de "Pendiente" normal
+            If Not tieneVencimiento AndAlso row.Cells("Estado").Value.ToString() = "PENDIENTE" Then
+                ' Solo cambiamos si no fue pintado ya por vencimiento
+                If row.DefaultCellStyle.BackColor = dgvMesa.DefaultCellStyle.BackColor Then
+                    row.DefaultCellStyle.ForeColor = Color.DarkRed
+                    row.DefaultCellStyle.BackColor = Color.MistyRose
+                End If
+            End If
+
+            ' 3. Digitales (Azulito)
             If dgvMesa.Columns("Digital") IsNot Nothing AndAlso row.Cells("Digital").Value.ToString() = "SI" Then
                 row.Cells("Digital").Style.ForeColor = Color.Blue
                 row.Cells("Digital").Style.Font = New Font("Segoe UI", 8, FontStyle.Bold)
+
+                ' Si está vencido (fondo rojo), forzamos el azul a ser amarillo para que se lea
+                If row.DefaultCellStyle.BackColor = Color.Firebrick Then
+                    row.Cells("Digital").Style.ForeColor = Color.Yellow
+                End If
             End If
         Next
     End Sub
 
     ' =========================================================
-    ' EVENTOS DE FILTROS
+    ' EVENTOS DE FILTROS Y OTROS
     ' =========================================================
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
         CargarMesa()
@@ -210,7 +236,6 @@ Public Class frmMesaEntrada
 
             dgvMovimientos.DataSource = historial
 
-            ' Configuración visual de las columnas (ajustada al nuevo orden)
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
 
             If dgvMovimientos.Columns("Tipo") IsNot Nothing Then
@@ -230,9 +255,6 @@ Public Class frmMesaEntrada
         End Using
     End Sub
 
-    ' =========================================================
-    ' BOTONES DE ACCIÓN (NUEVO, PASE, EDITAR)
-    ' =========================================================
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         Dim frm As New frmNuevoIngreso()
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
@@ -244,7 +266,6 @@ Public Class frmMesaEntrada
             Return
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
         Dim frm As New frmNuevoPase(idDoc)
         If frm.ShowDialog() = DialogResult.OK Then
             CargarMesa()
@@ -252,57 +273,33 @@ Public Class frmMesaEntrada
         End If
     End Sub
 
-    ' =========================================================
-    ' BOTÓN EDITAR / VER DETALLE
-    ' =========================================================
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
-        ' 1. Validar que haya algo seleccionado
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento de la lista para ver su detalle o editar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
-        ' 2. Obtener el ID oculto de la grilla
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
-        ' 3. Abrir el formulario en MODO EDICIÓN (Usando el constructor con ID)
-        ' Al pasarle idDoc, el formulario sabe que debe buscar los datos, el archivo adjunto y el recluso vinculado.
         Dim frm As New frmNuevoIngreso(idDoc)
-
         If frm.ShowDialog() = DialogResult.OK Then
-            ' Si el usuario guardó cambios, refrescamos todo
             CargarMesa()
             CargarHistorial(idDoc)
         End If
     End Sub
 
-    ' =========================================================
-    ' DIGITALIZACIÓN (VER DOCUMENTO)
-    ' =========================================================
     Private Sub btnVerDigital_Click(sender As Object, e As EventArgs) Handles btnVerDigital.Click
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
         Try
             Using db As New PoloNuevoEntities()
                 Dim doc = db.Documentos.Find(idDoc)
-
                 If doc IsNot Nothing AndAlso doc.Contenido IsNot Nothing AndAlso doc.Contenido.Length > 0 Then
-
-                    ' 1. Crear ruta temporal segura
                     Dim extension As String = If(String.IsNullOrEmpty(doc.Extension), ".dat", doc.Extension)
                     Dim tempPath As String = Path.Combine(Path.GetTempPath(), "Doc_" & doc.Id & extension)
-
-                    ' 2. Escribir el archivo
                     File.WriteAllBytes(tempPath, doc.Contenido)
-
-                    ' 3. Abrir con programa predeterminado
                     Process.Start(tempPath)
-
                 Else
                     MessageBox.Show("Este es un registro físico histórico. No tiene archivo digital adjunto.", "Sin Adjunto", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 End If
@@ -312,18 +309,13 @@ Public Class frmMesaEntrada
         End Try
     End Sub
 
-    ' =========================================================
-    ' CORRECCIÓN DE MOVIMIENTOS
-    ' =========================================================
     Private Sub EditarMovimiento()
         If dgvMovimientos.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione una línea del historial abajo.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
         Dim idMov As Integer = Convert.ToInt32(dgvMovimientos.SelectedRows(0).Cells("IdMov").Value)
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
         Dim frm As New frmNuevoPase(idDoc, idMov)
         If frm.ShowDialog() = DialogResult.OK Then
             CargarMesa()
@@ -339,21 +331,14 @@ Public Class frmMesaEntrada
         If e.RowIndex >= 0 Then EditarMovimiento()
     End Sub
 
-    ' =========================================================
-    ' IMPRESIÓN (RECIBO DE PASE)
-    ' =========================================================
     Private Sub btnImprimirRecibo_Click(sender As Object, e As EventArgs) Handles btnImprimirRecibo.Click
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
-
-        ' Capturar Datos Doc
         Dim row = dgvMesa.SelectedRows(0)
         _impReferencia = row.Cells("Referencia").Value.ToString()
         _impAsunto = row.Cells("Asunto").Value.ToString()
-
-        ' Capturar Datos Movimiento (Seleccionado o Último)
         If dgvMovimientos.Rows.Count > 0 Then
             Dim rowMov As DataGridViewRow
             If dgvMovimientos.SelectedRows.Count > 0 Then
@@ -369,7 +354,6 @@ Public Class frmMesaEntrada
             _impOrigen = "SIN DATOS"
             _impDestino = "SIN DATOS"
         End If
-
         If PrintDialog1.ShowDialog() = DialogResult.OK Then
             PrintDocument1.Print()
         End If
@@ -381,12 +365,10 @@ Public Class frmMesaEntrada
         Dim fuenteSub As New Font("Arial", 12, FontStyle.Bold)
         Dim fuenteNormal As New Font("Arial", 10, FontStyle.Regular)
         Dim fuenteChica As New Font("Arial", 8, FontStyle.Regular)
-
         Dim pincel As New SolidBrush(Color.Black)
         Dim margenIzq As Integer = 50
         Dim y As Integer = 50
 
-        ' ENCABEZADO
         g.DrawString("UNIDAD N° 4 - SANTIAGO VÁZQUEZ", fuenteTitulo, pincel, margenIzq, y)
         y += 30
         g.DrawString("CONSTANCIA DE PASE / MOVIMIENTO", fuenteSub, pincel, margenIzq, y)
@@ -394,19 +376,15 @@ Public Class frmMesaEntrada
         g.DrawLine(Pens.Black, margenIzq, y + 20, 750, y + 20)
         y += 40
 
-        ' DATOS DOC
         g.DrawString("DOCUMENTO: " & _impReferencia, fuenteSub, pincel, margenIzq, y)
         y += 25
         g.DrawString("ASUNTO: ", fuenteNormal, pincel, margenIzq, y)
-
         Dim rectAsunto As New RectangleF(margenIzq + 70, y, 600, 60)
         g.DrawString(_impAsunto, fuenteNormal, pincel, rectAsunto)
         y += 70
-
         g.DrawLine(Pens.Gray, margenIzq, y, 750, y)
         y += 20
 
-        ' DATOS MOV
         g.DrawString("FECHA MOVIMIENTO: " & _impFecha, fuenteNormal, pincel, margenIzq, y)
         y += 30
         g.DrawString("ORIGEN: " & _impOrigen, fuenteNormal, pincel, margenIzq, y)
@@ -414,18 +392,15 @@ Public Class frmMesaEntrada
         g.DrawString("DESTINO: " & _impDestino, fuenteSub, pincel, margenIzq, y)
         y += 50
 
-        ' FIRMA
         Dim rectFirma As New Rectangle(margenIzq, y, 700, 150)
         g.DrawRectangle(Pens.Black, rectFirma)
         g.DrawString("RECIBIDO POR:", fuenteNormal, pincel, margenIzq + 10, y + 10)
         g.DrawString("FIRMA Y ACLARACIÓN:", fuenteNormal, pincel, margenIzq + 10, y + 100)
         g.DrawString("FECHA: ______ / ______ / ___________", fuenteNormal, pincel, margenIzq + 400, y + 100)
 
-        ' PIE
         y += 170
         g.DrawString("Emitido por Sistema POLO el " & DateTime.Now.ToString(), fuenteChica, Brushes.Gray, margenIzq, y)
         g.DrawString("Operador: " & _impUsuario, fuenteChica, Brushes.Gray, margenIzq, y + 15)
-
         e.HasMorePages = False
     End Sub
 
