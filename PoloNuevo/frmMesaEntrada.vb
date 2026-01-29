@@ -34,8 +34,12 @@ Public Class frmMesaEntrada
                 Dim query = db.Documentos.Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
                 ' 2. Filtro Pendientes
+                ' CÓDIGO CORREGIDO
                 If chkPendientes.Checked Then
-                    query = query.Where(Function(d) d.MovimientosDocumentos.Count() = 1)
+                    ' Buscamos documentos cuyo ÚLTIMO movimiento (por fecha) NO sea una Salida
+                    query = query.Where(Function(d) d.MovimientosDocumentos _
+                                     .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                     .FirstOrDefault().EsSalida = False)
                 End If
 
                 ' 3. Buscador Inteligente
