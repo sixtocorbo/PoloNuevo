@@ -34,7 +34,6 @@ Partial Class frmGenerarDocumento
         Me.btnAdjuntar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
-        Me.chkMoverOriginal = New System.Windows.Forms.CheckBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.pnlTop.SuspendLayout()
         Me.grpAdjunto.SuspendLayout()
@@ -42,7 +41,7 @@ Partial Class frmGenerarDocumento
         '
         'pnlTop
         '
-        Me.pnlTop.BackColor = System.Drawing.Color.FromArgb(245, 246, 248)
+        Me.pnlTop.BackColor = System.Drawing.Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(246, Byte), Integer), CType(CType(248, Byte), Integer))
         Me.pnlTop.Controls.Add(Me.lblTitulo)
         Me.pnlTop.Controls.Add(Me.lblRefExterna)
         Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
@@ -55,10 +54,10 @@ Partial Class frmGenerarDocumento
         '
         Me.lblTitulo.AutoSize = True
         Me.lblTitulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTitulo.ForeColor = System.Drawing.Color.FromArgb(64, 64, 64)
+        Me.lblTitulo.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.lblTitulo.Location = New System.Drawing.Point(20, 15)
         Me.lblTitulo.Name = "lblTitulo"
-        Me.lblTitulo.Size = New System.Drawing.Size(306, 25)
+        Me.lblTitulo.Size = New System.Drawing.Size(442, 38)
         Me.lblTitulo.TabIndex = 0
         Me.lblTitulo.Text = "Generar Documento / Respuesta"
         '
@@ -69,7 +68,7 @@ Partial Class frmGenerarDocumento
         Me.lblRefExterna.ForeColor = System.Drawing.Color.DimGray
         Me.lblRefExterna.Location = New System.Drawing.Point(22, 50)
         Me.lblRefExterna.Name = "lblRefExterna"
-        Me.lblRefExterna.Size = New System.Drawing.Size(236, 19)
+        Me.lblRefExterna.Size = New System.Drawing.Size(334, 28)
         Me.lblRefExterna.TabIndex = 1
         Me.lblRefExterna.Text = "En referencia a: [Documento Externo]"
         '
@@ -78,7 +77,7 @@ Partial Class frmGenerarDocumento
         Me.lblTipo.AutoSize = True
         Me.lblTipo.Location = New System.Drawing.Point(31, 110)
         Me.lblTipo.Name = "lblTipo"
-        Me.lblTipo.Size = New System.Drawing.Size(172, 17)
+        Me.lblTipo.Size = New System.Drawing.Size(260, 28)
         Me.lblTipo.TabIndex = 1
         Me.lblTipo.Text = "Tipo de Documento (Salida):"
         '
@@ -88,7 +87,7 @@ Partial Class frmGenerarDocumento
         Me.cmbTipo.FormattingEnabled = True
         Me.cmbTipo.Location = New System.Drawing.Point(34, 130)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(260, 25)
+        Me.cmbTipo.Size = New System.Drawing.Size(260, 36)
         Me.cmbTipo.TabIndex = 2
         '
         'lblNumero
@@ -96,7 +95,7 @@ Partial Class frmGenerarDocumento
         Me.lblNumero.AutoSize = True
         Me.lblNumero.Location = New System.Drawing.Point(310, 110)
         Me.lblNumero.Name = "lblNumero"
-        Me.lblNumero.Size = New System.Drawing.Size(166, 17)
+        Me.lblNumero.Size = New System.Drawing.Size(248, 28)
         Me.lblNumero.TabIndex = 3
         Me.lblNumero.Text = "Número Oficial (Asignado):"
         '
@@ -104,7 +103,7 @@ Partial Class frmGenerarDocumento
         '
         Me.txtNumero.Location = New System.Drawing.Point(314, 130)
         Me.txtNumero.Name = "txtNumero"
-        Me.txtNumero.Size = New System.Drawing.Size(240, 25)
+        Me.txtNumero.Size = New System.Drawing.Size(240, 33)
         Me.txtNumero.TabIndex = 4
         '
         'lblAsunto
@@ -112,7 +111,7 @@ Partial Class frmGenerarDocumento
         Me.lblAsunto.AutoSize = True
         Me.lblAsunto.Location = New System.Drawing.Point(31, 170)
         Me.lblAsunto.Name = "lblAsunto"
-        Me.lblAsunto.Size = New System.Drawing.Size(202, 17)
+        Me.lblAsunto.Size = New System.Drawing.Size(296, 28)
         Me.lblAsunto.TabIndex = 5
         Me.lblAsunto.Text = "Asunto / Detalle de la Respuesta:"
         '
@@ -129,7 +128,7 @@ Partial Class frmGenerarDocumento
         Me.lblDestino.AutoSize = True
         Me.lblDestino.Location = New System.Drawing.Point(31, 285)
         Me.lblDestino.Name = "lblDestino"
-        Me.lblDestino.Size = New System.Drawing.Size(221, 17)
+        Me.lblDestino.Size = New System.Drawing.Size(316, 28)
         Me.lblDestino.TabIndex = 7
         Me.lblDestino.Text = "Destino del Pase (A quién se envía):"
         '
@@ -140,7 +139,7 @@ Partial Class frmGenerarDocumento
         Me.cmbDestino.FormattingEnabled = True
         Me.cmbDestino.Location = New System.Drawing.Point(34, 305)
         Me.cmbDestino.Name = "cmbDestino"
-        Me.cmbDestino.Size = New System.Drawing.Size(520, 25)
+        Me.cmbDestino.Size = New System.Drawing.Size(520, 36)
         Me.cmbDestino.TabIndex = 8
         '
         'grpAdjunto
@@ -160,7 +159,7 @@ Partial Class frmGenerarDocumento
         Me.lblArchivo.ForeColor = System.Drawing.Color.Gray
         Me.lblArchivo.Location = New System.Drawing.Point(130, 32)
         Me.lblArchivo.Name = "lblArchivo"
-        Me.lblArchivo.Size = New System.Drawing.Size(76, 17)
+        Me.lblArchivo.Size = New System.Drawing.Size(112, 28)
         Me.lblArchivo.TabIndex = 1
         Me.lblArchivo.Text = "Sin archivo."
         '
@@ -172,20 +171,6 @@ Partial Class frmGenerarDocumento
         Me.btnAdjuntar.TabIndex = 0
         Me.btnAdjuntar.Text = "Adjuntar..."
         Me.btnAdjuntar.UseVisualStyleBackColor = True
-        '
-        'chkMoverOriginal
-        '
-        Me.chkMoverOriginal.AutoSize = True
-        Me.chkMoverOriginal.Checked = True
-        Me.chkMoverOriginal.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkMoverOriginal.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.chkMoverOriginal.ForeColor = System.Drawing.Color.DarkSlateBlue
-        Me.chkMoverOriginal.Location = New System.Drawing.Point(34, 435)
-        Me.chkMoverOriginal.Name = "chkMoverOriginal"
-        Me.chkMoverOriginal.Size = New System.Drawing.Size(332, 19)
-        Me.chkMoverOriginal.TabIndex = 10
-        Me.chkMoverOriginal.Text = "Enviar el documento original junto con esta respuesta"
-        Me.chkMoverOriginal.UseVisualStyleBackColor = True
         '
         'btnGuardar
         '
@@ -211,10 +196,9 @@ Partial Class frmGenerarDocumento
         '
         'frmGenerarDocumento
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(11.0!, 28.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(600, 560)
-        Me.Controls.Add(Me.chkMoverOriginal)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
         Me.Controls.Add(Me.grpAdjunto)
@@ -259,6 +243,5 @@ Partial Class frmGenerarDocumento
     Friend WithEvents btnAdjuntar As System.Windows.Forms.Button
     Friend WithEvents btnGuardar As System.Windows.Forms.Button
     Friend WithEvents btnCancelar As System.Windows.Forms.Button
-    Friend WithEvents chkMoverOriginal As System.Windows.Forms.CheckBox
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 End Class

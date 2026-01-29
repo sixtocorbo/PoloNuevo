@@ -24,6 +24,8 @@ Partial Class frmNuevoIngreso
         Me.cmbTipo = New System.Windows.Forms.ComboBox()
         Me.lblNumero = New System.Windows.Forms.Label()
         Me.txtNumero = New System.Windows.Forms.TextBox()
+        Me.lblOrigen = New System.Windows.Forms.Label()
+        Me.cmbOrigen = New System.Windows.Forms.ComboBox()
         Me.lblAsunto = New System.Windows.Forms.Label()
         Me.txtAsunto = New System.Windows.Forms.TextBox()
         Me.grpVinculacion = New System.Windows.Forms.GroupBox()
@@ -37,10 +39,17 @@ Partial Class frmNuevoIngreso
         Me.btnCancelar = New System.Windows.Forms.Button()
         Me.chkVencimiento = New System.Windows.Forms.CheckBox()
         Me.dtpVencimiento = New System.Windows.Forms.DateTimePicker()
+        Me.grpRelacion = New System.Windows.Forms.GroupBox()
+        Me.lblInfoPadre = New System.Windows.Forms.Label()
+        Me.btnVerificarPadre = New System.Windows.Forms.Button()
+        Me.btnBuscarPadre = New System.Windows.Forms.Button()
+        Me.txtIdPadre = New System.Windows.Forms.TextBox()
+        Me.chkEsRespuesta = New System.Windows.Forms.CheckBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.pnlTop.SuspendLayout()
         Me.grpVinculacion.SuspendLayout()
         Me.grpArchivo.SuspendLayout()
+        Me.grpRelacion.SuspendLayout()
         Me.SuspendLayout()
         '
         'pnlTop
@@ -107,26 +116,135 @@ Partial Class frmNuevoIngreso
         Me.txtNumero.Size = New System.Drawing.Size(445, 26)
         Me.txtNumero.TabIndex = 4
         '
+        'lblOrigen
+        '
+        Me.lblOrigen.AutoSize = True
+        Me.lblOrigen.Location = New System.Drawing.Point(57, 215)
+        Me.lblOrigen.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblOrigen.Name = "lblOrigen"
+        Me.lblOrigen.Size = New System.Drawing.Size(160, 20)
+        Me.lblOrigen.TabIndex = 5
+        Me.lblOrigen.Text = "Organismo de Origen:"
+        '
+        'cmbOrigen
+        '
+        Me.cmbOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmbOrigen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
+        Me.cmbOrigen.FormattingEnabled = True
+        Me.cmbOrigen.Location = New System.Drawing.Point(63, 246)
+        Me.cmbOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.cmbOrigen.Name = "cmbOrigen"
+        Me.cmbOrigen.Size = New System.Drawing.Size(952, 28)
+        Me.cmbOrigen.TabIndex = 6
+        '
         'lblAsunto
         '
         Me.lblAsunto.AutoSize = True
-        Me.lblAsunto.Location = New System.Drawing.Point(57, 215)
+        Me.lblAsunto.Location = New System.Drawing.Point(57, 295)
         Me.lblAsunto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblAsunto.Name = "lblAsunto"
         Me.lblAsunto.Size = New System.Drawing.Size(64, 20)
-        Me.lblAsunto.TabIndex = 5
+        Me.lblAsunto.TabIndex = 7
         Me.lblAsunto.Text = "Asunto:"
         '
         'txtAsunto
         '
         Me.txtAsunto.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtAsunto.Location = New System.Drawing.Point(63, 246)
+        Me.txtAsunto.Location = New System.Drawing.Point(63, 326)
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
         Me.txtAsunto.Size = New System.Drawing.Size(952, 90)
-        Me.txtAsunto.TabIndex = 6
+        Me.txtAsunto.TabIndex = 8
+        '
+        'chkVencimiento
+        '
+        Me.chkVencimiento.AutoSize = True
+        Me.chkVencimiento.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.chkVencimiento.ForeColor = System.Drawing.Color.DarkOrange
+        Me.chkVencimiento.Location = New System.Drawing.Point(63, 442)
+        Me.chkVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkVencimiento.Name = "chkVencimiento"
+        Me.chkVencimiento.Size = New System.Drawing.Size(291, 29)
+        Me.chkVencimiento.TabIndex = 9
+        Me.chkVencimiento.Text = "¿Requiere Respuesta / Vence?"
+        Me.chkVencimiento.UseVisualStyleBackColor = True
+        '
+        'dtpVencimiento
+        '
+        Me.dtpVencimiento.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpVencimiento.Location = New System.Drawing.Point(525, 442)
+        Me.dtpVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dtpVencimiento.Name = "dtpVencimiento"
+        Me.dtpVencimiento.Size = New System.Drawing.Size(223, 26)
+        Me.dtpVencimiento.TabIndex = 10
+        Me.dtpVencimiento.Visible = False
+        '
+        'grpRelacion
+        '
+        Me.grpRelacion.Controls.Add(Me.lblInfoPadre)
+        Me.grpRelacion.Controls.Add(Me.btnVerificarPadre)
+        Me.grpRelacion.Controls.Add(Me.btnBuscarPadre)
+        Me.grpRelacion.Controls.Add(Me.txtIdPadre)
+        Me.grpRelacion.Controls.Add(Me.chkEsRespuesta)
+        Me.grpRelacion.Location = New System.Drawing.Point(63, 485)
+        Me.grpRelacion.Name = "grpRelacion"
+        Me.grpRelacion.Size = New System.Drawing.Size(952, 115)
+        Me.grpRelacion.TabIndex = 15
+        Me.grpRelacion.TabStop = False
+        Me.grpRelacion.Text = "Trazabilidad / Relación"
+        '
+        'lblInfoPadre
+        '
+        Me.lblInfoPadre.AutoSize = True
+        Me.lblInfoPadre.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblInfoPadre.ForeColor = System.Drawing.Color.Blue
+        Me.lblInfoPadre.Location = New System.Drawing.Point(445, 75)
+        Me.lblInfoPadre.Name = "lblInfoPadre"
+        Me.lblInfoPadre.Size = New System.Drawing.Size(280, 20)
+        Me.lblInfoPadre.TabIndex = 4
+        Me.lblInfoPadre.Text = "Ingrese ID o Busque..."
+        '
+        'btnVerificarPadre
+        '
+        Me.btnVerificarPadre.Enabled = False
+        Me.btnVerificarPadre.Location = New System.Drawing.Point(315, 65)
+        Me.btnVerificarPadre.Name = "btnVerificarPadre"
+        Me.btnVerificarPadre.Size = New System.Drawing.Size(100, 36)
+        Me.btnVerificarPadre.TabIndex = 3
+        Me.btnVerificarPadre.Text = "Verificar"
+        Me.btnVerificarPadre.UseVisualStyleBackColor = True
+        '
+        'btnBuscarPadre
+        '
+        Me.btnBuscarPadre.Enabled = False
+        Me.btnBuscarPadre.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnBuscarPadre.Location = New System.Drawing.Point(265, 65)
+        Me.btnBuscarPadre.Name = "btnBuscarPadre"
+        Me.btnBuscarPadre.Size = New System.Drawing.Size(45, 36)
+        Me.btnBuscarPadre.TabIndex = 2
+        Me.btnBuscarPadre.Text = "?"
+        Me.btnBuscarPadre.UseVisualStyleBackColor = True
+        '
+        'txtIdPadre
+        '
+        Me.txtIdPadre.Enabled = False
+        Me.txtIdPadre.Location = New System.Drawing.Point(33, 70)
+        Me.txtIdPadre.Name = "txtIdPadre"
+        Me.txtIdPadre.Size = New System.Drawing.Size(222, 26)
+        Me.txtIdPadre.TabIndex = 1
+        '
+        'chkEsRespuesta
+        '
+        Me.chkEsRespuesta.AutoSize = True
+        Me.chkEsRespuesta.Location = New System.Drawing.Point(33, 35)
+        Me.chkEsRespuesta.Name = "chkEsRespuesta"
+        Me.chkEsRespuesta.Size = New System.Drawing.Size(325, 24)
+        Me.chkEsRespuesta.TabIndex = 0
+        Me.chkEsRespuesta.Text = "¿Este documento responde a uno anterior?"
+        Me.chkEsRespuesta.UseVisualStyleBackColor = True
         '
         'grpVinculacion
         '
@@ -135,12 +253,12 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.Controls.Add(Me.lstReclusos)
         Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
         Me.grpVinculacion.Controls.Add(Me.chkVincular)
-        Me.grpVinculacion.Location = New System.Drawing.Point(63, 415)
+        Me.grpVinculacion.Location = New System.Drawing.Point(63, 620)
         Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Name = "grpVinculacion"
         Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Size = New System.Drawing.Size(957, 246)
-        Me.grpVinculacion.TabIndex = 9
+        Me.grpVinculacion.TabIndex = 11
         Me.grpVinculacion.TabStop = False
         Me.grpVinculacion.Text = "Asociación"
         '
@@ -186,12 +304,12 @@ Partial Class frmNuevoIngreso
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
         Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
-        Me.grpArchivo.Location = New System.Drawing.Point(63, 685)
+        Me.grpArchivo.Location = New System.Drawing.Point(63, 890)
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Size = New System.Drawing.Size(957, 138)
-        Me.grpArchivo.TabIndex = 10
+        Me.grpArchivo.TabIndex = 12
         Me.grpArchivo.TabStop = False
         Me.grpArchivo.Text = "Archivo Digital"
         '
@@ -223,61 +341,41 @@ Partial Class frmNuevoIngreso
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(615, 862)
+        Me.btnGuardar.Location = New System.Drawing.Point(615, 1067)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(405, 85)
-        Me.btnGuardar.TabIndex = 11
+        Me.btnGuardar.TabIndex = 13
         Me.btnGuardar.Text = "GUARDAR"
         Me.btnGuardar.UseVisualStyleBackColor = False
         '
         'btnCancelar
         '
-        Me.btnCancelar.Location = New System.Drawing.Point(63, 862)
+        Me.btnCancelar.Location = New System.Drawing.Point(63, 1067)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(225, 85)
-        Me.btnCancelar.TabIndex = 12
+        Me.btnCancelar.TabIndex = 14
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
-        '
-        'chkVencimiento
-        '
-        Me.chkVencimiento.AutoSize = True
-        Me.chkVencimiento.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.chkVencimiento.ForeColor = System.Drawing.Color.DarkOrange
-        Me.chkVencimiento.Location = New System.Drawing.Point(63, 362)
-        Me.chkVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkVencimiento.Name = "chkVencimiento"
-        Me.chkVencimiento.Size = New System.Drawing.Size(291, 29)
-        Me.chkVencimiento.TabIndex = 7
-        Me.chkVencimiento.Text = "¿Requiere Respuesta / Vence?"
-        Me.chkVencimiento.UseVisualStyleBackColor = True
-        '
-        'dtpVencimiento
-        '
-        Me.dtpVencimiento.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpVencimiento.Location = New System.Drawing.Point(525, 362)
-        Me.dtpVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.dtpVencimiento.Name = "dtpVencimiento"
-        Me.dtpVencimiento.Size = New System.Drawing.Size(223, 26)
-        Me.dtpVencimiento.TabIndex = 8
-        Me.dtpVencimiento.Visible = False
         '
         'frmNuevoIngreso
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(1101, 986)
-        Me.Controls.Add(Me.dtpVencimiento)
-        Me.Controls.Add(Me.chkVencimiento)
+        Me.ClientSize = New System.Drawing.Size(1101, 1180)
+        Me.Controls.Add(Me.grpRelacion)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
         Me.Controls.Add(Me.grpArchivo)
         Me.Controls.Add(Me.grpVinculacion)
+        Me.Controls.Add(Me.dtpVencimiento)
+        Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.txtAsunto)
         Me.Controls.Add(Me.lblAsunto)
+        Me.Controls.Add(Me.cmbOrigen)
+        Me.Controls.Add(Me.lblOrigen)
         Me.Controls.Add(Me.txtNumero)
         Me.Controls.Add(Me.lblNumero)
         Me.Controls.Add(Me.cmbTipo)
@@ -295,6 +393,8 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.PerformLayout()
         Me.grpArchivo.ResumeLayout(False)
         Me.grpArchivo.PerformLayout()
+        Me.grpRelacion.ResumeLayout(False)
+        Me.grpRelacion.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -306,6 +406,8 @@ Partial Class frmNuevoIngreso
     Friend WithEvents cmbTipo As System.Windows.Forms.ComboBox
     Friend WithEvents lblNumero As System.Windows.Forms.Label
     Friend WithEvents txtNumero As System.Windows.Forms.TextBox
+    Friend WithEvents lblOrigen As System.Windows.Forms.Label
+    Friend WithEvents cmbOrigen As System.Windows.Forms.ComboBox
     Friend WithEvents lblAsunto As System.Windows.Forms.Label
     Friend WithEvents txtAsunto As System.Windows.Forms.TextBox
     Friend WithEvents grpVinculacion As System.Windows.Forms.GroupBox
@@ -319,5 +421,11 @@ Partial Class frmNuevoIngreso
     Friend WithEvents btnCancelar As System.Windows.Forms.Button
     Friend WithEvents chkVencimiento As System.Windows.Forms.CheckBox
     Friend WithEvents dtpVencimiento As System.Windows.Forms.DateTimePicker
-    Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents grpRelacion As System.Windows.Forms.GroupBox
+    Friend WithEvents lblInfoPadre As System.Windows.Forms.Label
+    Friend WithEvents btnVerificarPadre As System.Windows.Forms.Button
+    Friend WithEvents btnBuscarPadre As System.Windows.Forms.Button
+    Friend WithEvents txtIdPadre As System.Windows.Forms.TextBox
+    Friend WithEvents chkEsRespuesta As System.Windows.Forms.CheckBox
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 End Class

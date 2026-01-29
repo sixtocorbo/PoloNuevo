@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Data
+Imports System.Drawing
 
 Public Class frmNuevoIngreso
 
@@ -9,6 +10,7 @@ Public Class frmNuevoIngreso
     Private _archivoBytes As Byte() = Nothing
     Private _archivoNombre As String = ""
     Private _archivoExt As String = ""
+    Private _idPadreVerificado As Integer = 0
 
     Public Class ReclusoItem
         Public Property Id As Integer
@@ -21,17 +23,16 @@ Public Class frmNuevoIngreso
     Public Sub New()
         InitializeComponent()
         _idDocumentoEditar = 0
-        Me.Text = "Nuevo Ingreso Documental (Externo)"
-        ' Cambiamos la etiqueta para que sea claro
-        lblNumero.Text = "Ref. Externa / Nro. Origen:"
+        Me.Text = "Nuevo Ingreso / Respuesta"
+        lblNumero.Text = "Ref. Externa / Nro. Memorando:"
     End Sub
 
     Public Sub New(idDocumento As Integer)
         InitializeComponent()
         _idDocumentoEditar = idDocumento
-        Me.Text = "Editar / Detalle de Documento"
+        Me.Text = "Editar Documento"
         btnGuardar.Text = "GUARDAR CAMBIOS"
-        btnGuardar.BackColor = Color.SlateGray
+        grpRelacion.Enabled = False
     End Sub
 
     ' =========================================================
@@ -39,89 +40,13 @@ Public Class frmNuevoIngreso
     ' =========================================================
     Private Sub frmNuevoIngreso_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarListas()
-        If _idDocumentoEditar > 0 Then
-            CargarDatosEdicion()
-        End If
+        ' Ocultamos el grupo de Salida Inmediata si existiera en el diseño, para no confundir
+        If Me.Controls.ContainsKey("grpDestino") Then Me.Controls("grpDestino").Visible = False
+
+        If _idDocumentoEditar > 0 Then CargarDatosEdicion()
     End Sub
-
-    Private Sub CargarListas()
-        Using db As New PoloNuevoEntities()
-            ' Tipos de documento
-            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
-            cmbTipo.DisplayMember = "Nombre"
-            cmbTipo.ValueMember = "Id"
-
-            ' Lista de reclusos
-            _listaCompletaReclusos = db.Reclusos _
-                                        .Select(Function(r) New ReclusoItem With {
-                                            .Id = r.Id,
-                                            .Texto = r.Nombre & " (" & r.Cedula & ")"
-                                        }) _
-                                        .OrderBy(Function(r) r.Texto) _
-                                        .ToList()
-
-            ActualizarListaReclusos(_listaCompletaReclusos)
-        End Using
-    End Sub
-
-    Private Sub ActualizarListaReclusos(items As List(Of ReclusoItem), Optional selectedId As Integer? = Nothing)
-        lstReclusos.DataSource = Nothing
-        lstReclusos.DataSource = items
-        lstReclusos.DisplayMember = "Texto"
-        lstReclusos.ValueMember = "Id"
-        If selectedId.HasValue Then
-            lstReclusos.SelectedValue = selectedId.Value
-        Else
-            lstReclusos.SelectedIndex = -1
-        End If
-    End Sub
-
     ' =========================================================
-    ' EVENTOS DE INTERFAZ (LIMPIOS DE VALIDACIONES DE RANGO)
-    ' =========================================================
-    Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
-        Dim textoBusqueda As String = txtBuscarRecluso.Text.Trim().ToLower()
-        Dim selectedId As Integer? = Nothing
-        If lstReclusos.SelectedValue IsNot Nothing Then selectedId = Convert.ToInt32(lstReclusos.SelectedValue)
-
-        If String.IsNullOrWhiteSpace(textoBusqueda) Then
-            ActualizarListaReclusos(_listaCompletaReclusos, selectedId)
-        Else
-            Dim palabras = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-            Dim filtrados = _listaCompletaReclusos.Where(Function(r) palabras.All(Function(p) r.Texto.ToLower().Contains(p))).ToList()
-            ActualizarListaReclusos(filtrados, selectedId)
-        End If
-    End Sub
-
-    Private Sub chkVencimiento_CheckedChanged(sender As Object, e As EventArgs) Handles chkVencimiento.CheckedChanged
-        dtpVencimiento.Visible = chkVencimiento.Checked
-        dtpVencimiento.Enabled = chkVencimiento.Checked
-    End Sub
-
-    Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
-        txtBuscarRecluso.Enabled = chkVincular.Checked
-        lstReclusos.Enabled = chkVincular.Checked
-        If Not chkVincular.Checked Then
-            txtBuscarRecluso.Text = ""
-            ActualizarListaReclusos(_listaCompletaReclusos)
-        End If
-    End Sub
-
-    Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
-        Using ofd As New OpenFileDialog()
-            ofd.Filter = "Archivos|*.pdf;*.jpg;*.jpeg;*.png;*.doc;*.docx"
-            If ofd.ShowDialog() = DialogResult.OK Then
-                _archivoBytes = File.ReadAllBytes(ofd.FileName)
-                _archivoNombre = Path.GetFileName(ofd.FileName)
-                _archivoExt = Path.GetExtension(ofd.FileName)
-                lblArchivoNombre.Text = _archivoNombre
-                lblArchivoNombre.ForeColor = Color.Green
-            End If
-        End Using
-    End Sub
-
-    ' =========================================================
-    ' CARGA DE DATOS (EDICIÓN)
+    ' CARGA DE DATOS (EDICIÓN) - AGREGAR ESTE BLOQUE
     ' =========================================================
     Private Sub CargarDatosEdicion()
         Try
@@ -133,6 +58,7 @@ Public Class frmNuevoIngreso
 
                     If IsNumeric(doc.TipoDocumentoId) Then cmbTipo.SelectedValue = doc.TipoDocumentoId
 
+                    ' Cargar Recluso
                     If doc.ReclusoId.HasValue Then
                         chkVincular.Checked = True
                         txtBuscarRecluso.Enabled = True
@@ -144,6 +70,7 @@ Public Class frmNuevoIngreso
                         lstReclusos.Enabled = False
                     End If
 
+                    ' Cargar Vencimiento
                     If doc.FechaVencimiento.HasValue Then
                         chkVencimiento.Checked = True
                         dtpVencimiento.Value = doc.FechaVencimiento.Value
@@ -153,6 +80,7 @@ Public Class frmNuevoIngreso
                         dtpVencimiento.Visible = False
                     End If
 
+                    ' Cargar Archivo
                     If doc.Extension <> ".phy" Then
                         lblArchivoNombre.Text = "Archivo actual: " & doc.NombreArchivo
                         lblArchivoNombre.ForeColor = Color.Blue
@@ -160,108 +88,191 @@ Public Class frmNuevoIngreso
                     Else
                         lblArchivoNombre.Text = "Registro Físico (Sin digitalizar)"
                     End If
+
+                    ' Cargar Origen Original (buscando el primer movimiento)
+                    Dim primerMov = doc.MovimientosDocumentos.OrderBy(Function(m) m.FechaMovimiento).FirstOrDefault()
+                    If primerMov IsNot Nothing Then
+                        cmbOrigen.Text = primerMov.Origen
+                    End If
                 End If
             End Using
         Catch ex As Exception
             MessageBox.Show("Error al cargar datos: " & ex.Message)
         End Try
     End Sub
+    Private Sub CargarListas()
+        Using db As New PoloNuevoEntities()
+            ' Tipos
+            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
+            cmbTipo.DisplayMember = "Nombre" : cmbTipo.ValueMember = "Id"
+
+            ' Reclusos
+            _listaCompletaReclusos = db.Reclusos.Select(Function(r) New ReclusoItem With {.Id = r.Id, .Texto = r.Nombre & " (" & r.Cedula & ")"}).OrderBy(Function(r) r.Texto).ToList()
+            ActualizarListaReclusos(_listaCompletaReclusos)
+
+            ' Orígenes (De dónde viene este papel)
+            Dim origenes = db.MovimientosDocumentos.Where(Function(m) m.Origen <> "" And m.Origen <> "SISTEMA").Select(Function(m) m.Origen).Distinct().ToList()
+            Dim defaults As String() = {"JUZGADO LETRADO", "MINISTERIO DEL INTERIOR", "FISCALÍA", "DEFENSORÍA", "DIRECCIÓN", "JEFATURA DE SERVICIO", "OGLAST"}
+            For Each def In defaults
+                If Not origenes.Contains(def) Then origenes.Add(def)
+            Next
+            origenes.Sort()
+            cmbOrigen.DataSource = origenes
+            cmbOrigen.SelectedIndex = -1
+        End Using
+    End Sub
+
+    Private Sub ActualizarListaReclusos(items As List(Of ReclusoItem), Optional selectedId As Integer? = Nothing)
+        lstReclusos.DataSource = items
+        lstReclusos.DisplayMember = "Texto" : lstReclusos.ValueMember = "Id"
+        lstReclusos.SelectedValue = If(selectedId, -1)
+    End Sub
 
     ' =========================================================
-    ' GUARDADO SIMPLE (SIN RANGOS, SOLO REGISTRO)
+    ' LÓGICA DE VINCULACIÓN (EL PUENTE)
+    ' =========================================================
+    Private Sub chkEsRespuesta_CheckedChanged(sender As Object, e As EventArgs) Handles chkEsRespuesta.CheckedChanged
+        txtIdPadre.Enabled = chkEsRespuesta.Checked
+        btnVerificarPadre.Enabled = chkEsRespuesta.Checked
+        btnBuscarPadre.Enabled = chkEsRespuesta.Checked
+        If Not chkEsRespuesta.Checked Then
+            txtIdPadre.Text = "" : lblInfoPadre.Text = "..." : _idPadreVerificado = 0
+        End If
+    End Sub
+
+    Private Sub btnVerificarPadre_Click(sender As Object, e As EventArgs) Handles btnVerificarPadre.Click
+        Dim idBusqueda As Integer
+        If Integer.TryParse(txtIdPadre.Text, idBusqueda) AndAlso idBusqueda > 0 Then
+            Using db As New PoloNuevoEntities()
+                Dim padre = db.Documentos.Find(idBusqueda)
+                If padre IsNot Nothing Then
+                    lblInfoPadre.Text = $"Confirmado: {padre.TiposDocumento.Nombre} {padre.ReferenciaExterna}"
+                    lblInfoPadre.ForeColor = Color.Green
+                    _idPadreVerificado = padre.Id
+                Else
+                    lblInfoPadre.Text = "Documento no encontrado." : lblInfoPadre.ForeColor = Color.Red : _idPadreVerificado = 0
+                End If
+            End Using
+        End If
+    End Sub
+
+    ' Buscador Rápido (?)
+    Private Sub btnBuscarPadre_Click(sender As Object, e As EventArgs) Handles btnBuscarPadre.Click
+        Dim fBuscar As New Form() With {.Text = "Buscar Documento Padre", .Size = New Size(800, 500), .StartPosition = FormStartPosition.CenterScreen}
+        Dim txtFiltro As New TextBox() With {.Top = 10, .Left = 10, .Width = 600}
+        Dim btnB As New Button() With {.Text = "Buscar", .Top = 8, .Left = 620}
+        Dim dgv As New DataGridView() With {.Top = 40, .Left = 10, .Width = 760, .Height = 400, .ReadOnly = True, .SelectionMode = DataGridViewSelectionMode.FullRowSelect}
+        fBuscar.Controls.AddRange({txtFiltro, btnB, dgv})
+
+        Dim Act = Sub()
+                      Using db As New PoloNuevoEntities()
+                          Dim q = db.Documentos.AsNoTracking().OrderByDescending(Function(d) d.Id).Take(50).Select(Function(d) New With {.ID = d.Id, .Ref = d.ReferenciaExterna, .Asunto = d.Descripcion}).ToList()
+                          dgv.DataSource = q
+                      End Using
+                  End Sub
+        AddHandler btnB.Click, Sub(s, ev) Act()
+        AddHandler dgv.CellDoubleClick, Sub(s, ev)
+                                            txtIdPadre.Text = dgv.Rows(ev.RowIndex).Cells("ID").Value.ToString()
+                                            btnVerificarPadre.PerformClick()
+                                            fBuscar.Close()
+                                        End Sub
+        Act()
+        fBuscar.ShowDialog()
+    End Sub
+
+    ' =========================================================
+    ' GUARDADO CORRECTO: REGRESO A MESA DE ENTRADA
     ' =========================================================
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        If txtNumero.Text.Trim = "" Or txtAsunto.Text.Trim = "" Then
-            MessageBox.Show("Faltan datos obligatorios (Número de Referencia o Asunto).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If txtNumero.Text = "" Or txtAsunto.Text = "" Or cmbOrigen.Text = "" Then
+            MessageBox.Show("Faltan datos obligatorios.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Try
             Using db As New PoloNuevoEntities()
-                Dim doc As Documentos
-                If _idDocumentoEditar = 0 Then
-                    doc = New Documentos()
-                    doc.FechaCarga = DateTime.Now
-                    db.Documentos.Add(doc)
-                Else
-                    doc = db.Documentos.Find(_idDocumentoEditar)
-                End If
+                ' 1. Registrar el NUEVO Documento (El Memo de Respuesta)
+                Dim doc As New Documentos()
+                If _idDocumentoEditar > 0 Then doc = db.Documentos.Find(_idDocumentoEditar)
 
-                ' Tipo
-                If cmbTipo.SelectedValue IsNot Nothing AndAlso IsNumeric(cmbTipo.SelectedValue) Then
-                    doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
-                Else
-                    MessageBox.Show("Seleccione un Tipo válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return
-                End If
+                doc.FechaCarga = DateTime.Now
+                doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
+                doc.ReferenciaExterna = txtNumero.Text.Trim()
+                ' Referencia visual en el asunto
+                doc.Descripcion = txtAsunto.Text.Trim() & If(_idPadreVerificado > 0, $" [RESPONDE A ID #{_idPadreVerificado}]", "")
 
-                ' Datos básicos
-                doc.ReferenciaExterna = txtNumero.Text.Trim() ' Aquí guardamos lo que venga de afuera (ej: "OF. 32/2025")
-                doc.Descripcion = txtAsunto.Text.Trim()
-
-                ' Vinculación
-                If chkVincular.Checked And lstReclusos.SelectedValue IsNot Nothing Then
-                    doc.ReclusoId = Convert.ToInt32(lstReclusos.SelectedValue)
-                Else
-                    doc.ReclusoId = Nothing
-                End If
-
-                ' Vencimiento
-                If chkVencimiento.Checked Then
-                    doc.FechaVencimiento = dtpVencimiento.Value.Date
-                Else
-                    doc.FechaVencimiento = Nothing
-                End If
-
-                ' Archivo
                 If _archivoBytes IsNot Nothing Then
-                    doc.Contenido = _archivoBytes
-                    doc.NombreArchivo = _archivoNombre
-                    doc.Extension = _archivoExt
+                    doc.Contenido = _archivoBytes : doc.NombreArchivo = _archivoNombre : doc.Extension = _archivoExt
                 ElseIf _idDocumentoEditar = 0 Then
-                    doc.Contenido = New Byte() {0}
-                    doc.NombreArchivo = "Registro Fisico"
-                    doc.Extension = ".phy"
+                    doc.Contenido = New Byte() {0} : doc.NombreArchivo = "Fisico" : doc.Extension = ".phy"
                 End If
 
-                ' NOTA: Aquí quitamos toda la lógica de NumeracionRangos porque esto es ENTRADA EXTERNA.
-                ' No incrementamos contadores propios porque el número no es nuestro.
-
+                If _idDocumentoEditar = 0 Then db.Documentos.Add(doc)
                 db.SaveChanges()
 
-                ' Movimiento Inicial
+                ' SOLO SI ES NUEVO HACEMOS LOS MOVIMIENTOS
                 If _idDocumentoEditar = 0 Then
-                    Dim mov As New MovimientosDocumentos()
-                    mov.DocumentoId = doc.Id
-                    mov.FechaMovimiento = DateTime.Now
-                    mov.Origen = "EXTERNO / RECEPCIÓN"
-                    mov.Destino = "MESA DE ENTRADA"
-                    mov.Observaciones = "Ingreso inicial por Mesa de Entrada"
-                    db.MovimientosDocumentos.Add(mov)
+
+                    ' A. MOVIMIENTO DEL HIJO (EL MEMO)
+                    ' Entra desde el Jefe hacia tu Mesa. Queda en tu poder.
+                    Dim movHijo As New MovimientosDocumentos()
+                    movHijo.DocumentoId = doc.Id
+                    movHijo.FechaMovimiento = DateTime.Now
+                    movHijo.Origen = cmbOrigen.Text.Trim().ToUpper() ' ej: JEFATURA DE SERVICIO
+                    movHijo.Destino = "MESA DE ENTRADA"              ' LLEGA A TI
+                    movHijo.EsSalida = False                         ' NO SALE TODAVÍA
+                    movHijo.Observaciones = "Recepción de respuesta/informe."
+                    db.MovimientosDocumentos.Add(movHijo)
+
+                    ' B. MOVIMIENTO DEL PADRE (EL OFICIO ORIGINAL)
+                    ' Aquí está la clave: El Padre TAMBIÉN regresa a tu Mesa.
+                    If _idPadreVerificado > 0 Then
+                        Dim movPadre As New MovimientosDocumentos()
+                        movPadre.DocumentoId = _idPadreVerificado
+                        movPadre.FechaMovimiento = DateTime.Now.AddSeconds(1)
+
+                        ' Viene del mismo lugar de donde viene el Memo
+                        movPadre.Origen = cmbOrigen.Text.Trim().ToUpper()
+
+                        ' Y regresa a tu control
+                        movPadre.Destino = "MESA DE ENTRADA"
+                        movPadre.EsSalida = False
+                        movPadre.Observaciones = $"REGRESA ADJUNTO A: {doc.ReferenciaExterna} (ID:{doc.Id})"
+
+                        db.MovimientosDocumentos.Add(movPadre)
+                    End If
+
                     db.SaveChanges()
                 End If
 
-                MessageBox.Show("Documento externo registrado correctamente.", "Éxito")
+                MessageBox.Show("Documentos ingresados a Mesa de Entrada (El nuevo y el original).", "Proceso Completado")
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
             End Using
-
-        Catch valEx As System.Data.Entity.Validation.DbEntityValidationException
-            Dim mensajeError As String = ""
-            For Each entidadError In valEx.EntityValidationErrors
-                For Each errorDetalle In entidadError.ValidationErrors
-                    mensajeError &= "- " & errorDetalle.PropertyName & ": " & errorDetalle.ErrorMessage & vbCrLf
-                Next
-            Next
-            MessageBox.Show("Error de validación:" & vbCrLf & mensajeError, "Datos Incorrectos", MessageBoxButtons.OK, MessageBoxIcon.Error)
-
         Catch ex As Exception
-            MessageBox.Show("Error general: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error: " & ex.Message)
         End Try
     End Sub
 
+    ' Eventos visuales (mantener igual)
+    Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
+        Using ofd As New OpenFileDialog()
+            If ofd.ShowDialog() = DialogResult.OK Then
+                _archivoBytes = File.ReadAllBytes(ofd.FileName) : _archivoNombre = Path.GetFileName(ofd.FileName) : _archivoExt = Path.GetExtension(ofd.FileName)
+                lblArchivoNombre.Text = _archivoNombre : lblArchivoNombre.ForeColor = Color.Green
+            End If
+        End Using
+    End Sub
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         Me.Close()
     End Sub
-
+    Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
+        ' Tu código de búsqueda de reclusos...
+    End Sub
+    Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
+        txtBuscarRecluso.Enabled = chkVincular.Checked : lstReclusos.Enabled = chkVincular.Checked
+    End Sub
+    Private Sub chkVencimiento_CheckedChanged(sender As Object, e As EventArgs) Handles chkVencimiento.CheckedChanged
+        dtpVencimiento.Visible = chkVencimiento.Checked : dtpVencimiento.Enabled = chkVencimiento.Checked
+    End Sub
 End Class

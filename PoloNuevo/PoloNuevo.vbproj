@@ -295,6 +295,9 @@
     <EmbeddedResource Include="frmComisiones.resx">
       <DependentUpon>frmComisiones.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmGenerarDocumento.resx">
+      <DependentUpon>frmGenerarDocumento.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmLegajo.resx">
       <DependentUpon>frmLegajo.vb</DependentUpon>
     </EmbeddedResource>
