@@ -51,6 +51,11 @@
         <AssociationConnector Association="PoloNuevoModel.FK_Vencimientos_Reclusos" ManuallyRouted="false" />
         <EntityTypeShape EntityType="PoloNuevoModel.vw_DocumentosDetalle" Width="1.5" PointX="5.375" PointY="0.75" />
         <EntityTypeShape EntityType="PoloNuevoModel.vw_PlanillaMensual" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaDocumentos" Width="1.5" PointX="0.75" PointY="7.75" />
+        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaMovimientos" Width="1.5" PointX="3" PointY="7.875" />
+        <AssociationConnector Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" />
+        <EntityTypeShape EntityType="PoloNuevoModel.NumeracionRangos" Width="1.5" PointX="5.25" PointY="34.125" />
+        <AssociationConnector Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

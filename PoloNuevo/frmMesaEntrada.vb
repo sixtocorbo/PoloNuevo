@@ -260,16 +260,28 @@ Public Class frmMesaEntrada
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
     End Sub
 
-    Private Sub btnPase_Click(sender As Object, e As EventArgs) Handles btnPase.Click
-        If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-        Dim frm As New frmNuevoPase(idDoc)
+    'Private Sub btnPase_Click(sender As Object, e As EventArgs) Handles btnPase.Click
+    '    If dgvMesa.SelectedRows.Count = 0 Then
+    '        MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    '        Return
+    '    End If
+    '    Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+    '    Dim frm As New frmNuevoPase(idDoc)
+    '    If frm.ShowDialog() = DialogResult.OK Then
+    '        CargarMesa()
+    '        CargarHistorial(idDoc)
+    '    End If
+    'End Sub
+    Private Sub btnResponder_Click(sender As Object, e As EventArgs) Handles btnPase.Click
+        If dgvMesa.SelectedRows.Count = 0 Then Return
+
+        Dim idDocExterno As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+
+        ' Abrimos el nuevo formulario pasándole el ID
+        Dim frm As New frmGenerarDocumento(idDocExterno)
+
         If frm.ShowDialog() = DialogResult.OK Then
-            CargarMesa()
-            CargarHistorial(idDoc)
+            CargarMesa() ' Refrescamos la lista para ver el nuevo doc generado
         End If
     End Sub
 
@@ -404,4 +416,68 @@ Public Class frmMesaEntrada
         e.HasMorePages = False
     End Sub
 
+    Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
+        ' 1. Validar selección
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Por favor, seleccione el documento que desea eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        ' 2. Solicitar MOTIVO
+        Dim motivo As String = InputBox("Ingrese el MOTIVO de la eliminación:" & vbCrLf & "(Ej: Error de carga, Duplicado, Orden Judicial, etc.)", "Auditoría de Eliminación")
+        If String.IsNullOrWhiteSpace(motivo) Then Return
+
+        ' 3. Confirmación
+        If MessageBox.Show("¿Está seguro? Se eliminará el documento y se archivará TODO su historial en auditoría.", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+            Try
+                Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+
+                Using db As New PoloNuevoEntities()
+                    Dim doc = db.Documentos.Find(idDoc)
+
+                    If doc IsNot Nothing Then
+                        ' A. GUARDAR CABECERA (El Documento)
+                        Dim auditoria As New AuditoriaDocumentos()
+                        auditoria.FechaEliminacion = DateTime.Now
+                        auditoria.UsuarioResponsable = "Operador de Mesa"
+                        auditoria.MotivoEliminacion = motivo
+                        auditoria.DocIdOriginal = doc.Id
+                        auditoria.DocReferencia = doc.ReferenciaExterna
+                        auditoria.DocAsunto = doc.Descripcion
+                        auditoria.DocFechaCarga = doc.FechaCarga
+
+                        db.AuditoriaDocumentos.Add(auditoria)
+                        ' Guardamos aquí para obtener el ID de la auditoría y usarlo abajo
+                        db.SaveChanges()
+
+                        ' B. GUARDAR DETALLE (El Historial de Movimientos)
+                        For Each mov In doc.MovimientosDocumentos
+                            Dim audMov As New AuditoriaMovimientos()
+                            audMov.AuditoriaDocId = auditoria.Id ' <--- Vinculamos con el padre borrado
+                            audMov.FechaMovimientoOriginal = mov.FechaMovimiento
+                            audMov.Origen = mov.Origen
+                            audMov.Destino = mov.Destino
+                            audMov.Observaciones = mov.Observaciones
+                            audMov.TipoMovimiento = If(mov.EsSalida, "SALIDA", "ENTRADA")
+
+                            db.AuditoriaMovimientos.Add(audMov)
+                        Next
+
+                        ' C. BORRAR DATOS ORIGINALES
+                        db.MovimientosDocumentos.RemoveRange(doc.MovimientosDocumentos)
+                        db.Documentos.Remove(doc)
+
+                        ' D. CONFIRMAR CAMBIOS
+                        db.SaveChanges()
+
+                        MessageBox.Show("Eliminación completa. El historial ha sido resguardado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        CargarMesa()
+                        dgvMovimientos.DataSource = Nothing
+                    End If
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Error crítico: " & ex.Message)
+            End Try
+        End If
+    End Sub
 End Class

@@ -15,6 +15,31 @@
           <Property Name="Motivo" Type="nvarchar(max)" />
           <Property Name="Activo" Type="bit" />
         </EntityType>
+        <EntityType Name="AuditoriaDocumentos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FechaEliminacion" Type="datetime" />
+          <Property Name="UsuarioResponsable" Type="nvarchar" MaxLength="100" />
+          <Property Name="MotivoEliminacion" Type="nvarchar" MaxLength="255" />
+          <Property Name="DocIdOriginal" Type="int" />
+          <Property Name="DocReferencia" Type="nvarchar" MaxLength="100" />
+          <Property Name="DocAsunto" Type="nvarchar(max)" />
+          <Property Name="DocFechaCarga" Type="datetime" />
+        </EntityType>
+        <EntityType Name="AuditoriaMovimientos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AuditoriaDocId" Type="int" Nullable="false" />
+          <Property Name="FechaMovimientoOriginal" Type="datetime" />
+          <Property Name="Origen" Type="nvarchar" MaxLength="100" />
+          <Property Name="Destino" Type="nvarchar" MaxLength="100" />
+          <Property Name="TipoMovimiento" Type="nvarchar" MaxLength="50" />
+          <Property Name="Observaciones" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="CandidatosLaborales">
           <Key>
             <PropertyRef Name="Id" />
@@ -143,6 +168,18 @@
           <Property Name="Fecha" Type="date" Nullable="false" />
           <Property Name="Mensaje" Type="nvarchar(max)" />
           <Property Name="FechaRegistro" Type="date" />
+        </EntityType>
+        <EntityType Name="NumeracionRangos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TipoDocumentoId" Type="int" Nullable="false" />
+          <Property Name="NombreRango" Type="nvarchar" MaxLength="50" />
+          <Property Name="NumeroInicio" Type="int" Nullable="false" />
+          <Property Name="NumeroFin" Type="int" Nullable="false" />
+          <Property Name="UltimoUtilizado" Type="int" Nullable="false" />
+          <Property Name="Activo" Type="bit" />
         </EntityType>
         <EntityType Name="Obras">
           <Key>
@@ -301,6 +338,30 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="CantDocumentos" Type="int" />
           <Property Name="SituacionLaboral" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
+        <Association Name="FK__Auditoria__Audit__73BA3083">
+          <End Role="AuditoriaDocumentos" Type="Self.AuditoriaDocumentos" Multiplicity="1" />
+          <End Role="AuditoriaMovimientos" Type="Self.AuditoriaMovimientos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AuditoriaDocumentos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AuditoriaMovimientos">
+              <PropertyRef Name="AuditoriaDocId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Numeracio__TipoD__778AC167">
+          <End Role="TiposDocumento" Type="Self.TiposDocumento" Multiplicity="1" />
+          <End Role="NumeracionRangos" Type="Self.NumeracionRangos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TiposDocumento">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NumeracionRangos">
+              <PropertyRef Name="TipoDocumentoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Actividades_Gestion">
           <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="1" />
           <End Role="ActividadesObras" Type="Self.ActividadesObras" Multiplicity="*" />
@@ -555,6 +616,8 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
         </Association>
         <EntityContainer Name="PoloNuevoModelStoreContainer">
           <EntitySet Name="ActividadesObras" EntityType="Self.ActividadesObras" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuditoriaDocumentos" EntityType="Self.AuditoriaDocumentos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AuditoriaMovimientos" EntityType="Self.AuditoriaMovimientos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CandidatosLaborales" EntityType="Self.CandidatosLaborales" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comisiones" EntityType="Self.Comisiones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comunicados" EntityType="Self.Comunicados" Schema="dbo" store:Type="Tables" />
@@ -567,6 +630,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySet Name="MotivosAusencia" EntityType="Self.MotivosAusencia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MovimientosDocumentos" EntityType="Self.MovimientosDocumentos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Notificaciones" EntityType="Self.Notificaciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NumeracionRangos" EntityType="Self.NumeracionRangos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Obras" EntityType="Self.Obras" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PlanillasLaborales" EntityType="Self.PlanillasLaborales" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reclusos" EntityType="Self.Reclusos" Schema="dbo" store:Type="Tables" />
@@ -615,6 +679,14 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
     [vw_ReclusosMaestro].[SituacionLaboral] AS [SituacionLaboral]
     FROM [dbo].[vw_ReclusosMaestro] AS [vw_ReclusosMaestro]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="Self.FK__Auditoria__Audit__73BA3083">
+            <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
+            <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Numeracio__TipoD__778AC167" Association="Self.FK__Numeracio__TipoD__778AC167">
+            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
+            <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
+          </AssociationSet>
           <AssociationSet Name="FK_Actividades_Gestion" Association="Self.FK_Actividades_Gestion">
             <End Role="GestionObras" EntitySet="GestionObras" />
             <End Role="ActividadesObras" EntitySet="ActividadesObras" />
@@ -956,6 +1028,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Documentos" Relationship="Self.FK_Documentos_Tipos" FromRole="TiposDocumento" ToRole="Documentos" />
+          <NavigationProperty Name="NumeracionRangos" Relationship="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" FromRole="TiposDocumento" ToRole="NumeracionRangos" />
         </EntityType>
         <EntityType Name="Usuarios">
           <Key>
@@ -1362,6 +1435,17 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           </AssociationSet>
           <EntitySet Name="vw_DocumentosDetalle" EntityType="PoloNuevoModel.vw_DocumentosDetalle" />
           <EntitySet Name="vw_PlanillaMensual" EntityType="PoloNuevoModel.vw_PlanillaMensual" />
+          <EntitySet Name="AuditoriaDocumentos" EntityType="PoloNuevoModel.AuditoriaDocumentos" />
+          <EntitySet Name="AuditoriaMovimientos" EntityType="PoloNuevoModel.AuditoriaMovimientos" />
+          <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083">
+            <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
+            <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
+          </AssociationSet>
+          <EntitySet Name="NumeracionRangos" EntityType="PoloNuevoModel.NumeracionRangos" />
+          <AssociationSet Name="FK__Numeracio__TipoD__778AC167" Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167">
+            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
+            <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="vw_DocumentosDetalle">
           <Key>
@@ -1399,6 +1483,70 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="TotalHoras" Type="Int32" Nullable="false" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="AuditoriaDocumentos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FechaEliminacion" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioResponsable" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MotivoEliminacion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DocIdOriginal" Type="Int32" />
+          <Property Name="DocReferencia" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="DocAsunto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DocFechaCarga" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="AuditoriaMovimientos" Relationship="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaDocumentos" ToRole="AuditoriaMovimientos" />
+        </EntityType>
+        <EntityType Name="AuditoriaMovimientos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AuditoriaDocId" Type="Int32" Nullable="false" />
+          <Property Name="FechaMovimientoOriginal" Type="DateTime" Precision="3" />
+          <Property Name="Origen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Destino" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TipoMovimiento" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AuditoriaDocumentos" Relationship="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaMovimientos" ToRole="AuditoriaDocumentos" />
+        </EntityType>
+        <Association Name="FK__Auditoria__Audit__73BA3083">
+          <End Type="PoloNuevoModel.AuditoriaDocumentos" Role="AuditoriaDocumentos" Multiplicity="1" />
+          <End Type="PoloNuevoModel.AuditoriaMovimientos" Role="AuditoriaMovimientos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AuditoriaDocumentos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AuditoriaMovimientos">
+              <PropertyRef Name="AuditoriaDocId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="NumeracionRangos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TipoDocumentoId" Type="Int32" Nullable="false" />
+          <Property Name="NombreRango" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NumeroInicio" Type="Int32" Nullable="false" />
+          <Property Name="NumeroFin" Type="Int32" Nullable="false" />
+          <Property Name="UltimoUtilizado" Type="Int32" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" />
+          <NavigationProperty Name="TiposDocumento" Relationship="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" FromRole="NumeracionRangos" ToRole="TiposDocumento" />
+        </EntityType>
+        <Association Name="FK__Numeracio__TipoD__778AC167">
+          <End Type="PoloNuevoModel.TiposDocumento" Role="TiposDocumento" Multiplicity="1" />
+          <End Type="PoloNuevoModel.NumeracionRangos" Role="NumeracionRangos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TiposDocumento">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NumeracionRangos">
+              <PropertyRef Name="TipoDocumentoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1701,6 +1849,46 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
                 <ScalarProperty Name="Tarea" ColumnName="Tarea" />
                 <ScalarProperty Name="Cedula" ColumnName="Cedula" />
                 <ScalarProperty Name="Recluso" ColumnName="Recluso" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AuditoriaDocumentos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaDocumentos">
+              <MappingFragment StoreEntitySet="AuditoriaDocumentos">
+                <ScalarProperty Name="DocFechaCarga" ColumnName="DocFechaCarga" />
+                <ScalarProperty Name="DocAsunto" ColumnName="DocAsunto" />
+                <ScalarProperty Name="DocReferencia" ColumnName="DocReferencia" />
+                <ScalarProperty Name="DocIdOriginal" ColumnName="DocIdOriginal" />
+                <ScalarProperty Name="MotivoEliminacion" ColumnName="MotivoEliminacion" />
+                <ScalarProperty Name="UsuarioResponsable" ColumnName="UsuarioResponsable" />
+                <ScalarProperty Name="FechaEliminacion" ColumnName="FechaEliminacion" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AuditoriaMovimientos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaMovimientos">
+              <MappingFragment StoreEntitySet="AuditoriaMovimientos">
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="TipoMovimiento" ColumnName="TipoMovimiento" />
+                <ScalarProperty Name="Destino" ColumnName="Destino" />
+                <ScalarProperty Name="Origen" ColumnName="Origen" />
+                <ScalarProperty Name="FechaMovimientoOriginal" ColumnName="FechaMovimientoOriginal" />
+                <ScalarProperty Name="AuditoriaDocId" ColumnName="AuditoriaDocId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NumeracionRangos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.NumeracionRangos">
+              <MappingFragment StoreEntitySet="NumeracionRangos">
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="UltimoUtilizado" ColumnName="UltimoUtilizado" />
+                <ScalarProperty Name="NumeroFin" ColumnName="NumeroFin" />
+                <ScalarProperty Name="NumeroInicio" ColumnName="NumeroInicio" />
+                <ScalarProperty Name="NombreRango" ColumnName="NombreRango" />
+                <ScalarProperty Name="TipoDocumentoId" ColumnName="TipoDocumentoId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

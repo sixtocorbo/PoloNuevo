@@ -10,11 +10,15 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class TiposDocumento
+Partial Public Class NumeracionRangos
     Public Property Id As Integer
-    Public Property Nombre As String
+    Public Property TipoDocumentoId As Integer
+    Public Property NombreRango As String
+    Public Property NumeroInicio As Integer
+    Public Property NumeroFin As Integer
+    Public Property UltimoUtilizado As Integer
+    Public Property Activo As Nullable(Of Boolean)
 
-    Public Overridable Property Documentos As ICollection(Of Documentos) = New HashSet(Of Documentos)
-    Public Overridable Property NumeracionRangos As ICollection(Of NumeracionRangos) = New HashSet(Of NumeracionRangos)
+    Public Overridable Property TiposDocumento As TiposDocumento
 
 End Class

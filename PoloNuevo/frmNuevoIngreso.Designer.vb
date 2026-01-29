@@ -17,6 +17,7 @@ Partial Class frmNuevoIngreso
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.pnlTop = New System.Windows.Forms.Panel()
         Me.lblTitulo = New System.Windows.Forms.Label()
         Me.lblTipo = New System.Windows.Forms.Label()
@@ -26,18 +27,17 @@ Partial Class frmNuevoIngreso
         Me.lblAsunto = New System.Windows.Forms.Label()
         Me.txtAsunto = New System.Windows.Forms.TextBox()
         Me.grpVinculacion = New System.Windows.Forms.GroupBox()
-        Me.txtBuscarRecluso = New System.Windows.Forms.TextBox()
         Me.lstReclusos = New System.Windows.Forms.ListBox()
+        Me.txtBuscarRecluso = New System.Windows.Forms.TextBox()
         Me.chkVincular = New System.Windows.Forms.CheckBox()
         Me.grpArchivo = New System.Windows.Forms.GroupBox()
         Me.lblArchivoNombre = New System.Windows.Forms.Label()
         Me.btnAdjuntar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.btnCancelar = New System.Windows.Forms.Button()
-        ' --- NUEVOS CONTROLES ---
         Me.chkVencimiento = New System.Windows.Forms.CheckBox()
         Me.dtpVencimiento = New System.Windows.Forms.DateTimePicker()
-
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.pnlTop.SuspendLayout()
         Me.grpVinculacion.SuspendLayout()
         Me.grpArchivo.SuspendLayout()
@@ -51,7 +51,7 @@ Partial Class frmNuevoIngreso
         Me.pnlTop.Location = New System.Drawing.Point(0, 0)
         Me.pnlTop.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.pnlTop.Name = "pnlTop"
-        Me.pnlTop.Size = New System.Drawing.Size(750, 77)
+        Me.pnlTop.Size = New System.Drawing.Size(1101, 92)
         Me.pnlTop.TabIndex = 0
         '
         'lblTitulo
@@ -59,7 +59,7 @@ Partial Class frmNuevoIngreso
         Me.lblTitulo.AutoSize = True
         Me.lblTitulo.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.lblTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTitulo.Location = New System.Drawing.Point(18, 23)
+        Me.lblTitulo.Location = New System.Drawing.Point(27, 28)
         Me.lblTitulo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTitulo.Name = "lblTitulo"
         Me.lblTitulo.Size = New System.Drawing.Size(230, 32)
@@ -69,7 +69,7 @@ Partial Class frmNuevoIngreso
         'lblTipo
         '
         Me.lblTipo.AutoSize = True
-        Me.lblTipo.Location = New System.Drawing.Point(38, 108)
+        Me.lblTipo.Location = New System.Drawing.Point(57, 123)
         Me.lblTipo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblTipo.Name = "lblTipo"
         Me.lblTipo.Size = New System.Drawing.Size(43, 20)
@@ -78,19 +78,20 @@ Partial Class frmNuevoIngreso
         '
         'cmbTipo
         '
-        Me.cmbTipo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmbTipo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmbTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbTipo.FormattingEnabled = True
-        Me.cmbTipo.Location = New System.Drawing.Point(42, 132)
+        Me.cmbTipo.Location = New System.Drawing.Point(63, 154)
         Me.cmbTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(298, 28)
+        Me.cmbTipo.Size = New System.Drawing.Size(445, 28)
         Me.cmbTipo.TabIndex = 2
         '
         'lblNumero
         '
         Me.lblNumero.AutoSize = True
-        Me.lblNumero.Location = New System.Drawing.Point(375, 108)
+        Me.lblNumero.Location = New System.Drawing.Point(562, 123)
         Me.lblNumero.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblNumero.Name = "lblNumero"
         Me.lblNumero.Size = New System.Drawing.Size(124, 20)
@@ -100,16 +101,16 @@ Partial Class frmNuevoIngreso
         'txtNumero
         '
         Me.txtNumero.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNumero.Location = New System.Drawing.Point(380, 134)
+        Me.txtNumero.Location = New System.Drawing.Point(570, 154)
         Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNumero.Name = "txtNumero"
-        Me.txtNumero.Size = New System.Drawing.Size(298, 26)
+        Me.txtNumero.Size = New System.Drawing.Size(445, 26)
         Me.txtNumero.TabIndex = 4
         '
         'lblAsunto
         '
         Me.lblAsunto.AutoSize = True
-        Me.lblAsunto.Location = New System.Drawing.Point(38, 192)
+        Me.lblAsunto.Location = New System.Drawing.Point(57, 215)
         Me.lblAsunto.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblAsunto.Name = "lblAsunto"
         Me.lblAsunto.Size = New System.Drawing.Size(64, 20)
@@ -120,33 +121,12 @@ Partial Class frmNuevoIngreso
         '
         Me.txtAsunto.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtAsunto.Location = New System.Drawing.Point(42, 217)
+        Me.txtAsunto.Location = New System.Drawing.Point(63, 246)
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
-        Me.txtAsunto.Size = New System.Drawing.Size(636, 90)
+        Me.txtAsunto.Size = New System.Drawing.Size(952, 90)
         Me.txtAsunto.TabIndex = 6
-        '
-        ' --- NUEVO: CHECKBOX VENCIMIENTO ---
-        '
-        Me.chkVencimiento.AutoSize = True
-        Me.chkVencimiento.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.chkVencimiento.ForeColor = System.Drawing.Color.DarkOrange
-        Me.chkVencimiento.Location = New System.Drawing.Point(42, 320)
-        Me.chkVencimiento.Name = "chkVencimiento"
-        Me.chkVencimiento.Size = New System.Drawing.Size(320, 29)
-        Me.chkVencimiento.TabIndex = 7
-        Me.chkVencimiento.Text = "¿Requiere Respuesta / Vence?"
-        Me.chkVencimiento.UseVisualStyleBackColor = True
-        '
-        ' --- NUEVO: DATEPICKER VENCIMIENTO ---
-        '
-        Me.dtpVencimiento.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.dtpVencimiento.Location = New System.Drawing.Point(350, 318)
-        Me.dtpVencimiento.Name = "dtpVencimiento"
-        Me.dtpVencimiento.Size = New System.Drawing.Size(150, 26)
-        Me.dtpVencimiento.TabIndex = 8
-        Me.dtpVencimiento.Visible = False ' Oculto por defecto
         '
         'grpVinculacion
         '
@@ -155,44 +135,44 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.Controls.Add(Me.lstReclusos)
         Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
         Me.grpVinculacion.Controls.Add(Me.chkVincular)
-        ' Ajustamos un poco la posición Y para que entre lo nuevo
-        Me.grpVinculacion.Location = New System.Drawing.Point(42, 360)
+        Me.grpVinculacion.Location = New System.Drawing.Point(63, 415)
         Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Name = "grpVinculacion"
         Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Size = New System.Drawing.Size(638, 190)
+        Me.grpVinculacion.Size = New System.Drawing.Size(957, 246)
         Me.grpVinculacion.TabIndex = 9
         Me.grpVinculacion.TabStop = False
         Me.grpVinculacion.Text = "Asociación"
+        '
+        'lstReclusos
+        '
+        Me.lstReclusos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstReclusos.Enabled = False
+        Me.lstReclusos.FormattingEnabled = True
+        Me.lstReclusos.ItemHeight = 20
+        Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
+        Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.lstReclusos.Name = "lstReclusos"
+        Me.lstReclusos.Size = New System.Drawing.Size(872, 84)
+        Me.lstReclusos.TabIndex = 2
         '
         'txtBuscarRecluso
         '
         Me.txtBuscarRecluso.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBuscarRecluso.Enabled = False
-        Me.txtBuscarRecluso.Location = New System.Drawing.Point(22, 69)
+        Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
         Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(583, 26)
+        Me.txtBuscarRecluso.Size = New System.Drawing.Size(872, 26)
         Me.txtBuscarRecluso.TabIndex = 1
-        '
-        'lstReclusos
-        '
-        Me.lstReclusos.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstReclusos.Enabled = False
-        Me.lstReclusos.FormattingEnabled = True
-        Me.lstReclusos.ItemHeight = 20
-        Me.lstReclusos.Location = New System.Drawing.Point(22, 104)
-        Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.lstReclusos.Name = "lstReclusos"
-        Me.lstReclusos.Size = New System.Drawing.Size(583, 64)
-        Me.lstReclusos.TabIndex = 2
         '
         'chkVincular
         '
         Me.chkVincular.AutoSize = True
-        Me.chkVincular.Location = New System.Drawing.Point(22, 31)
+        Me.chkVincular.Location = New System.Drawing.Point(33, 46)
         Me.chkVincular.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.chkVincular.Name = "chkVincular"
         Me.chkVincular.Size = New System.Drawing.Size(185, 24)
@@ -206,11 +186,11 @@ Partial Class frmNuevoIngreso
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
         Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
-        Me.grpArchivo.Location = New System.Drawing.Point(42, 560) ' Bajamos un poco Y
+        Me.grpArchivo.Location = New System.Drawing.Point(63, 685)
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpArchivo.Size = New System.Drawing.Size(638, 108)
+        Me.grpArchivo.Size = New System.Drawing.Size(957, 138)
         Me.grpArchivo.TabIndex = 10
         Me.grpArchivo.TabStop = False
         Me.grpArchivo.Text = "Archivo Digital"
@@ -219,7 +199,7 @@ Partial Class frmNuevoIngreso
         '
         Me.lblArchivoNombre.AutoSize = True
         Me.lblArchivoNombre.ForeColor = System.Drawing.Color.DimGray
-        Me.lblArchivoNombre.Location = New System.Drawing.Point(195, 46)
+        Me.lblArchivoNombre.Location = New System.Drawing.Point(292, 62)
         Me.lblArchivoNombre.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblArchivoNombre.Name = "lblArchivoNombre"
         Me.lblArchivoNombre.Size = New System.Drawing.Size(93, 20)
@@ -228,47 +208,68 @@ Partial Class frmNuevoIngreso
         '
         'btnAdjuntar
         '
-        Me.btnAdjuntar.Location = New System.Drawing.Point(22, 38)
+        Me.btnAdjuntar.Location = New System.Drawing.Point(33, 46)
         Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnAdjuntar.Name = "btnAdjuntar"
-        Me.btnAdjuntar.Size = New System.Drawing.Size(150, 35)
+        Me.btnAdjuntar.Size = New System.Drawing.Size(225, 54)
         Me.btnAdjuntar.TabIndex = 0
         Me.btnAdjuntar.Text = "Examinar..."
         Me.btnAdjuntar.UseVisualStyleBackColor = True
         '
         'btnGuardar
         '
-        Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(410, 690)
+        Me.btnGuardar.Location = New System.Drawing.Point(615, 862)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(270, 62)
+        Me.btnGuardar.Size = New System.Drawing.Size(405, 85)
         Me.btnGuardar.TabIndex = 11
         Me.btnGuardar.Text = "GUARDAR"
         Me.btnGuardar.UseVisualStyleBackColor = False
         '
         'btnCancelar
         '
-        Me.btnCancelar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCancelar.Location = New System.Drawing.Point(42, 690)
+        Me.btnCancelar.Location = New System.Drawing.Point(63, 862)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(150, 62)
+        Me.btnCancelar.Size = New System.Drawing.Size(225, 85)
         Me.btnCancelar.TabIndex = 12
         Me.btnCancelar.Text = "Cancelar"
         Me.btnCancelar.UseVisualStyleBackColor = True
+        '
+        'chkVencimiento
+        '
+        Me.chkVencimiento.AutoSize = True
+        Me.chkVencimiento.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.chkVencimiento.ForeColor = System.Drawing.Color.DarkOrange
+        Me.chkVencimiento.Location = New System.Drawing.Point(63, 362)
+        Me.chkVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkVencimiento.Name = "chkVencimiento"
+        Me.chkVencimiento.Size = New System.Drawing.Size(291, 29)
+        Me.chkVencimiento.TabIndex = 7
+        Me.chkVencimiento.Text = "¿Requiere Respuesta / Vence?"
+        Me.chkVencimiento.UseVisualStyleBackColor = True
+        '
+        'dtpVencimiento
+        '
+        Me.dtpVencimiento.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtpVencimiento.Location = New System.Drawing.Point(525, 362)
+        Me.dtpVencimiento.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dtpVencimiento.Name = "dtpVencimiento"
+        Me.dtpVencimiento.Size = New System.Drawing.Size(223, 26)
+        Me.dtpVencimiento.TabIndex = 8
+        Me.dtpVencimiento.Visible = False
         '
         'frmNuevoIngreso
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(750, 780)
-        ' AGREGAMOS LOS CONTROLES AL FORMULARIO
+        Me.ClientSize = New System.Drawing.Size(1101, 986)
         Me.Controls.Add(Me.dtpVencimiento)
         Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.btnCancelar)
@@ -282,7 +283,6 @@ Partial Class frmNuevoIngreso
         Me.Controls.Add(Me.cmbTipo)
         Me.Controls.Add(Me.lblTipo)
         Me.Controls.Add(Me.pnlTop)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -317,7 +317,7 @@ Partial Class frmNuevoIngreso
     Friend WithEvents lblArchivoNombre As System.Windows.Forms.Label
     Friend WithEvents btnGuardar As System.Windows.Forms.Button
     Friend WithEvents btnCancelar As System.Windows.Forms.Button
-    ' Declaraciones de los nuevos controles
     Friend WithEvents chkVencimiento As System.Windows.Forms.CheckBox
     Friend WithEvents dtpVencimiento As System.Windows.Forms.DateTimePicker
+    Friend WithEvents ToolTip1 As ToolTip
 End Class

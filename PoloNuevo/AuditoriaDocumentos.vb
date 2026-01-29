@@ -10,11 +10,16 @@
 Imports System
 Imports System.Collections.Generic
 
-Partial Public Class TiposDocumento
+Partial Public Class AuditoriaDocumentos
     Public Property Id As Integer
-    Public Property Nombre As String
+    Public Property FechaEliminacion As Nullable(Of Date)
+    Public Property UsuarioResponsable As String
+    Public Property MotivoEliminacion As String
+    Public Property DocIdOriginal As Nullable(Of Integer)
+    Public Property DocReferencia As String
+    Public Property DocAsunto As String
+    Public Property DocFechaCarga As Nullable(Of Date)
 
-    Public Overridable Property Documentos As ICollection(Of Documentos) = New HashSet(Of Documentos)
-    Public Overridable Property NumeracionRangos As ICollection(Of NumeracionRangos) = New HashSet(Of NumeracionRangos)
+    Public Overridable Property AuditoriaMovimientos As ICollection(Of AuditoriaMovimientos) = New HashSet(Of AuditoriaMovimientos)
 
 End Class

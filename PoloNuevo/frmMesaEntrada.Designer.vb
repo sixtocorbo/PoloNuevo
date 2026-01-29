@@ -19,6 +19,7 @@ Partial Class frmMesaEntrada
     Private Sub InitializeComponent()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnVerDigital = New System.Windows.Forms.Button()
         Me.btnImprimirRecibo = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
@@ -54,6 +55,7 @@ Partial Class frmMesaEntrada
         'pnlTop
         '
         Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.btnEliminar)
         Me.pnlTop.Controls.Add(Me.btnVerDigital)
         Me.pnlTop.Controls.Add(Me.btnImprimirRecibo)
         Me.pnlTop.Controls.Add(Me.btnEditar)
@@ -67,6 +69,21 @@ Partial Class frmMesaEntrada
         Me.pnlTop.Name = "pnlTop"
         Me.pnlTop.Size = New System.Drawing.Size(1512, 185)
         Me.pnlTop.TabIndex = 0
+        '
+        'btnEliminar
+        '
+        Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEliminar.BackColor = System.Drawing.Color.Maroon
+        Me.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEliminar.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnEliminar.ForeColor = System.Drawing.Color.White
+        Me.btnEliminar.Location = New System.Drawing.Point(60, 18)
+        Me.btnEliminar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnEliminar.Name = "btnEliminar"
+        Me.btnEliminar.Size = New System.Drawing.Size(120, 54)
+        Me.btnEliminar.TabIndex = 7
+        Me.btnEliminar.Text = "🗑 ELIMINAR"
+        Me.btnEliminar.UseVisualStyleBackColor = False
         '
         'btnVerDigital
         '
@@ -408,4 +425,5 @@ Partial Class frmMesaEntrada
     Friend WithEvents btnVerDigital As System.Windows.Forms.Button
     Friend WithEvents PrintDocument1 As System.Drawing.Printing.PrintDocument
     Friend WithEvents PrintDialog1 As System.Windows.Forms.PrintDialog
+    Friend WithEvents btnEliminar As System.Windows.Forms.Button ' <--- 3. Declaración
 End Class

@@ -15,21 +15,28 @@ Public Class frmNuevoIngreso
         Public Property Texto As String
     End Class
 
+    ' =========================================================
+    ' CONSTRUCTORES
+    ' =========================================================
     Public Sub New()
         InitializeComponent()
         _idDocumentoEditar = 0
-        Me.Text = "Nuevo Ingreso Documental"
+        Me.Text = "Nuevo Ingreso Documental (Externo)"
+        ' Cambiamos la etiqueta para que sea claro
+        lblNumero.Text = "Ref. Externa / Nro. Origen:"
     End Sub
 
     Public Sub New(idDocumento As Integer)
         InitializeComponent()
-        ApplyModernUi()
         _idDocumentoEditar = idDocumento
         Me.Text = "Editar / Detalle de Documento"
         btnGuardar.Text = "GUARDAR CAMBIOS"
         btnGuardar.BackColor = Color.SlateGray
     End Sub
 
+    ' =========================================================
+    ' CARGA INICIAL
+    ' =========================================================
     Private Sub frmNuevoIngreso_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarListas()
         If _idDocumentoEditar > 0 Then
@@ -39,10 +46,12 @@ Public Class frmNuevoIngreso
 
     Private Sub CargarListas()
         Using db As New PoloNuevoEntities()
+            ' Tipos de documento
             cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
 
+            ' Lista de reclusos
             _listaCompletaReclusos = db.Reclusos _
                                         .Select(Function(r) New ReclusoItem With {
                                             .Id = r.Id,
@@ -67,75 +76,26 @@ Public Class frmNuevoIngreso
         End If
     End Sub
 
+    ' =========================================================
+    ' EVENTOS DE INTERFAZ (LIMPIOS DE VALIDACIONES DE RANGO)
+    ' =========================================================
     Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
         Dim textoBusqueda As String = txtBuscarRecluso.Text.Trim().ToLower()
         Dim selectedId As Integer? = Nothing
-
-        If lstReclusos.SelectedValue IsNot Nothing Then
-            selectedId = Convert.ToInt32(lstReclusos.SelectedValue)
-        End If
+        If lstReclusos.SelectedValue IsNot Nothing Then selectedId = Convert.ToInt32(lstReclusos.SelectedValue)
 
         If String.IsNullOrWhiteSpace(textoBusqueda) Then
             ActualizarListaReclusos(_listaCompletaReclusos, selectedId)
         Else
             Dim palabras = textoBusqueda.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-            Dim filtrados = _listaCompletaReclusos.Where(Function(r)
-                                                             Return palabras.All(Function(p) r.Texto.ToLower().Contains(p))
-                                                         End Function).ToList()
+            Dim filtrados = _listaCompletaReclusos.Where(Function(r) palabras.All(Function(p) r.Texto.ToLower().Contains(p))).ToList()
             ActualizarListaReclusos(filtrados, selectedId)
         End If
     End Sub
 
-    ' =========================================================
-    ' LÓGICA VENCIMIENTOS (NUEVO)
-    ' =========================================================
     Private Sub chkVencimiento_CheckedChanged(sender As Object, e As EventArgs) Handles chkVencimiento.CheckedChanged
         dtpVencimiento.Visible = chkVencimiento.Checked
         dtpVencimiento.Enabled = chkVencimiento.Checked
-    End Sub
-
-    Private Sub CargarDatosEdicion()
-        Try
-            Using db As New PoloNuevoEntities()
-                Dim doc = db.Documentos.Find(_idDocumentoEditar)
-                If doc IsNot Nothing Then
-                    txtNumero.Text = doc.ReferenciaExterna
-                    txtAsunto.Text = doc.Descripcion
-                    cmbTipo.SelectedValue = doc.TipoDocumentoId
-
-                    If doc.ReclusoId.HasValue Then
-                        chkVincular.Checked = True
-                        txtBuscarRecluso.Enabled = True
-                        lstReclusos.Enabled = True
-                        ActualizarListaReclusos(_listaCompletaReclusos, doc.ReclusoId.Value)
-                    Else
-                        chkVincular.Checked = False
-                        txtBuscarRecluso.Enabled = False
-                        lstReclusos.Enabled = False
-                    End If
-
-                    ' CARGAR VENCIMIENTO
-                    If doc.FechaVencimiento.HasValue Then
-                        chkVencimiento.Checked = True
-                        dtpVencimiento.Value = doc.FechaVencimiento.Value
-                        dtpVencimiento.Visible = True
-                    Else
-                        chkVencimiento.Checked = False
-                        dtpVencimiento.Visible = False
-                    End If
-
-                    If doc.Extension <> ".phy" Then
-                        lblArchivoNombre.Text = "Archivo actual: " & doc.NombreArchivo
-                        lblArchivoNombre.ForeColor = Color.Blue
-                        btnAdjuntar.Text = "Reemplazar..."
-                    Else
-                        lblArchivoNombre.Text = "Registro Físico (Sin digitalizar)"
-                    End If
-                End If
-            End Using
-        Catch ex As Exception
-            MessageBox.Show("Error al cargar datos: " & ex.Message)
-        End Try
     End Sub
 
     Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
@@ -160,9 +120,59 @@ Public Class frmNuevoIngreso
         End Using
     End Sub
 
+    ' =========================================================
+    ' CARGA DE DATOS (EDICIÓN)
+    ' =========================================================
+    Private Sub CargarDatosEdicion()
+        Try
+            Using db As New PoloNuevoEntities()
+                Dim doc = db.Documentos.Find(_idDocumentoEditar)
+                If doc IsNot Nothing Then
+                    txtNumero.Text = doc.ReferenciaExterna
+                    txtAsunto.Text = doc.Descripcion
+
+                    If IsNumeric(doc.TipoDocumentoId) Then cmbTipo.SelectedValue = doc.TipoDocumentoId
+
+                    If doc.ReclusoId.HasValue Then
+                        chkVincular.Checked = True
+                        txtBuscarRecluso.Enabled = True
+                        lstReclusos.Enabled = True
+                        ActualizarListaReclusos(_listaCompletaReclusos, doc.ReclusoId.Value)
+                    Else
+                        chkVincular.Checked = False
+                        txtBuscarRecluso.Enabled = False
+                        lstReclusos.Enabled = False
+                    End If
+
+                    If doc.FechaVencimiento.HasValue Then
+                        chkVencimiento.Checked = True
+                        dtpVencimiento.Value = doc.FechaVencimiento.Value
+                        dtpVencimiento.Visible = True
+                    Else
+                        chkVencimiento.Checked = False
+                        dtpVencimiento.Visible = False
+                    End If
+
+                    If doc.Extension <> ".phy" Then
+                        lblArchivoNombre.Text = "Archivo actual: " & doc.NombreArchivo
+                        lblArchivoNombre.ForeColor = Color.Blue
+                        btnAdjuntar.Text = "Reemplazar..."
+                    Else
+                        lblArchivoNombre.Text = "Registro Físico (Sin digitalizar)"
+                    End If
+                End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Error al cargar datos: " & ex.Message)
+        End Try
+    End Sub
+
+    ' =========================================================
+    ' GUARDADO SIMPLE (SIN RANGOS, SOLO REGISTRO)
+    ' =========================================================
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If txtNumero.Text.Trim = "" Or txtAsunto.Text.Trim = "" Then
-            MessageBox.Show("Faltan datos obligatorios.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Faltan datos obligatorios (Número de Referencia o Asunto).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
@@ -177,50 +187,76 @@ Public Class frmNuevoIngreso
                     doc = db.Documentos.Find(_idDocumentoEditar)
                 End If
 
-                doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
-                doc.ReferenciaExterna = txtNumero.Text.Trim()
+                ' Tipo
+                If cmbTipo.SelectedValue IsNot Nothing AndAlso IsNumeric(cmbTipo.SelectedValue) Then
+                    doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
+                Else
+                    MessageBox.Show("Seleccione un Tipo válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                ' Datos básicos
+                doc.ReferenciaExterna = txtNumero.Text.Trim() ' Aquí guardamos lo que venga de afuera (ej: "OF. 32/2025")
                 doc.Descripcion = txtAsunto.Text.Trim()
 
+                ' Vinculación
                 If chkVincular.Checked And lstReclusos.SelectedValue IsNot Nothing Then
                     doc.ReclusoId = Convert.ToInt32(lstReclusos.SelectedValue)
                 Else
                     doc.ReclusoId = Nothing
                 End If
 
-                ' GUARDAR VENCIMIENTO
+                ' Vencimiento
                 If chkVencimiento.Checked Then
                     doc.FechaVencimiento = dtpVencimiento.Value.Date
                 Else
                     doc.FechaVencimiento = Nothing
                 End If
 
+                ' Archivo
                 If _archivoBytes IsNot Nothing Then
                     doc.Contenido = _archivoBytes
                     doc.NombreArchivo = _archivoNombre
                     doc.Extension = _archivoExt
                 ElseIf _idDocumentoEditar = 0 Then
+                    doc.Contenido = New Byte() {0}
+                    doc.NombreArchivo = "Registro Fisico"
                     doc.Extension = ".phy"
-                    doc.NombreArchivo = "Fisico"
                 End If
+
+                ' NOTA: Aquí quitamos toda la lógica de NumeracionRangos porque esto es ENTRADA EXTERNA.
+                ' No incrementamos contadores propios porque el número no es nuestro.
 
                 db.SaveChanges()
 
+                ' Movimiento Inicial
                 If _idDocumentoEditar = 0 Then
                     Dim mov As New MovimientosDocumentos()
                     mov.DocumentoId = doc.Id
                     mov.FechaMovimiento = DateTime.Now
                     mov.Origen = "EXTERNO / RECEPCIÓN"
                     mov.Destino = "MESA DE ENTRADA"
+                    mov.Observaciones = "Ingreso inicial por Mesa de Entrada"
                     db.MovimientosDocumentos.Add(mov)
                     db.SaveChanges()
                 End If
 
-                MessageBox.Show("Guardado correctamente.", "Éxito")
+                MessageBox.Show("Documento externo registrado correctamente.", "Éxito")
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
             End Using
+
+        Catch valEx As System.Data.Entity.Validation.DbEntityValidationException
+            Dim mensajeError As String = ""
+            For Each entidadError In valEx.EntityValidationErrors
+                For Each errorDetalle In entidadError.ValidationErrors
+                    mensajeError &= "- " & errorDetalle.PropertyName & ": " & errorDetalle.ErrorMessage & vbCrLf
+                Next
+            Next
+            MessageBox.Show("Error de validación:" & vbCrLf & mensajeError, "Datos Incorrectos", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
         Catch ex As Exception
-            MessageBox.Show("Error al guardar: " & ex.Message)
+            MessageBox.Show("Error general: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
@@ -228,80 +264,4 @@ Public Class frmNuevoIngreso
         Me.Close()
     End Sub
 
-    Private Sub ApplyModernUi()
-        Me.SuspendLayout()
-        Me.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point)
-        Me.BackColor = Color.White
-        Me.DoubleBuffered = True
-        Me.Padding = New Padding(16)
-        Me.FormBorderStyle = FormBorderStyle.Sizable
-        Me.MaximizeBox = False
-        Me.MinimumSize = New Size(780, 820)
-        Me.AcceptButton = btnGuardar
-        Me.CancelButton = btnCancelar
-
-        pnlTop.BackColor = Color.FromArgb(245, 246, 248)
-        pnlTop.Padding = New Padding(16, 16, 16, 12)
-        pnlTop.Height = 64
-
-        lblTitulo.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold, GraphicsUnit.Point)
-        lblTitulo.ForeColor = Color.FromArgb(55, 55, 55)
-
-        For Each lbl In New Label() {lblTipo, lblNumero, lblAsunto}
-            lbl.ForeColor = Color.FromArgb(70, 70, 70)
-        Next
-
-        cmbTipo.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        txtNumero.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        txtAsunto.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-
-        txtNumero.BorderStyle = BorderStyle.FixedSingle
-        txtAsunto.BorderStyle = BorderStyle.FixedSingle
-        txtBuscarRecluso.BorderStyle = BorderStyle.FixedSingle
-
-        StyleGroupBox(grpVinculacion)
-        StyleGroupBox(grpArchivo)
-
-        lstReclusos.BorderStyle = BorderStyle.FixedSingle
-        lstReclusos.IntegralHeight = False
-        lstReclusos.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
-        txtBuscarRecluso.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-
-        btnAdjuntar.FlatStyle = FlatStyle.Flat
-        btnAdjuntar.FlatAppearance.BorderSize = 1
-        btnAdjuntar.FlatAppearance.BorderColor = Color.FromArgb(210, 210, 210)
-        btnAdjuntar.BackColor = Color.White
-        btnAdjuntar.ForeColor = Color.FromArgb(60, 60, 60)
-        btnAdjuntar.Cursor = Cursors.Hand
-
-        lblArchivoNombre.ForeColor = Color.FromArgb(110, 110, 110)
-
-        StylePrimaryButton(btnGuardar)
-        StyleSecondaryButton(btnCancelar)
-        Me.ResumeLayout(True)
-    End Sub
-
-    Private Sub StyleGroupBox(g As GroupBox)
-        g.ForeColor = Color.FromArgb(70, 70, 70)
-        g.Padding = New Padding(10, 26, 10, 10)
-    End Sub
-
-    Private Sub StylePrimaryButton(b As Button)
-        b.FlatStyle = FlatStyle.Flat
-        b.FlatAppearance.BorderSize = 0
-        b.BackColor = Color.FromArgb(46, 125, 50)
-        b.ForeColor = Color.White
-        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold, GraphicsUnit.Point)
-        b.Cursor = Cursors.Hand
-    End Sub
-
-    Private Sub StyleSecondaryButton(b As Button)
-        b.FlatStyle = FlatStyle.Flat
-        b.FlatAppearance.BorderSize = 1
-        b.FlatAppearance.BorderColor = Color.FromArgb(210, 210, 210)
-        b.BackColor = Color.White
-        b.ForeColor = Color.FromArgb(60, 60, 60)
-        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Regular, GraphicsUnit.Point)
-        b.Cursor = Cursors.Hand
-    End Sub
 End Class

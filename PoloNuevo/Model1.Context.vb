@@ -47,5 +47,8 @@ Partial Public Class PoloNuevoEntities
     Public Overridable Property vw_ReclusosMaestro() As DbSet(Of vw_ReclusosMaestro)
     Public Overridable Property vw_DocumentosDetalle() As DbSet(Of vw_DocumentosDetalle)
     Public Overridable Property vw_PlanillaMensual() As DbSet(Of vw_PlanillaMensual)
+    Public Overridable Property AuditoriaDocumentos() As DbSet(Of AuditoriaDocumentos)
+    Public Overridable Property AuditoriaMovimientos() As DbSet(Of AuditoriaMovimientos)
+    Public Overridable Property NumeracionRangos() As DbSet(Of NumeracionRangos)
 
 End Class
