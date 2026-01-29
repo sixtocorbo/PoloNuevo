@@ -93,6 +93,7 @@
           <Property Name="FechaCarga" Type="datetime" />
           <Property Name="ReferenciaExterna" Type="nvarchar" MaxLength="100" />
           <Property Name="FechaVencimiento" Type="datetime" />
+          <Property Name="DocumentoPadreId" Type="int" />
         </EntityType>
         <EntityType Name="Estados">
           <Key>
@@ -422,6 +423,18 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Documentos_Padre">
+          <End Role="Documentos" Type="Self.Documentos" Multiplicity="0..1" />
+          <End Role="Documentos1" Type="Self.Documentos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Documentos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Documentos1">
+              <PropertyRef Name="DocumentoPadreId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Documentos_Reclusos">
           <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="0..1" />
           <End Role="Documentos" Type="Self.Documentos" Multiplicity="*" />
@@ -707,6 +720,10 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             <End Role="Tareas" EntitySet="Tareas" />
             <End Role="Comisiones" EntitySet="Comisiones" />
           </AssociationSet>
+          <AssociationSet Name="FK_Documentos_Padre" Association="Self.FK_Documentos_Padre">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="Documentos1" EntitySet="Documentos" />
+          </AssociationSet>
           <AssociationSet Name="FK_Documentos_Reclusos" Association="Self.FK_Documentos_Reclusos">
             <End Role="Reclusos" EntitySet="Reclusos" />
             <End Role="Documentos" EntitySet="Documentos" />
@@ -847,6 +864,9 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <NavigationProperty Name="TiposDocumento" Relationship="Self.FK_Documentos_Tipos" FromRole="Documentos" ToRole="TiposDocumento" />
           <NavigationProperty Name="MovimientosDocumentos" Relationship="Self.FK_Movimientos_Documentos" FromRole="Documentos" ToRole="MovimientosDocumentos" />
           <Property Name="FechaVencimiento" Type="DateTime" Precision="3" />
+          <Property Name="DocumentoPadreId" Type="Int32" />
+          <NavigationProperty Name="Documentos1" Relationship="PoloNuevoModel.FK_Documentos_Padre" FromRole="Documentos" ToRole="Documentos1" />
+          <NavigationProperty Name="Documentos2" Relationship="PoloNuevoModel.FK_Documentos_Padre" FromRole="Documentos1" ToRole="Documentos" />
         </EntityType>
         <EntityType Name="Estados">
           <Key>
@@ -1446,6 +1466,10 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             <End Role="TiposDocumento" EntitySet="TiposDocumento" />
             <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
           </AssociationSet>
+          <AssociationSet Name="FK_Documentos_Padre" Association="PoloNuevoModel.FK_Documentos_Padre">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="Documentos1" EntitySet="Documentos" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="vw_DocumentosDetalle">
           <Key>
@@ -1547,6 +1571,18 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Documentos_Padre">
+          <End Type="PoloNuevoModel.Documentos" Role="Documentos" Multiplicity="0..1" />
+          <End Type="PoloNuevoModel.Documentos" Role="Documentos1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Documentos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Documentos1">
+              <PropertyRef Name="DocumentoPadreId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1609,6 +1645,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySetMapping Name="Documentos">
             <EntityTypeMapping TypeName="PoloNuevoModel.Documentos">
               <MappingFragment StoreEntitySet="Documentos">
+                <ScalarProperty Name="DocumentoPadreId" ColumnName="DocumentoPadreId" />
                 <ScalarProperty Name="FechaVencimiento" ColumnName="FechaVencimiento" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />

@@ -56,6 +56,7 @@
         <AssociationConnector Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" />
         <EntityTypeShape EntityType="PoloNuevoModel.NumeracionRangos" Width="1.5" PointX="5.25" PointY="34.125" />
         <AssociationConnector Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Padre" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

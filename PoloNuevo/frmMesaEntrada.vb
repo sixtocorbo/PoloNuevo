@@ -68,7 +68,7 @@ Public Class frmMesaEntrada
                                      .Recluso = If(d.Reclusos IsNot Nothing, d.Reclusos.Nombre, "Sin Vincular"),
                                      .Estado = If(d.MovimientosDocumentos.Count() = 1, "PENDIENTE", "MOVIDO"),
                                      .Digital = If(d.Extension <> ".phy", "SI", "NO"),
-                                     .Vencimiento = d.FechaVencimiento ' <--- NUEVO CAMPO CARGADO
+                                     .Vencimiento = d.FechaVencimiento
                                  }) _
                                  .Take(200) _
                                  .ToList()
@@ -78,7 +78,7 @@ Public Class frmMesaEntrada
 
                 ' 7. Configuración Visual
                 If dgvMesa.Columns("Id") IsNot Nothing Then dgvMesa.Columns("Id").Visible = False
-                If dgvMesa.Columns("Vencimiento") IsNot Nothing Then dgvMesa.Columns("Vencimiento").Visible = False ' Lo ocultamos, solo es para colorear
+                If dgvMesa.Columns("Vencimiento") IsNot Nothing Then dgvMesa.Columns("Vencimiento").Visible = False
 
                 ConfigurarColumnas()
                 ColorearPendientes()
@@ -123,54 +123,38 @@ Public Class frmMesaEntrada
         End With
     End Sub
 
-    ' =========================================================
-    ' COLOREAR FILAS (LÓGICA ACTUALIZADA DE ALERTAS)
-    ' =========================================================
     Private Sub ColorearPendientes()
         If dgvMesa.Columns("Estado") Is Nothing Then Return
 
         Dim fechaHoy As Date = DateTime.Now.Date
 
         For Each row As DataGridViewRow In dgvMesa.Rows
-
-            ' 1. Verificamos Vencimientos (Prioridad Alta)
             Dim tieneVencimiento As Boolean = False
-
-            ' Verificamos que la columna exista y el valor no sea nulo
             If dgvMesa.Columns("Vencimiento") IsNot Nothing AndAlso row.Cells("Vencimiento").Value IsNot Nothing Then
                 Dim fechaVenc As Date = Convert.ToDateTime(row.Cells("Vencimiento").Value)
                 tieneVencimiento = True
-
                 Dim diasRestantes As Integer = (fechaVenc - fechaHoy).TotalDays
 
                 If diasRestantes < 0 Then
-                    ' VENCIDO: Fondo Rojo Intenso, Letra Blanca
                     row.DefaultCellStyle.BackColor = Color.Firebrick
                     row.DefaultCellStyle.ForeColor = Color.White
                     row.Cells("Referencia").Value = "(VENCIDO) " & row.Cells("Referencia").Value.ToString()
-
                 ElseIf diasRestantes <= 5 Then
-                    ' ALERTA (Faltan 5 días o menos): Fondo Naranja, Letra Negra
                     row.DefaultCellStyle.BackColor = Color.Orange
                     row.DefaultCellStyle.ForeColor = Color.Black
                 End If
             End If
 
-            ' 2. Si no tiene alerta de vencimiento, aplicamos el color de "Pendiente" normal
             If Not tieneVencimiento AndAlso row.Cells("Estado").Value.ToString() = "PENDIENTE" Then
-                ' Solo cambiamos si no fue pintado ya por vencimiento
                 If row.DefaultCellStyle.BackColor = dgvMesa.DefaultCellStyle.BackColor Then
                     row.DefaultCellStyle.ForeColor = Color.DarkRed
                     row.DefaultCellStyle.BackColor = Color.MistyRose
                 End If
             End If
 
-            ' 3. Digitales (Azulito)
             If dgvMesa.Columns("Digital") IsNot Nothing AndAlso row.Cells("Digital").Value.ToString() = "SI" Then
                 row.Cells("Digital").Style.ForeColor = Color.Blue
                 row.Cells("Digital").Style.Font = New Font("Segoe UI", 8, FontStyle.Bold)
-
-                ' Si está vencido (fondo rojo), forzamos el azul a ser amarillo para que se lea
                 If row.DefaultCellStyle.BackColor = Color.Firebrick Then
                     row.Cells("Digital").Style.ForeColor = Color.Yellow
                 End If
@@ -179,7 +163,116 @@ Public Class frmMesaEntrada
     End Sub
 
     ' =========================================================
-    ' EVENTOS DE FILTROS Y OTROS
+    ' BOTONES DE ACCIÓN (LO QUE PEDISTE)
+    ' =========================================================
+
+    ' 1. NUEVO INGRESO (Lo de ingreso)
+    Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
+        Dim frm As New frmNuevoIngreso()
+        If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
+    End Sub
+
+    ' 2. REGISTRAR PASE (Lo de pases)
+    Private Sub btnPase_Click(sender As Object, e As EventArgs) Handles btnPase.Click
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+
+        ' Abre frmNuevoPase (que tiene la lógica de arrastre de adjuntos)
+        Dim frm As New frmNuevoPase(idDoc)
+        If frm.ShowDialog() = DialogResult.OK Then
+            CargarMesa()
+            CargarHistorial(idDoc)
+        End If
+    End Sub
+
+    ' 3. ACTUAR / RESPONDER (Lo de actuar)
+    Private Sub btnActuar_Click(sender As Object, e As EventArgs) Handles btnActuar.Click
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Seleccione un documento para responder o actuar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+
+        ' Abre frmGenerarDocumento (que crea un documento nuevo vinculado al padre)
+        Dim frm As New frmGenerarDocumento(idDoc)
+        If frm.ShowDialog() = DialogResult.OK Then
+            CargarMesa()
+            CargarHistorial(idDoc)
+        End If
+    End Sub
+
+    ' 4. EDITAR / DETALLE
+    Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Seleccione un documento de la lista para ver su detalle o editar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        Dim frm As New frmNuevoIngreso(idDoc)
+        If frm.ShowDialog() = DialogResult.OK Then
+            CargarMesa()
+            CargarHistorial(idDoc)
+        End If
+    End Sub
+
+    ' 5. ELIMINAR
+    Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Por favor, seleccione el documento que desea eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        Dim motivo As String = InputBox("Ingrese el MOTIVO de la eliminación:" & vbCrLf & "(Ej: Error de carga, Duplicado, Orden Judicial, etc.)", "Auditoría de Eliminación")
+        If String.IsNullOrWhiteSpace(motivo) Then Return
+
+        If MessageBox.Show("¿Está seguro? Se eliminará el documento y se archivará TODO su historial en auditoría.", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+            Try
+                Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+                Using db As New PoloNuevoEntities()
+                    Dim doc = db.Documentos.Find(idDoc)
+                    If doc IsNot Nothing Then
+                        Dim auditoria As New AuditoriaDocumentos()
+                        auditoria.FechaEliminacion = DateTime.Now
+                        auditoria.UsuarioResponsable = "Operador de Mesa"
+                        auditoria.MotivoEliminacion = motivo
+                        auditoria.DocIdOriginal = doc.Id
+                        auditoria.DocReferencia = doc.ReferenciaExterna
+                        auditoria.DocAsunto = doc.Descripcion
+                        auditoria.DocFechaCarga = doc.FechaCarga
+                        db.AuditoriaDocumentos.Add(auditoria)
+                        db.SaveChanges()
+
+                        For Each mov In doc.MovimientosDocumentos
+                            Dim audMov As New AuditoriaMovimientos()
+                            audMov.AuditoriaDocId = auditoria.Id
+                            audMov.FechaMovimientoOriginal = mov.FechaMovimiento
+                            audMov.Origen = mov.Origen
+                            audMov.Destino = mov.Destino
+                            audMov.Observaciones = mov.Observaciones
+                            audMov.TipoMovimiento = If(mov.EsSalida, "SALIDA", "ENTRADA")
+                            db.AuditoriaMovimientos.Add(audMov)
+                        Next
+
+                        db.MovimientosDocumentos.RemoveRange(doc.MovimientosDocumentos)
+                        db.Documentos.Remove(doc)
+                        db.SaveChanges()
+
+                        MessageBox.Show("Eliminación completa. El historial ha sido resguardado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        CargarMesa()
+                        dgvMovimientos.DataSource = Nothing
+                    End If
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Error crítico: " & ex.Message)
+            End Try
+        End If
+    End Sub
+
+    ' =========================================================
+    ' EVENTOS DE INTERFAZ AUXILIARES
     ' =========================================================
     Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
         CargarMesa()
@@ -237,65 +330,17 @@ Public Class frmMesaEntrada
             dgvMovimientos.DataSource = historial
 
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
-
-            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then
-                dgvMovimientos.Columns("Tipo").Width = 300
-            End If
-
+            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then dgvMovimientos.Columns("Tipo").Width = 300
             If dgvMovimientos.Columns("Destino") IsNot Nothing Then
                 dgvMovimientos.Columns("Destino").HeaderText = "Destino"
                 dgvMovimientos.Columns("Destino").Width = 180
             End If
-
             If dgvMovimientos.Columns("Fecha") IsNot Nothing Then
                 dgvMovimientos.Columns("Fecha").HeaderText = "Fecha mov."
                 dgvMovimientos.Columns("Fecha").Width = 120
                 dgvMovimientos.Columns("Fecha").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
         End Using
-    End Sub
-
-    Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Dim frm As New frmNuevoIngreso()
-        If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
-    End Sub
-
-    'Private Sub btnPase_Click(sender As Object, e As EventArgs) Handles btnPase.Click
-    '    If dgvMesa.SelectedRows.Count = 0 Then
-    '        MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    '        Return
-    '    End If
-    '    Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-    '    Dim frm As New frmNuevoPase(idDoc)
-    '    If frm.ShowDialog() = DialogResult.OK Then
-    '        CargarMesa()
-    '        CargarHistorial(idDoc)
-    '    End If
-    'End Sub
-    Private Sub btnResponder_Click(sender As Object, e As EventArgs) Handles btnPase.Click
-        If dgvMesa.SelectedRows.Count = 0 Then Return
-
-        Dim idDocExterno As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
-        ' Abrimos el nuevo formulario pasándole el ID
-        Dim frm As New frmGenerarDocumento(idDocExterno)
-
-        If frm.ShowDialog() = DialogResult.OK Then
-            CargarMesa() ' Refrescamos la lista para ver el nuevo doc generado
-        End If
-    End Sub
-
-    Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
-        If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione un documento de la lista para ver su detalle o editar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-        Dim frm As New frmNuevoIngreso(idDoc)
-        If frm.ShowDialog() = DialogResult.OK Then
-            CargarMesa()
-            CargarHistorial(idDoc)
-        End If
     End Sub
 
     Private Sub btnVerDigital_Click(sender As Object, e As EventArgs) Handles btnVerDigital.Click
@@ -416,68 +461,4 @@ Public Class frmMesaEntrada
         e.HasMorePages = False
     End Sub
 
-    Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
-        ' 1. Validar selección
-        If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Por favor, seleccione el documento que desea eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-
-        ' 2. Solicitar MOTIVO
-        Dim motivo As String = InputBox("Ingrese el MOTIVO de la eliminación:" & vbCrLf & "(Ej: Error de carga, Duplicado, Orden Judicial, etc.)", "Auditoría de Eliminación")
-        If String.IsNullOrWhiteSpace(motivo) Then Return
-
-        ' 3. Confirmación
-        If MessageBox.Show("¿Está seguro? Se eliminará el documento y se archivará TODO su historial en auditoría.", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
-            Try
-                Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
-                Using db As New PoloNuevoEntities()
-                    Dim doc = db.Documentos.Find(idDoc)
-
-                    If doc IsNot Nothing Then
-                        ' A. GUARDAR CABECERA (El Documento)
-                        Dim auditoria As New AuditoriaDocumentos()
-                        auditoria.FechaEliminacion = DateTime.Now
-                        auditoria.UsuarioResponsable = "Operador de Mesa"
-                        auditoria.MotivoEliminacion = motivo
-                        auditoria.DocIdOriginal = doc.Id
-                        auditoria.DocReferencia = doc.ReferenciaExterna
-                        auditoria.DocAsunto = doc.Descripcion
-                        auditoria.DocFechaCarga = doc.FechaCarga
-
-                        db.AuditoriaDocumentos.Add(auditoria)
-                        ' Guardamos aquí para obtener el ID de la auditoría y usarlo abajo
-                        db.SaveChanges()
-
-                        ' B. GUARDAR DETALLE (El Historial de Movimientos)
-                        For Each mov In doc.MovimientosDocumentos
-                            Dim audMov As New AuditoriaMovimientos()
-                            audMov.AuditoriaDocId = auditoria.Id ' <--- Vinculamos con el padre borrado
-                            audMov.FechaMovimientoOriginal = mov.FechaMovimiento
-                            audMov.Origen = mov.Origen
-                            audMov.Destino = mov.Destino
-                            audMov.Observaciones = mov.Observaciones
-                            audMov.TipoMovimiento = If(mov.EsSalida, "SALIDA", "ENTRADA")
-
-                            db.AuditoriaMovimientos.Add(audMov)
-                        Next
-
-                        ' C. BORRAR DATOS ORIGINALES
-                        db.MovimientosDocumentos.RemoveRange(doc.MovimientosDocumentos)
-                        db.Documentos.Remove(doc)
-
-                        ' D. CONFIRMAR CAMBIOS
-                        db.SaveChanges()
-
-                        MessageBox.Show("Eliminación completa. El historial ha sido resguardado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                        CargarMesa()
-                        dgvMovimientos.DataSource = Nothing
-                    End If
-                End Using
-            Catch ex As Exception
-                MessageBox.Show("Error crítico: " & ex.Message)
-            End Try
-        End If
-    End Sub
 End Class

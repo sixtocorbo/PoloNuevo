@@ -60,7 +60,7 @@ Partial Class frmNuevoIngreso
         Me.pnlTop.Location = New System.Drawing.Point(0, 0)
         Me.pnlTop.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.pnlTop.Name = "pnlTop"
-        Me.pnlTop.Size = New System.Drawing.Size(1101, 92)
+        Me.pnlTop.Size = New System.Drawing.Size(1075, 92)
         Me.pnlTop.TabIndex = 0
         '
         'lblTitulo
@@ -94,7 +94,7 @@ Partial Class frmNuevoIngreso
         Me.cmbTipo.Location = New System.Drawing.Point(63, 154)
         Me.cmbTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(445, 28)
+        Me.cmbTipo.Size = New System.Drawing.Size(367, 28)
         Me.cmbTipo.TabIndex = 2
         '
         'lblNumero
@@ -110,7 +110,7 @@ Partial Class frmNuevoIngreso
         'txtNumero
         '
         Me.txtNumero.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNumero.Location = New System.Drawing.Point(570, 154)
+        Me.txtNumero.Location = New System.Drawing.Point(492, 154)
         Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNumero.Name = "txtNumero"
         Me.txtNumero.Size = New System.Drawing.Size(445, 26)
@@ -122,7 +122,7 @@ Partial Class frmNuevoIngreso
         Me.lblOrigen.Location = New System.Drawing.Point(57, 215)
         Me.lblOrigen.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblOrigen.Name = "lblOrigen"
-        Me.lblOrigen.Size = New System.Drawing.Size(160, 20)
+        Me.lblOrigen.Size = New System.Drawing.Size(163, 20)
         Me.lblOrigen.TabIndex = 5
         Me.lblOrigen.Text = "Organismo de Origen:"
         '
@@ -130,12 +130,11 @@ Partial Class frmNuevoIngreso
         '
         Me.cmbOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmbOrigen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cmbOrigen.FormattingEnabled = True
         Me.cmbOrigen.Location = New System.Drawing.Point(63, 246)
         Me.cmbOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbOrigen.Name = "cmbOrigen"
-        Me.cmbOrigen.Size = New System.Drawing.Size(952, 28)
+        Me.cmbOrigen.Size = New System.Drawing.Size(874, 28)
         Me.cmbOrigen.TabIndex = 6
         '
         'lblAsunto
@@ -156,8 +155,121 @@ Partial Class frmNuevoIngreso
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
-        Me.txtAsunto.Size = New System.Drawing.Size(952, 90)
+        Me.txtAsunto.Size = New System.Drawing.Size(874, 90)
         Me.txtAsunto.TabIndex = 8
+        '
+        'grpVinculacion
+        '
+        Me.grpVinculacion.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpVinculacion.Controls.Add(Me.lstReclusos)
+        Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
+        Me.grpVinculacion.Controls.Add(Me.chkVincular)
+        Me.grpVinculacion.Location = New System.Drawing.Point(63, 620)
+        Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpVinculacion.Name = "grpVinculacion"
+        Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpVinculacion.Size = New System.Drawing.Size(879, 246)
+        Me.grpVinculacion.TabIndex = 11
+        Me.grpVinculacion.TabStop = False
+        Me.grpVinculacion.Text = "Asociación"
+        '
+        'lstReclusos
+        '
+        Me.lstReclusos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstReclusos.Enabled = False
+        Me.lstReclusos.FormattingEnabled = True
+        Me.lstReclusos.ItemHeight = 20
+        Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
+        Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.lstReclusos.Name = "lstReclusos"
+        Me.lstReclusos.Size = New System.Drawing.Size(794, 84)
+        Me.lstReclusos.TabIndex = 2
+        '
+        'txtBuscarRecluso
+        '
+        Me.txtBuscarRecluso.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBuscarRecluso.Enabled = False
+        Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
+        Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
+        Me.txtBuscarRecluso.Size = New System.Drawing.Size(794, 26)
+        Me.txtBuscarRecluso.TabIndex = 1
+        '
+        'chkVincular
+        '
+        Me.chkVincular.AutoSize = True
+        Me.chkVincular.Location = New System.Drawing.Point(33, 46)
+        Me.chkVincular.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkVincular.Name = "chkVincular"
+        Me.chkVincular.Size = New System.Drawing.Size(185, 24)
+        Me.chkVincular.TabIndex = 0
+        Me.chkVincular.Text = "¿Vincular a Recluso?"
+        Me.chkVincular.UseVisualStyleBackColor = True
+        '
+        'grpArchivo
+        '
+        Me.grpArchivo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
+        Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
+        Me.grpArchivo.Location = New System.Drawing.Point(63, 890)
+        Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpArchivo.Name = "grpArchivo"
+        Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.grpArchivo.Size = New System.Drawing.Size(879, 138)
+        Me.grpArchivo.TabIndex = 12
+        Me.grpArchivo.TabStop = False
+        Me.grpArchivo.Text = "Archivo Digital"
+        '
+        'lblArchivoNombre
+        '
+        Me.lblArchivoNombre.AutoSize = True
+        Me.lblArchivoNombre.ForeColor = System.Drawing.Color.DimGray
+        Me.lblArchivoNombre.Location = New System.Drawing.Point(292, 62)
+        Me.lblArchivoNombre.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblArchivoNombre.Name = "lblArchivoNombre"
+        Me.lblArchivoNombre.Size = New System.Drawing.Size(93, 20)
+        Me.lblArchivoNombre.TabIndex = 1
+        Me.lblArchivoNombre.Text = "Sin adjunto."
+        '
+        'btnAdjuntar
+        '
+        Me.btnAdjuntar.Location = New System.Drawing.Point(33, 46)
+        Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAdjuntar.Name = "btnAdjuntar"
+        Me.btnAdjuntar.Size = New System.Drawing.Size(225, 54)
+        Me.btnAdjuntar.TabIndex = 0
+        Me.btnAdjuntar.Text = "Examinar..."
+        Me.btnAdjuntar.UseVisualStyleBackColor = True
+        '
+        'btnGuardar
+        '
+        Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
+        Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.btnGuardar.ForeColor = System.Drawing.Color.White
+        Me.btnGuardar.Location = New System.Drawing.Point(537, 1067)
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnGuardar.Name = "btnGuardar"
+        Me.btnGuardar.Size = New System.Drawing.Size(405, 85)
+        Me.btnGuardar.TabIndex = 13
+        Me.btnGuardar.Text = "GUARDAR"
+        Me.btnGuardar.UseVisualStyleBackColor = False
+        '
+        'btnCancelar
+        '
+        Me.btnCancelar.Location = New System.Drawing.Point(63, 1067)
+        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCancelar.Name = "btnCancelar"
+        Me.btnCancelar.Size = New System.Drawing.Size(225, 85)
+        Me.btnCancelar.TabIndex = 14
+        Me.btnCancelar.Text = "Cancelar"
+        Me.btnCancelar.UseVisualStyleBackColor = True
         '
         'chkVencimiento
         '
@@ -203,7 +315,7 @@ Partial Class frmNuevoIngreso
         Me.lblInfoPadre.ForeColor = System.Drawing.Color.Blue
         Me.lblInfoPadre.Location = New System.Drawing.Point(445, 75)
         Me.lblInfoPadre.Name = "lblInfoPadre"
-        Me.lblInfoPadre.Size = New System.Drawing.Size(280, 20)
+        Me.lblInfoPadre.Size = New System.Drawing.Size(168, 20)
         Me.lblInfoPadre.TabIndex = 4
         Me.lblInfoPadre.Text = "Ingrese ID o Busque..."
         '
@@ -241,130 +353,17 @@ Partial Class frmNuevoIngreso
         Me.chkEsRespuesta.AutoSize = True
         Me.chkEsRespuesta.Location = New System.Drawing.Point(33, 35)
         Me.chkEsRespuesta.Name = "chkEsRespuesta"
-        Me.chkEsRespuesta.Size = New System.Drawing.Size(325, 24)
+        Me.chkEsRespuesta.Size = New System.Drawing.Size(343, 24)
         Me.chkEsRespuesta.TabIndex = 0
         Me.chkEsRespuesta.Text = "¿Este documento responde a uno anterior?"
         Me.chkEsRespuesta.UseVisualStyleBackColor = True
-        '
-        'grpVinculacion
-        '
-        Me.grpVinculacion.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpVinculacion.Controls.Add(Me.lstReclusos)
-        Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
-        Me.grpVinculacion.Controls.Add(Me.chkVincular)
-        Me.grpVinculacion.Location = New System.Drawing.Point(63, 620)
-        Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Name = "grpVinculacion"
-        Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Size = New System.Drawing.Size(957, 246)
-        Me.grpVinculacion.TabIndex = 11
-        Me.grpVinculacion.TabStop = False
-        Me.grpVinculacion.Text = "Asociación"
-        '
-        'lstReclusos
-        '
-        Me.lstReclusos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstReclusos.Enabled = False
-        Me.lstReclusos.FormattingEnabled = True
-        Me.lstReclusos.ItemHeight = 20
-        Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
-        Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.lstReclusos.Name = "lstReclusos"
-        Me.lstReclusos.Size = New System.Drawing.Size(872, 84)
-        Me.lstReclusos.TabIndex = 2
-        '
-        'txtBuscarRecluso
-        '
-        Me.txtBuscarRecluso.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtBuscarRecluso.Enabled = False
-        Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
-        Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(872, 26)
-        Me.txtBuscarRecluso.TabIndex = 1
-        '
-        'chkVincular
-        '
-        Me.chkVincular.AutoSize = True
-        Me.chkVincular.Location = New System.Drawing.Point(33, 46)
-        Me.chkVincular.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkVincular.Name = "chkVincular"
-        Me.chkVincular.Size = New System.Drawing.Size(185, 24)
-        Me.chkVincular.TabIndex = 0
-        Me.chkVincular.Text = "¿Vincular a Recluso?"
-        Me.chkVincular.UseVisualStyleBackColor = True
-        '
-        'grpArchivo
-        '
-        Me.grpArchivo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
-        Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
-        Me.grpArchivo.Location = New System.Drawing.Point(63, 890)
-        Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpArchivo.Name = "grpArchivo"
-        Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpArchivo.Size = New System.Drawing.Size(957, 138)
-        Me.grpArchivo.TabIndex = 12
-        Me.grpArchivo.TabStop = False
-        Me.grpArchivo.Text = "Archivo Digital"
-        '
-        'lblArchivoNombre
-        '
-        Me.lblArchivoNombre.AutoSize = True
-        Me.lblArchivoNombre.ForeColor = System.Drawing.Color.DimGray
-        Me.lblArchivoNombre.Location = New System.Drawing.Point(292, 62)
-        Me.lblArchivoNombre.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.lblArchivoNombre.Name = "lblArchivoNombre"
-        Me.lblArchivoNombre.Size = New System.Drawing.Size(93, 20)
-        Me.lblArchivoNombre.TabIndex = 1
-        Me.lblArchivoNombre.Text = "Sin adjunto."
-        '
-        'btnAdjuntar
-        '
-        Me.btnAdjuntar.Location = New System.Drawing.Point(33, 46)
-        Me.btnAdjuntar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnAdjuntar.Name = "btnAdjuntar"
-        Me.btnAdjuntar.Size = New System.Drawing.Size(225, 54)
-        Me.btnAdjuntar.TabIndex = 0
-        Me.btnAdjuntar.Text = "Examinar..."
-        Me.btnAdjuntar.UseVisualStyleBackColor = True
-        '
-        'btnGuardar
-        '
-        Me.btnGuardar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
-        Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
-        Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(615, 1067)
-        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(405, 85)
-        Me.btnGuardar.TabIndex = 13
-        Me.btnGuardar.Text = "GUARDAR"
-        Me.btnGuardar.UseVisualStyleBackColor = False
-        '
-        'btnCancelar
-        '
-        Me.btnCancelar.Location = New System.Drawing.Point(63, 1067)
-        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnCancelar.Name = "btnCancelar"
-        Me.btnCancelar.Size = New System.Drawing.Size(225, 85)
-        Me.btnCancelar.TabIndex = 14
-        Me.btnCancelar.Text = "Cancelar"
-        Me.btnCancelar.UseVisualStyleBackColor = True
         '
         'frmNuevoIngreso
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(1101, 1180)
+        Me.ClientSize = New System.Drawing.Size(1101, 1050)
         Me.Controls.Add(Me.grpRelacion)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)

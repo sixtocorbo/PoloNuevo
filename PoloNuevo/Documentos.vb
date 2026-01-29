@@ -21,9 +21,12 @@ Partial Public Class Documentos
     Public Property FechaCarga As Nullable(Of Date)
     Public Property ReferenciaExterna As String
     Public Property FechaVencimiento As Nullable(Of Date)
+    Public Property DocumentoPadreId As Nullable(Of Integer)
 
     Public Overridable Property Reclusos As Reclusos
     Public Overridable Property TiposDocumento As TiposDocumento
     Public Overridable Property MovimientosDocumentos As ICollection(Of MovimientosDocumentos) = New HashSet(Of MovimientosDocumentos)
+    Public Overridable Property Documentos1 As ICollection(Of Documentos) = New HashSet(Of Documentos)
+    Public Overridable Property Documentos2 As Documentos
 
 End Class
