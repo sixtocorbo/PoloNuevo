@@ -94,7 +94,7 @@ Partial Class frmNuevoIngreso
         Me.cmbTipo.Location = New System.Drawing.Point(63, 154)
         Me.cmbTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(367, 28)
+        Me.cmbTipo.Size = New System.Drawing.Size(289, 28)
         Me.cmbTipo.TabIndex = 2
         '
         'lblNumero
@@ -110,7 +110,7 @@ Partial Class frmNuevoIngreso
         'txtNumero
         '
         Me.txtNumero.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNumero.Location = New System.Drawing.Point(492, 154)
+        Me.txtNumero.Location = New System.Drawing.Point(414, 154)
         Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNumero.Name = "txtNumero"
         Me.txtNumero.Size = New System.Drawing.Size(445, 26)
@@ -134,7 +134,7 @@ Partial Class frmNuevoIngreso
         Me.cmbOrigen.Location = New System.Drawing.Point(63, 246)
         Me.cmbOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbOrigen.Name = "cmbOrigen"
-        Me.cmbOrigen.Size = New System.Drawing.Size(874, 28)
+        Me.cmbOrigen.Size = New System.Drawing.Size(796, 28)
         Me.cmbOrigen.TabIndex = 6
         '
         'lblAsunto
@@ -155,7 +155,7 @@ Partial Class frmNuevoIngreso
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
-        Me.txtAsunto.Size = New System.Drawing.Size(874, 90)
+        Me.txtAsunto.Size = New System.Drawing.Size(796, 90)
         Me.txtAsunto.TabIndex = 8
         '
         'grpVinculacion
@@ -169,7 +169,7 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Name = "grpVinculacion"
         Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Size = New System.Drawing.Size(879, 246)
+        Me.grpVinculacion.Size = New System.Drawing.Size(801, 246)
         Me.grpVinculacion.TabIndex = 11
         Me.grpVinculacion.TabStop = False
         Me.grpVinculacion.Text = "Asociación"
@@ -185,7 +185,7 @@ Partial Class frmNuevoIngreso
         Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
         Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lstReclusos.Name = "lstReclusos"
-        Me.lstReclusos.Size = New System.Drawing.Size(794, 84)
+        Me.lstReclusos.Size = New System.Drawing.Size(716, 84)
         Me.lstReclusos.TabIndex = 2
         '
         'txtBuscarRecluso
@@ -196,7 +196,7 @@ Partial Class frmNuevoIngreso
         Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
         Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(794, 26)
+        Me.txtBuscarRecluso.Size = New System.Drawing.Size(716, 26)
         Me.txtBuscarRecluso.TabIndex = 1
         '
         'chkVincular
@@ -220,7 +220,7 @@ Partial Class frmNuevoIngreso
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpArchivo.Size = New System.Drawing.Size(879, 138)
+        Me.grpArchivo.Size = New System.Drawing.Size(801, 138)
         Me.grpArchivo.TabIndex = 12
         Me.grpArchivo.TabStop = False
         Me.grpArchivo.Text = "Archivo Digital"
@@ -253,7 +253,7 @@ Partial Class frmNuevoIngreso
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(537, 1067)
+        Me.btnGuardar.Location = New System.Drawing.Point(459, 1067)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(405, 85)

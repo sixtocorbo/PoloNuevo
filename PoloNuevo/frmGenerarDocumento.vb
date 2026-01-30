@@ -32,7 +32,7 @@ Public Class frmGenerarDocumento
     Private Sub frmGenerarDocumento_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarDatosIniciales()
 
-        ' Limpieza de interfaz por seguridad
+        ' Ocultar controles que no apliquen en este modo
         Dim controls = Me.Controls.Find("chkMoverOriginal", True)
         If controls.Length > 0 Then controls(0).Visible = False
     End Sub
@@ -46,7 +46,11 @@ Public Class frmGenerarDocumento
                 cmbTipo.ValueMember = "Id"
 
                 ' 2. Cargar Destinos (Basado en el historial para autocompletar)
-                Dim destinos = db.MovimientosDocumentos.Where(Function(m) m.Destino <> "").Select(Function(m) m.Destino).Distinct().ToList()
+                Dim destinos = db.MovimientosDocumentos _
+                                 .Where(Function(m) m.Destino IsNot Nothing And m.Destino <> "") _
+                                 .Select(Function(m) m.Destino) _
+                                 .Distinct().ToList()
+
                 cmbDestino.DataSource = destinos
                 cmbDestino.SelectedIndex = -1
 
@@ -54,12 +58,19 @@ Public Class frmGenerarDocumento
                 If _idDocExterno > 0 Then
                     Dim docExt = db.Documentos.Find(_idDocExterno)
                     If docExt IsNot Nothing Then
-                        lblRefExterna.Text = $"RESPONDIENDO AL EXPEDIENTE: {docExt.TiposDocumento.Nombre} {docExt.ReferenciaExterna}"
+                        lblRefExterna.Text = $"RESPONDIENDO A: {docExt.TiposDocumento.Nombre} {docExt.ReferenciaExterna}"
                         lblRefExterna.ForeColor = Color.Blue
 
-                        ' Sugerir Asunto para mantener el hilo de la conversación
+                        ' Sugerir Asunto prellenado
                         txtAsunto.Text = $"REF {docExt.ReferenciaExterna} // "
                         txtAsunto.SelectionStart = txtAsunto.Text.Length
+
+                        ' Intentar preseleccionar el destino sugerido (Origen del padre)
+                        ' Buscamos el último movimiento para saber de dónde vino
+                        Dim ultimoMov = docExt.MovimientosDocumentos.OrderByDescending(Function(m) m.FechaMovimiento).FirstOrDefault()
+                        If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Origen) Then
+                            cmbDestino.Text = ultimoMov.Origen ' Sugerimos devolverlo a quien lo mandó
+                        End If
                     End If
                 Else
                     lblRefExterna.Text = "Nuevo Documento Independiente"
@@ -113,23 +124,27 @@ Public Class frmGenerarDocumento
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         ' 1. Validaciones básicas
         If txtNumero.Text.Trim = "" Or txtAsunto.Text.Trim = "" Or cmbDestino.Text.Trim = "" Then
-            MessageBox.Show("Faltan datos obligatorios.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Faltan datos obligatorios (Número, Asunto o Destino).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Try
+            Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
 
                 ' Validar Rango si aplica
                 Dim numVal As Integer
                 If _tieneRangoActivo AndAlso Integer.TryParse(txtNumero.Text, numVal) Then
                     If numVal < _minRango Or numVal > _maxRango Then
-                        If MessageBox.Show("El número está FUERA del rango oficial. ¿Guardar igual?", "Alerta", MessageBoxButtons.YesNo) = DialogResult.No Then Return
+                        If MessageBox.Show("El número está FUERA del rango oficial. ¿Guardar igual?", "Alerta", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.No Then
+                            Me.Cursor = Cursors.Default
+                            Return
+                        End If
                     End If
                 End If
 
                 ' ---------------------------------------------------------
-                ' PASO 1: CREAR EL NUEVO DOCUMENTO (TU RESPUESTA)
+                ' PASO 1: CREAR EL NUEVO DOCUMENTO (TU RESPUESTA/ACTUACIÓN)
                 ' ---------------------------------------------------------
                 Dim docRespuesta As New Documentos()
                 docRespuesta.FechaCarga = DateTime.Now
@@ -137,12 +152,8 @@ Public Class frmGenerarDocumento
                 docRespuesta.ReferenciaExterna = txtNumero.Text.Trim()
                 docRespuesta.Descripcion = txtAsunto.Text.Trim()
 
-                ' >>>>> AQUÍ ESTÁ LA CORRECCIÓN CLAVE <<<<<
-                ' Guardamos el ID del padre en la base de datos para que el vínculo sea eterno.
-                If _idDocExterno > 0 Then
-                    docRespuesta.DocumentoPadreId = _idDocExterno
-                End If
-                ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                ' NOTA: Si en el futuro agregas la columna DocumentoPadreId a la BD, descomenta esto:
+                ' If _idDocExterno > 0 Then docRespuesta.DocumentoPadreId = _idDocExterno
 
                 ' Gestión de Archivo Adjunto
                 If _archivoBytes IsNot Nothing Then
@@ -150,7 +161,7 @@ Public Class frmGenerarDocumento
                     docRespuesta.NombreArchivo = _archivoNombre
                     docRespuesta.Extension = _archivoExt
                 Else
-                    ' Archivo dummy si es papel físico
+                    ' Archivo dummy si es papel físico o no se cargó nada
                     docRespuesta.Contenido = New Byte() {0}
                     docRespuesta.NombreArchivo = "Generado Interno"
                     docRespuesta.Extension = ".phy"
@@ -168,29 +179,30 @@ Public Class frmGenerarDocumento
                 db.SaveChanges() ' Obtenemos el ID del nuevo documento
 
                 ' ---------------------------------------------------------
-                ' PASO 2: CREACIÓN (EL NACIMIENTO DEL DOCUMENTO)
+                ' PASO 2: EL NACIMIENTO (Entrada Administrativa)
                 ' ---------------------------------------------------------
+                ' Creamos un movimiento inicial para que conste que se creó aquí.
                 Dim movCreacion As New MovimientosDocumentos()
                 movCreacion.DocumentoId = docRespuesta.Id
                 movCreacion.FechaMovimiento = DateTime.Now
                 movCreacion.Origen = "SISTEMA"
-                movCreacion.Destino = "SECRETARÍA (MI OFICINA)"
+                movCreacion.Destino = "MESA DE ENTRADA" ' O "MI OFICINA"
                 movCreacion.EsSalida = False
-                movCreacion.Observaciones = "Generado automáticamente"
+                movCreacion.Observaciones = "Generación de Documento"
                 db.MovimientosDocumentos.Add(movCreacion)
 
                 ' ---------------------------------------------------------
-                ' PASO 3: SALIDA DEL NUEVO DOCUMENTO HACIA EL DESTINO
+                ' PASO 3: LA SALIDA (ESTO EVITA QUE SE QUEDE EN BANDEJA)
                 ' ---------------------------------------------------------
                 Dim destinoFinal As String = cmbDestino.Text.Trim().ToUpper()
 
                 Dim movSalida As New MovimientosDocumentos()
                 movSalida.DocumentoId = docRespuesta.Id
-                movSalida.FechaMovimiento = DateTime.Now.AddSeconds(1)
-                movSalida.Origen = "SECRETARÍA (MI OFICINA)"
+                movSalida.FechaMovimiento = DateTime.Now.AddSeconds(1) ' +1 seg para que sea posterior
+                movSalida.Origen = "MESA DE ENTRADA"
                 movSalida.Destino = destinoFinal
-                movSalida.EsSalida = True
-                movSalida.Observaciones = "Enviado como respuesta/actuación."
+                movSalida.EsSalida = True ' <--- CLAVE: Esto lo saca de "Pendientes"
+                movSalida.Observaciones = "Pase / Respuesta enviada"
                 db.MovimientosDocumentos.Add(movSalida)
 
                 ' ---------------------------------------------------------
@@ -201,24 +213,28 @@ Public Class frmGenerarDocumento
                     Dim movOriginal As New MovimientosDocumentos()
                     movOriginal.DocumentoId = _idDocExterno
                     movOriginal.FechaMovimiento = DateTime.Now.AddSeconds(1)
-                    movOriginal.Origen = "MESA DE ENTRADA / SECRETARÍA"
+                    movOriginal.Origen = "MESA DE ENTRADA"
                     movOriginal.Destino = destinoFinal
-                    movOriginal.EsSalida = True
+                    movOriginal.EsSalida = True ' <--- CLAVE: El padre también se va
 
-                    ' Dejamos constancia clara en el historial
-                    movOriginal.Observaciones = $"Se adjunta al nuevo {cmbTipo.Text} N° {docRespuesta.ReferenciaExterna}"
+                    ' Referencia cruzada en la observación
+                    movOriginal.Observaciones = $"ADJUNTO A NUEVO: {docRespuesta.ReferenciaExterna}"
 
                     db.MovimientosDocumentos.Add(movOriginal)
                 End If
 
                 db.SaveChanges()
 
-                MessageBox.Show("Documento generado y enviado correctamente." & vbCrLf & "El expediente original se ha adjuntado al pase.", "Proceso Completo")
+                MessageBox.Show("Documento generado y enviado correctamente." & vbCrLf &
+                                "El documento original también ha sido movido al destino.",
+                                "Proceso Completo", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error al guardar: " & ex.Message)
+            MessageBox.Show("Error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            Me.Cursor = Cursors.Default
         End Try
     End Sub
 
@@ -228,10 +244,11 @@ Public Class frmGenerarDocumento
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
         Using ofd As New OpenFileDialog()
             ofd.Filter = "Archivos|*.pdf;*.jpg;*.jpeg;*.png;*.doc;*.docx"
+            ofd.Title = "Seleccionar adjunto digital"
             If ofd.ShowDialog() = DialogResult.OK Then
                 _archivoBytes = File.ReadAllBytes(ofd.FileName)
                 _archivoNombre = Path.GetFileName(ofd.FileName)
-                _archivoExt = Path.GetExtension(ofd.FileName)
+                _archivoExt = Path.GetExtension(ofd.FileName).ToLower()
                 lblArchivo.Text = _archivoNombre
                 lblArchivo.ForeColor = Color.Green
             End If

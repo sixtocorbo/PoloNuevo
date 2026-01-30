@@ -235,121 +235,146 @@ Public Class frmNuevoIngreso
     End Sub
 
 
-    ' =========================================================
-    ' GUARDADO CON VINCULACIÓN CRUZADA (PADRE <-> HIJO)
-    ' =========================================================
+
+    ' EN frmNuevoIngreso.vb - Evento btnGuardar_Click
+
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        ' Validaciones Básicas
-        If txtNumero.Text = "" Or txtAsunto.Text = "" Or cmbOrigen.Text = "" Then
-            MessageBox.Show("Faltan datos obligatorios (Número, Asunto u Origen).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ' 1. Validaciones
+        If String.IsNullOrWhiteSpace(txtAsunto.Text) Then
+            MessageBox.Show("Debe ingresar el Asunto o Descripción.", "Faltan datos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Try
+            Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
-                ' 1. Crear o Buscar el objeto Documento (El HIJO, ej: Memorando 21)
-                Dim doc As New Documentos()
-                If _idDocumentoEditar > 0 Then doc = db.Documentos.Find(_idDocumentoEditar)
 
-                ' 2. Llenar propiedades
-                doc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
-                doc.ReferenciaExterna = txtNumero.Text.Trim()
-                doc.Descripcion = txtAsunto.Text.Trim()
+                ' =============================================================================
+                ' CORRECCIÓN: Declaramos las variables AQUÍ para que sean accesibles en todo el bloque
+                ' =============================================================================
+                Dim padreEstaEnMesa As Boolean = True
+                Dim destinoDelPadre As String = "MESA DE ENTRADA"
+                Dim referenciaPadre As String = ""
+                ' =============================================================================
 
-                If _idDocumentoEditar = 0 Then doc.FechaCarga = DateTime.Now
+                ' ---------------------------------------------------------
+                ' PASO 1: GUARDAR DOCUMENTO (Datos Básicos)
+                ' ---------------------------------------------------------
+                Dim nuevoDoc As New Documentos()
+                If _idDocumentoEditar > 0 Then nuevoDoc = db.Documentos.Find(_idDocumentoEditar)
 
-                ' 3. VINCULACIÓN FUERTE EN BASE DE DATOS
-                If _idPadreVerificado > 0 Then
-                    doc.DocumentoPadreId = _idPadreVerificado
+                nuevoDoc.FechaCarga = If(_idDocumentoEditar = 0, DateTime.Now, nuevoDoc.FechaCarga)
+                nuevoDoc.Descripcion = txtAsunto.Text.Trim()
+                nuevoDoc.ReferenciaExterna = txtNumero.Text.Trim()
+
+                If cmbTipo.SelectedValue IsNot Nothing Then
+                    nuevoDoc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
                 End If
 
-                ' 4. Manejo de Archivos y otros datos (Reclusos, Vencimientos, etc...)
+                ' NOTA: Solo descomentar si tienes la columna DocumentoPadreId en la BD
+                ' If _idPadreVerificado > 0 Then nuevoDoc.DocumentoPadreId = _idPadreVerificado
+
                 If _archivoBytes IsNot Nothing Then
-                    doc.Contenido = _archivoBytes
-                    doc.NombreArchivo = _archivoNombre
-                    doc.Extension = _archivoExt
+                    nuevoDoc.Contenido = _archivoBytes
+                    nuevoDoc.NombreArchivo = _archivoNombre
+                    nuevoDoc.Extension = _archivoExt
                 ElseIf _idDocumentoEditar = 0 Then
-                    doc.Contenido = New Byte() {0}
-                    doc.NombreArchivo = "Fisico"
-                    doc.Extension = ".phy"
+                    nuevoDoc.Contenido = New Byte() {0}
+                    nuevoDoc.NombreArchivo = "S/D"
+                    nuevoDoc.Extension = ".phy"
                 End If
 
-                If chkVincular.Checked AndAlso lstReclusos.SelectedValue IsNot Nothing Then
-                    doc.ReclusoId = Convert.ToInt32(lstReclusos.SelectedValue)
-                Else
-                    doc.ReclusoId = Nothing
-                End If
-
-                If chkVencimiento.Checked Then
-                    doc.FechaVencimiento = dtpVencimiento.Value
-                Else
-                    doc.FechaVencimiento = Nothing
-                End If
-
-                ' Guardar el Documento Nuevo
-                If _idDocumentoEditar = 0 Then db.Documentos.Add(doc)
+                If _idDocumentoEditar = 0 Then db.Documentos.Add(nuevoDoc)
                 db.SaveChanges()
 
-                ' =========================================================
-                ' GESTIÓN DE MOVIMIENTOS Y VINCULACIÓN
-                ' =========================================================
+                ' ---------------------------------------------------------
+                ' PASO 2: LÓGICA DE MOVIMIENTOS INTELIGENTE
+                ' ---------------------------------------------------------
                 If _idDocumentoEditar = 0 Then
 
-                    ' Variables para los textos de referencia
-                    Dim obsHijo As String = "Ingreso al sistema."
-                    Dim obsPadre As String = ""
-                    Dim nombrePadre As String = ""
-
-                    ' Si hay padre, preparamos la información
+                    ' A) Analizar Dónde está el Padre
                     If _idPadreVerificado > 0 Then
                         Dim padre = db.Documentos.Find(_idPadreVerificado)
                         If padre IsNot Nothing Then
-                            nombrePadre = padre.TiposDocumento.Nombre & " " & padre.ReferenciaExterna
+                            referenciaPadre = padre.ReferenciaExterna
 
-                            ' AQUI ESTÁ EL CAMBIO QUE PEDISTE:
-                            ' Definimos explícitamente que el hijo se adjunta al padre.
-                            obsHijo = $"INGRESO VINCULADO / SE ADJUNTA A: {nombrePadre}"
-                            obsPadre = $"SE VINCULA CON RESPUESTA: {doc.ReferenciaExterna}"
+                            ' Buscamos el último movimiento para ver su ubicación real
+                            Dim ultimoMov = padre.MovimientosDocumentos _
+                                                 .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                                 .FirstOrDefault()
+
+                            If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
+                                destinoDelPadre = ultimoMov.Destino
+                                ' Si su último destino NO es Mesa de Entrada, es que ya se fue.
+                                If destinoDelPadre <> "MESA DE ENTRADA" Then padreEstaEnMesa = False
+                            End If
                         End If
                     End If
 
-                    ' A. MOVIMIENTO DEL DOCUMENTO NUEVO (EJ: MEMO 21)
-                    Dim movHijo As New MovimientosDocumentos()
-                    movHijo.DocumentoId = doc.Id
-                    movHijo.FechaMovimiento = DateTime.Now
-                    movHijo.Origen = cmbOrigen.Text.Trim().ToUpper()
-                    movHijo.Destino = "MESA DE ENTRADA"
-                    movHijo.EsSalida = False
-                    movHijo.Observaciones = obsHijo ' <--- "SE ADJUNTA A..."
-                    db.MovimientosDocumentos.Add(movHijo)
+                    ' B) Registrar la ENTRADA (Siempre debe constar que entró)
+                    Dim movEntrada As New MovimientosDocumentos()
+                    movEntrada.DocumentoId = nuevoDoc.Id
+                    movEntrada.FechaMovimiento = DateTime.Now
+                    movEntrada.Origen = cmbOrigen.Text
+                    movEntrada.Destino = "MESA DE ENTRADA"
+                    movEntrada.EsSalida = False
 
-                    ' B. MOVIMIENTO DEL DOCUMENTO PADRE (EJ: OFICIO 100)
-                    ' Lo traemos a Mesa de Entrada para que estén juntos y no quede pendiente.
                     If _idPadreVerificado > 0 Then
-                        Dim movPadre As New MovimientosDocumentos()
-                        movPadre.DocumentoId = _idPadreVerificado
-
-                        ' Le sumamos un segundo para que en el historial aparezca justo encima
-                        movPadre.FechaMovimiento = DateTime.Now.AddSeconds(1)
-
-                        ' Viene del mismo origen del que trae la respuesta
-                        movPadre.Origen = cmbOrigen.Text.Trim().ToUpper()
-                        movPadre.Destino = "MESA DE ENTRADA"
-                        movPadre.EsSalida = False
-                        movPadre.Observaciones = obsPadre ' <--- "SE VINCULA CON..."
-
-                        db.MovimientosDocumentos.Add(movPadre)
+                        movEntrada.Observaciones = "VINCULADO A: " & referenciaPadre
+                    Else
+                        movEntrada.Observaciones = "Ingreso Estándar"
                     End If
 
-                    db.SaveChanges()
+                    db.MovimientosDocumentos.Add(movEntrada)
+                    db.SaveChanges() ' Guardamos para asegurar el orden cronológico
+
+                    ' C) RUTEO AUTOMÁTICO (Aquí está la magia)
+                    If _idPadreVerificado > 0 Then
+
+                        If padreEstaEnMesa Then
+                            ' CASO 1: Padre sigue en Mesa (Pendiente) -> Se quedan juntos
+                            Dim movUpdate As New MovimientosDocumentos()
+                            movUpdate.DocumentoId = _idPadreVerificado
+                            movUpdate.FechaMovimiento = DateTime.Now.AddSeconds(1)
+                            movUpdate.Origen = cmbOrigen.Text
+                            movUpdate.Destino = "MESA DE ENTRADA"
+                            movUpdate.EsSalida = False
+                            movUpdate.Observaciones = "SE ADJUNTA INFORME/DOC: " & nuevoDoc.ReferenciaExterna
+                            db.MovimientosDocumentos.Add(movUpdate)
+
+                        Else
+                            ' CASO 2: Padre está lejos -> Salida Automática
+                            Dim movSalidaAuto As New MovimientosDocumentos()
+                            movSalidaAuto.DocumentoId = nuevoDoc.Id
+                            movSalidaAuto.FechaMovimiento = DateTime.Now.AddSeconds(2)
+                            movSalidaAuto.Origen = "MESA DE ENTRADA"
+                            movSalidaAuto.Destino = destinoDelPadre
+                            movSalidaAuto.EsSalida = True
+                            movSalidaAuto.Observaciones = "PASE AUTOMÁTICO (Alcanza al Exp. Principal)"
+                            db.MovimientosDocumentos.Add(movSalidaAuto)
+
+                            MessageBox.Show($"El documento ha sido registrado y enviado automáticamente a {destinoDelPadre} para unirse al principal.", "Ruteo Automático", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        End If
+
+                        db.SaveChanges()
+                    End If
                 End If
 
-                MessageBox.Show("Documento ingresado y vinculado correctamente.", "Éxito")
+                ' Mensaje final estándar si no hubo ruteo automático
+                If _idDocumentoEditar > 0 Then
+                    MessageBox.Show("Cambios guardados correctamente.", "Éxito")
+                ElseIf _idPadreVerificado = 0 OrElse (padreEstaEnMesa And _idPadreVerificado > 0) Then
+                    MessageBox.Show("Ingreso registrado correctamente.", "Éxito")
+                End If
+
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
+
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error al guardar: " & ex.Message)
+            MessageBox.Show("Error: " & ex.Message)
+        Finally
+            Me.Cursor = Cursors.Default
         End Try
     End Sub
 

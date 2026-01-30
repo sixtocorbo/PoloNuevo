@@ -323,9 +323,9 @@ Public Class frmMesaEntrada
                               .Select(Function(m) New With {
                                   .IdMov = m.Id,
                                   .Origen = m.Origen,
-                                  .Tipo = If(m.EsSalida,
-                                             "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
-                                             "ENTRADA / PASE"),
+                                .Tipo = If(m.EsSalida,
+           "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
+           "ENTRADA (" & If(m.Observaciones Is Nothing, "Pase", m.Observaciones) & ")"),
                                   .Destino = If(m.Destino Is Nothing OrElse m.Destino = "", "SIN DESTINO", m.Destino),
                                   .Fecha = m.FechaMovimiento
                               }) _
