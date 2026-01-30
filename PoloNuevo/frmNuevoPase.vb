@@ -61,15 +61,15 @@ Public Class frmNuevoPase
 
     Private Sub CargarListas()
         Using db As New PoloNuevoEntities()
-            ' 1. Cargar Destinos en memoria para el buscador inteligente
+            ' 1. Cargar Destinos: FILTRO BLINDADO CONTRA NULOS
             _todosDestinos = db.MovimientosDocumentos _
-                               .Where(Function(m) m.Destino <> "") _
+                               .Where(Function(m) m.Destino IsNot Nothing AndAlso m.Destino <> "") _
                                .Select(Function(m) m.Destino) _
                                .Distinct() _
                                .OrderBy(Function(d) d) _
                                .ToList()
 
-            ' 2. Cargar Tipos
+            ' 2. Cargar Tipos (Igual que antes)
             cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
@@ -99,24 +99,26 @@ Public Class frmNuevoPase
             Return
         End If
 
-        ' Algoritmo de Búsqueda Inteligente (Tipo Mesa de Entrada)
+        ' PROTECCIÓN EXTRA: Si la lista aún no cargó, salimos para evitar error
+        If _todosDestinos Is Nothing Then Return
+
+        ' Algoritmo de Búsqueda Inteligente
         Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
 
-        ' Empezamos con todos
         Dim filtrada As IEnumerable(Of String) = _todosDestinos
 
-        ' Filtramos secuencialmente por cada palabra escrita
+        ' Filtramos secuencialmente
         For Each palabra In palabras
-            Dim p = palabra ' Captura para lambda
-            filtrada = filtrada.Where(Function(d) d.ToLower().Contains(p))
+            Dim p = palabra
+            ' AQUI ESTA LA SOLUCIÓN: Agregamos "d IsNot Nothing" antes de evaluar
+            filtrada = filtrada.Where(Function(d) d IsNot Nothing AndAlso d.ToLower().Contains(p))
         Next
 
-        Dim resultados = filtrada.Take(10).ToList() ' Solo mostrar los primeros 10 para no saturar
+        Dim resultados = filtrada.Take(10).ToList()
 
         If resultados.Count > 0 Then
             lstSugerencias.DataSource = resultados
             lstSugerencias.Visible = True
-            ' Posicionamos la lista justo debajo del texto
             lstSugerencias.Top = txtDestino.Bottom + 2
             lstSugerencias.Left = txtDestino.Left
             lstSugerencias.Width = txtDestino.Width
