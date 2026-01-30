@@ -33,13 +33,21 @@ Public Class frmMesaEntrada
                 ' 1. CONSULTA BASE
                 Dim query = db.Documentos.Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' 2. Filtro Pendientes
-                ' CÓDIGO CORREGIDO
+                ' ---------------------------------------------------------
+                ' 2. Filtro Pendientes (LÓGICA CORREGIDA)
+                ' ---------------------------------------------------------
                 If chkPendientes.Checked Then
-                    ' Buscamos documentos cuyo ÚLTIMO movimiento (por fecha) NO sea una Salida
+                    ' ANTES: Buscábamos si "EsSalida" era Falso. (Error: Mostraba cosas que estaban en otras oficinas internas)
+                    ' AHORA: Buscamos explícitamente que el documento ESTÉ ACTUALMENTE en "MESA DE ENTRADA".
+
                     query = query.Where(Function(d) d.MovimientosDocumentos _
-                                     .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                     .FirstOrDefault().EsSalida = False)
+                            .OrderByDescending(Function(m) m.FechaMovimiento) _
+                            .FirstOrDefault().Destino = "MESA DE ENTRADA")
+
+                    ' EXPLICACIÓN:
+                    ' - Si hiciste un ingreso nuevo -> Su destino es "MESA DE ENTRADA" -> APARECE (Es correcto).
+                    ' - Si hiciste un pase a Director -> Su destino es "DIRECCION" -> DESAPARECE (Es correcto).
+                    ' - Si salió al Juzgado -> Su destino es "JUZGADO" -> DESAPARECE (Es correcto).
                 End If
 
                 ' 3. Buscador Inteligente
@@ -176,32 +184,25 @@ Public Class frmMesaEntrada
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
     End Sub
 
-    ' 2. REGISTRAR PASE (Lo de pases)
-    Private Sub btnPase_Click(sender As Object, e As EventArgs) Handles btnPase.Click
-        If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Seleccione un documento.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
-        End If
-        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
 
-        ' Abre frmNuevoPase (que tiene la lógica de arrastre de adjuntos)
-        Dim frm As New frmNuevoPase(idDoc)
-        If frm.ShowDialog() = DialogResult.OK Then
-            CargarMesa()
-            CargarHistorial(idDoc)
-        End If
-    End Sub
-
-    ' 3. ACTUAR / RESPONDER (Lo de actuar)
+    ' 3. ACTUAR / RESPONDER
     Private Sub btnActuar_Click(sender As Object, e As EventArgs) Handles btnActuar.Click
+        ' 1. Validación: Que haya algo seleccionado
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento para responder o actuar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
+
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
 
-        ' Abre frmGenerarDocumento (que crea un documento nuevo vinculado al padre)
-        Dim frm As New frmGenerarDocumento(idDoc)
+        ' ========================================================================
+        ' CAMBIO REALIZADO:
+        ' Ya no usamos frmGenerarDocumento.
+        ' Llamamos a frmNuevoPase pasándole el ID del documento padre.
+        ' El usuario decidirá dentro si marca "Generar Actuación" o hace un Pase simple.
+        ' ========================================================================
+        Dim frm As New frmNuevoPase(idDoc)
+
         If frm.ShowDialog() = DialogResult.OK Then
             CargarMesa()
             CargarHistorial(idDoc)

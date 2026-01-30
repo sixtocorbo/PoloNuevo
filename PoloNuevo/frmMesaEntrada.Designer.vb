@@ -17,7 +17,7 @@ Partial Class frmMesaEntrada
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.pnlTop = New System.Windows.Forms.Panel()
         Me.btnActuar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
@@ -33,7 +33,6 @@ Partial Class frmMesaEntrada
         Me.chkFechas = New System.Windows.Forms.CheckBox()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.btnPase = New System.Windows.Forms.Button()
         Me.btnNuevo = New System.Windows.Forms.Button()
         Me.lblTitulo = New System.Windows.Forms.Label()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
@@ -62,7 +61,6 @@ Partial Class frmMesaEntrada
         Me.pnlTop.Controls.Add(Me.btnImprimirRecibo)
         Me.pnlTop.Controls.Add(Me.btnEditar)
         Me.pnlTop.Controls.Add(Me.grpFiltros)
-        Me.pnlTop.Controls.Add(Me.btnPase)
         Me.pnlTop.Controls.Add(Me.btnNuevo)
         Me.pnlTop.Controls.Add(Me.lblTitulo)
         Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
@@ -84,7 +82,7 @@ Partial Class frmMesaEntrada
         Me.btnActuar.Name = "btnActuar"
         Me.btnActuar.Size = New System.Drawing.Size(220, 69)
         Me.btnActuar.TabIndex = 8
-        Me.btnActuar.Text = "⚡ ACTUAR / RESPONDER"
+        Me.btnActuar.Text = "⚡ ACTUAR / PASE"
         Me.btnActuar.UseVisualStyleBackColor = False
         '
         'btnEliminar
@@ -248,21 +246,6 @@ Partial Class frmMesaEntrada
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Texto / Oficio:"
         '
-        'btnPase
-        '
-        Me.btnPase.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnPase.BackColor = System.Drawing.Color.DarkOrange
-        Me.btnPase.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnPase.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnPase.ForeColor = System.Drawing.Color.White
-        Me.btnPase.Location = New System.Drawing.Point(1006, 18)
-        Me.btnPase.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnPase.Name = "btnPase"
-        Me.btnPase.Size = New System.Drawing.Size(240, 69)
-        Me.btnPase.TabIndex = 2
-        Me.btnPase.Text = "REGISTRAR PASE"
-        Me.btnPase.UseVisualStyleBackColor = False
-        '
         'btnNuevo
         '
         Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -270,7 +253,7 @@ Partial Class frmMesaEntrada
         Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNuevo.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnNuevo.ForeColor = System.Drawing.Color.White
-        Me.btnNuevo.Location = New System.Drawing.Point(1254, 18)
+        Me.btnNuevo.Location = New System.Drawing.Point(1006, 18)
         Me.btnNuevo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNuevo.Name = "btnNuevo"
         Me.btnNuevo.Size = New System.Drawing.Size(240, 69)
@@ -323,7 +306,7 @@ Partial Class frmMesaEntrada
         Me.dgvMesa.AllowUserToResizeRows = False
         Me.dgvMesa.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.dgvMesa.BackgroundColor = System.Drawing.Color.White
-        Me.dgvMesa.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        Me.dgvMesa.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
         Me.dgvMesa.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvMesa.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvMesa.Location = New System.Drawing.Point(15, 15)
@@ -422,7 +405,6 @@ Partial Class frmMesaEntrada
     Friend WithEvents pnlTop As System.Windows.Forms.Panel
     Friend WithEvents lblTitulo As System.Windows.Forms.Label
     Friend WithEvents btnNuevo As System.Windows.Forms.Button
-    Friend WithEvents btnPase As System.Windows.Forms.Button
     Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
     Friend WithEvents dgvMesa As System.Windows.Forms.DataGridView

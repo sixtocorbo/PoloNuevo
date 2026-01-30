@@ -1,143 +1,324 @@
-﻿Public Class frmNuevoPase
+﻿Imports System.IO
+Imports System.Data
+Imports System.Data.Entity
 
+Public Class frmNuevoPase
+
+    ' VARIABLES GLOBALES
     Private _idDocumento As Integer
     Private _idMovimientoEditar As Integer = 0
+    Private _todosDestinos As New List(Of String) ' Caché de destinos para búsqueda rápida
 
-    ' =========================================================
-    ' CONSTRUCTORES
-    ' =========================================================
+    ' Variables para Actuación
+    Private _archivoBytes As Byte() = Nothing
+    Private _archivoNombre As String = ""
+    Private _archivoExt As String = ""
+    Private _tieneRangoActivo As Boolean = False
+    Private _rangoId As Integer = 0
 
-    ' Constructor 1: NUEVO MOVIMIENTO (Solo recibe ID Documento)
+    ' --- CONSTRUCTORES (Igual que antes) ---
     Public Sub New(idDocumento As Integer)
         InitializeComponent()
         _idDocumento = idDocumento
         _idMovimientoEditar = 0
     End Sub
 
-    ' Constructor 2: EDITAR MOVIMIENTO (Recibe ID Doc + ID Movimiento)
     Public Sub New(idDocumento As Integer, idMovimiento As Integer)
         InitializeComponent()
         _idDocumento = idDocumento
         _idMovimientoEditar = idMovimiento
     End Sub
 
-    ' =========================================================
-    ' CARGA INICIAL
-    ' =========================================================
-    Private Sub frmNuevoPase_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' 1. Cargar la lista inteligente de destinos
-        CargarHistorialDestinos()
+    Public Sub New()
+        InitializeComponent()
+        _idDocumento = 0
+        _idMovimientoEditar = 0
+    End Sub
 
-        ' 2. Configurar según si es Nuevo o Edición
+    ' --- CARGA INICIAL ---
+    Private Sub frmNuevoPase_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CargarListas()
+
         If _idMovimientoEditar > 0 Then
             Me.Text = "Corregir Movimiento"
             btnGuardar.Text = "GUARDAR CAMBIOS"
-            btnGuardar.BackColor = Color.SlateGray
+            chkGenerarActuacion.Visible = False
+            grpActuacion.Visible = False
             CargarDatosEdicion()
         Else
-            Me.Text = "Registrar Nuevo Pase / Salida"
-            ' Si es nuevo, sugerimos la fecha actual
-            dtpFecha.Value = DateTime.Now
-            ' Por defecto asumimos que es Salida (para agilizar)
-            chkEsSalida.Checked = True
+            If _idDocumento = 0 Then
+                Me.Text = "Nuevo Documento Independiente"
+                chkGenerarActuacion.Checked = True
+                chkGenerarActuacion.Enabled = False
+                chkGenerarActuacion.Text = "Generando Nuevo Documento..."
+            Else
+                Me.Text = "Registrar Pase / Respuesta"
+                chkGenerarActuacion.Checked = False
+                dtpFecha.Value = DateTime.Now
+            End If
         End If
     End Sub
 
-    ' =========================================================
-    ' MÉTODOS AUXILIARES
-    ' =========================================================
+    Private Sub CargarListas()
+        Using db As New PoloNuevoEntities()
+            ' 1. Cargar Destinos en memoria para el buscador inteligente
+            _todosDestinos = db.MovimientosDocumentos _
+                               .Where(Function(m) m.Destino <> "") _
+                               .Select(Function(m) m.Destino) _
+                               .Distinct() _
+                               .OrderBy(Function(d) d) _
+                               .ToList()
 
-    ' Busca todos los destinos únicos en la base para llenar el autocompletado
-    Private Sub CargarHistorialDestinos()
-        Try
-            Using db As New PoloNuevoEntities()
-                ' Buscamos destinos distintos que no estén vacíos
-                Dim listaDestinos = db.MovimientosDocumentos _
-                                      .Where(Function(m) m.Destino IsNot Nothing And m.Destino <> "") _
-                                      .Select(Function(m) m.Destino) _
-                                      .Distinct() _
-                                      .OrderBy(Function(d) d) _
-                                      .ToList()
-
-                cmbDestino.DataSource = listaDestinos
-                cmbDestino.SelectedIndex = -1 ' Arranca vacío para obligar a elegir o escribir
-            End Using
-        Catch ex As Exception
-            ' Si falla (ej: base vacía), no hacemos nada, el combo queda vacío pero funcional
-        End Try
+            ' 2. Cargar Tipos
+            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
+            cmbTipo.DisplayMember = "Nombre"
+            cmbTipo.ValueMember = "Id"
+            cmbTipo.SelectedIndex = -1
+        End Using
     End Sub
 
-    ' Carga los datos del movimiento que vamos a corregir
     Private Sub CargarDatosEdicion()
         Using db As New PoloNuevoEntities()
             Dim mov = db.MovimientosDocumentos.Find(_idMovimientoEditar)
             If mov IsNot Nothing Then
-                ' Usamos .Text para asignar el valor, funcione o no el DataSource
-                cmbDestino.Text = mov.Destino
+                txtDestino.Text = mov.Destino ' Asignamos al TextBox
                 dtpFecha.Value = mov.FechaMovimiento
-                chkEsSalida.Checked = mov.EsSalida
             End If
         End Using
     End Sub
 
     ' =========================================================
-    ' BOTONES: GUARDAR Y CANCELAR
+    ' BUSCADOR INTELIGENTE DE DESTINOS
     ' =========================================================
+    Private Sub txtDestino_TextChanged(sender As Object, e As EventArgs) Handles txtDestino.TextChanged
+        Dim texto As String = txtDestino.Text.Trim().ToLower()
+
+        ' Si está vacío, ocultamos la lista
+        If String.IsNullOrEmpty(texto) Then
+            lstSugerencias.Visible = False
+            Return
+        End If
+
+        ' Algoritmo de Búsqueda Inteligente (Tipo Mesa de Entrada)
+        Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
+
+        ' Empezamos con todos
+        Dim filtrada As IEnumerable(Of String) = _todosDestinos
+
+        ' Filtramos secuencialmente por cada palabra escrita
+        For Each palabra In palabras
+            Dim p = palabra ' Captura para lambda
+            filtrada = filtrada.Where(Function(d) d.ToLower().Contains(p))
+        Next
+
+        Dim resultados = filtrada.Take(10).ToList() ' Solo mostrar los primeros 10 para no saturar
+
+        If resultados.Count > 0 Then
+            lstSugerencias.DataSource = resultados
+            lstSugerencias.Visible = True
+            ' Posicionamos la lista justo debajo del texto
+            lstSugerencias.Top = txtDestino.Bottom + 2
+            lstSugerencias.Left = txtDestino.Left
+            lstSugerencias.Width = txtDestino.Width
+            lstSugerencias.BringToFront()
+        Else
+            lstSugerencias.Visible = False
+        End If
+    End Sub
+
+    Private Sub lstSugerencias_Click(sender As Object, e As EventArgs) Handles lstSugerencias.Click
+        If lstSugerencias.SelectedItem IsNot Nothing Then
+            txtDestino.Text = lstSugerencias.SelectedItem.ToString()
+            lstSugerencias.Visible = False
+            txtDestino.SelectionStart = txtDestino.Text.Length ' Cursor al final
+            txtDestino.Focus()
+        End If
+    End Sub
+
+    ' Para ocultar la lista si hacemos clic fuera o salimos
+    Private Sub txtDestino_Leave(sender As Object, e As EventArgs) Handles txtDestino.Leave
+        ' Pequeño retardo para permitir el clic en la lista antes de que desaparezca
+        If Not lstSugerencias.Focused Then
+            lstSugerencias.Visible = False
+        End If
+    End Sub
+
+    ' =========================================================
+    ' LÓGICA DE INTERFAZ Y GUARDADO (Igual que antes pero usando txtDestino)
+    ' =========================================================
+    Private Sub chkGenerarActuacion_CheckedChanged(sender As Object, e As EventArgs) Handles chkGenerarActuacion.CheckedChanged
+        grpActuacion.Visible = chkGenerarActuacion.Checked
+        If chkGenerarActuacion.Checked Then
+            btnGuardar.Text = "GENERAR Y ENVIAR"
+            btnGuardar.BackColor = Color.ForestGreen
+            If _idDocumento > 0 AndAlso String.IsNullOrEmpty(txtAsunto.Text) Then
+                Using db As New PoloNuevoEntities()
+                    Dim doc = db.Documentos.Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = _idDocumento)
+                    If doc IsNot Nothing Then
+                        txtAsunto.Text = $"REF {doc.TiposDocumento.Nombre} {doc.ReferenciaExterna} // "
+                        txtAsunto.SelectionStart = txtAsunto.Text.Length
+                    End If
+                End Using
+            End If
+        Else
+            btnGuardar.Text = "CONFIRMAR PASE"
+            btnGuardar.BackColor = Color.SteelBlue
+        End If
+    End Sub
+
+    Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "Documentos|*.pdf;*.doc;*.docx;*.jpg;*.png"
+            If ofd.ShowDialog() = DialogResult.OK Then
+                _archivoBytes = File.ReadAllBytes(ofd.FileName)
+                _archivoNombre = Path.GetFileName(ofd.FileName)
+                _archivoExt = Path.GetExtension(ofd.FileName).ToLower()
+                lblArchivo.Text = _archivoNombre
+                lblArchivo.ForeColor = Color.Green
+            End If
+        End Using
+    End Sub
+
+    Private Sub cmbTipo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbTipo.SelectedIndexChanged
+        If cmbTipo.SelectedValue IsNot Nothing AndAlso IsNumeric(cmbTipo.SelectedValue) Then
+            CalcularNumeroEstricto(Convert.ToInt32(cmbTipo.SelectedValue))
+        End If
+    End Sub
+
+    Private Sub CalcularNumeroEstricto(idTipo As Integer)
+        Using db As New PoloNuevoEntities()
+            Dim rango = db.NumeracionRangos.FirstOrDefault(Function(r) r.TipoDocumentoId = idTipo And r.Activo = True And r.UltimoUtilizado < r.NumeroFin)
+            If rango IsNot Nothing Then
+                _tieneRangoActivo = True
+                _rangoId = rango.Id
+                txtNumero.Text = (rango.UltimoUtilizado + 1).ToString()
+                txtNumero.BackColor = Color.LightYellow
+                lblInfoRango.Text = $"Rango Activo: {rango.NombreRango} (Disp: {rango.NumeroFin - rango.UltimoUtilizado})"
+                lblInfoRango.ForeColor = Color.Green
+            Else
+                _tieneRangoActivo = False
+                txtNumero.Text = "SIN RANGO"
+                txtNumero.BackColor = Color.MistyRose
+                lblInfoRango.Text = "No existe rango disponible."
+                lblInfoRango.ForeColor = Color.Red
+            End If
+        End Using
+    End Sub
+
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        ' Validamos usando .Text (lo que escribió el usuario)
-        If String.IsNullOrWhiteSpace(cmbDestino.Text) Then
-            MessageBox.Show("Por favor, indique el Destino u Oficina.", "Falta Destino", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            cmbDestino.Focus()
+        ' Validación: Ahora usamos txtDestino en lugar del combo
+        If String.IsNullOrWhiteSpace(txtDestino.Text) Then
+            MessageBox.Show("Debe indicar el Destino u Oficina.", "Falta Destino", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtDestino.Focus()
             Return
         End If
 
         Try
             Using db As New PoloNuevoEntities()
-                ' Guardamos siempre en MAYÚSCULAS para mantener el orden en el futuro
-                Dim destinoFinal As String = cmbDestino.Text.Trim().ToUpper()
+                Dim destinoFinal As String = txtDestino.Text.Trim().ToUpper()
 
-                If _idMovimientoEditar = 0 Then
-                    ' --- MODO NUEVO ---
-                    Dim mov As New MovimientosDocumentos()
-                    mov.DocumentoId = _idDocumento
-                    mov.FechaMovimiento = dtpFecha.Value
-                    mov.Destino = destinoFinal
-                    mov.Origen = "MESA DE ENTRADA" ' Origen automático
-                    mov.EsSalida = chkEsSalida.Checked
-
-                    ' Opcional: Agregar detalle automático en observaciones si es salida
-                    Dim doc = db.Documentos.Find(_idDocumento)
-                    If doc IsNot Nothing Then
-                        mov.Observaciones = "PASE DE: " & doc.TiposDocumento.Nombre & " " & doc.ReferenciaExterna
+                If chkGenerarActuacion.Checked Then
+                    If Not _tieneRangoActivo Then
+                        MessageBox.Show("ERROR BLOQUEANTE: Sin rango no se puede generar documento.", "Seguridad", MessageBoxButtons.OK, MessageBoxIcon.Stop)
+                        Return
+                    End If
+                    If String.IsNullOrWhiteSpace(txtAsunto.Text) Then
+                        MessageBox.Show("Falta Asunto.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return
                     End If
 
-                    db.MovimientosDocumentos.Add(mov)
-                    db.SaveChanges()
-                    MessageBox.Show("Pase registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Else
-                    ' --- MODO EDICIÓN ---
-                    Dim mov = db.MovimientosDocumentos.Find(_idMovimientoEditar)
-                    If mov IsNot Nothing Then
-                        mov.Destino = destinoFinal
-                        mov.FechaMovimiento = dtpFecha.Value
-                        mov.EsSalida = chkEsSalida.Checked
+                    Dim docNuevo As New Documentos()
+                    docNuevo.FechaCarga = DateTime.Now
+                    docNuevo.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
+                    docNuevo.ReferenciaExterna = txtNumero.Text
+                    docNuevo.Descripcion = txtAsunto.Text.Trim()
 
+                    If _archivoBytes IsNot Nothing Then
+                        docNuevo.Contenido = _archivoBytes
+                        docNuevo.NombreArchivo = _archivoNombre
+                        docNuevo.Extension = _archivoExt
+                    Else
+                        docNuevo.Contenido = New Byte() {0}
+                        docNuevo.NombreArchivo = "Interno"
+                        docNuevo.Extension = ".phy"
+                    End If
+
+                    Dim rango = db.NumeracionRangos.Find(_rangoId)
+                    If rango IsNot Nothing Then
+                        Dim numUsar As Integer = Convert.ToInt32(docNuevo.ReferenciaExterna)
+                        If numUsar <= rango.UltimoUtilizado Then
+                            MessageBox.Show("Número ocupado. Reintentando...", "Alerta", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                            CalcularNumeroEstricto(docNuevo.TipoDocumentoId)
+                            Return
+                        End If
+                        rango.UltimoUtilizado = numUsar
+                    End If
+
+                    db.Documentos.Add(docNuevo)
+                    db.SaveChanges()
+
+                    Dim movNacer As New MovimientosDocumentos() With {
+                        .DocumentoId = docNuevo.Id, .FechaMovimiento = dtpFecha.Value,
+                        .Origen = "SISTEMA", .Destino = "MESA DE ENTRADA", .EsSalida = False, .Observaciones = "Generación Inicial"
+                    }
+                    db.MovimientosDocumentos.Add(movNacer)
+
+                    Dim movSalir As New MovimientosDocumentos() With {
+                        .DocumentoId = docNuevo.Id, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
+                        .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True, .Observaciones = "Enviado / Producido"
+                    }
+                    db.MovimientosDocumentos.Add(movSalir)
+
+                    If _idDocumento > 0 Then
+                        Dim movPadre As New MovimientosDocumentos() With {
+                           .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
+                           .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True,
+                           .Observaciones = $"ADJUNTO A NUEVO: {docNuevo.ReferenciaExterna}"
+                        }
+                        db.MovimientosDocumentos.Add(movPadre)
+                    End If
+
+                    db.SaveChanges()
+                    MessageBox.Show($"Documento Nº {docNuevo.ReferenciaExterna} generado y enviado a {destinoFinal}.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                Else
+                    ' PASE SIMPLE
+                    If _idDocumento = 0 Then
+                        MessageBox.Show("Error interno.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Return
+                    End If
+
+                    If _idMovimientoEditar = 0 Then
+                        Dim mov As New MovimientosDocumentos() With {
+                            .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value,
+                            .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True
+                        }
+                        Dim doc = db.Documentos.Find(_idDocumento)
+                        If doc IsNot Nothing Then mov.Observaciones = $"PASE: {doc.ReferenciaExterna}"
+
+                        db.MovimientosDocumentos.Add(mov)
                         db.SaveChanges()
-                        MessageBox.Show("Movimiento corregido exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        MessageBox.Show($"Pase registrado a {destinoFinal}.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Else
+                        Dim mov = db.MovimientosDocumentos.Find(_idMovimientoEditar)
+                        If mov IsNot Nothing Then
+                            mov.Destino = destinoFinal
+                            mov.FechaMovimiento = dtpFecha.Value
+                            db.SaveChanges()
+                            MessageBox.Show("Movimiento actualizado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        End If
                     End If
                 End If
 
-                ' Cerramos el formulario devolviendo OK para que la grilla principal se actualice
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
             End Using
         Catch ex As Exception
-            MessageBox.Show("Ocurrió un error al guardar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         Me.Close()
     End Sub
-
 End Class

@@ -17,280 +17,235 @@ Partial Class frmGestionRangos
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.pnlTop = New System.Windows.Forms.Panel()
-        Me.lblTitulo = New System.Windows.Forms.Label()
-        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.dgvRangos = New System.Windows.Forms.DataGridView()
+        Me.pnlEditor = New System.Windows.Forms.GroupBox()
         Me.chkActivo = New System.Windows.Forms.CheckBox()
-        Me.btnEliminar = New System.Windows.Forms.Button()
+        Me.btnCancelar = New System.Windows.Forms.Button()
         Me.btnGuardar = New System.Windows.Forms.Button()
-        Me.numUltimo = New System.Windows.Forms.NumericUpDown()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.numFin = New System.Windows.Forms.NumericUpDown()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.numInicio = New System.Windows.Forms.NumericUpDown()
-        Me.Label3 = New System.Windows.Forms.Label()
+        Me.txtUltimo = New System.Windows.Forms.TextBox()
+        Me.lblUltimo = New System.Windows.Forms.Label()
+        Me.txtFin = New System.Windows.Forms.TextBox()
+        Me.lblFin = New System.Windows.Forms.Label()
+        Me.txtInicio = New System.Windows.Forms.TextBox()
+        Me.lblInicio = New System.Windows.Forms.Label()
         Me.txtNombre = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
+        Me.lblNombre = New System.Windows.Forms.Label()
         Me.cmbTipo = New System.Windows.Forms.ComboBox()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblTipo = New System.Windows.Forms.Label()
+        Me.dgvRangos = New System.Windows.Forms.DataGridView()
         Me.btnNuevo = New System.Windows.Forms.Button()
-        Me.pnlTop.SuspendLayout()
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SplitContainer1.Panel1.SuspendLayout()
-        Me.SplitContainer1.Panel2.SuspendLayout()
-        Me.SplitContainer1.SuspendLayout()
+        Me.btnEditar = New System.Windows.Forms.Button()
+        Me.pnlEditor.SuspendLayout()
         CType(Me.dgvRangos, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.numUltimo, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.numFin, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.numInicio, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'pnlTop
+        'pnlEditor
         '
-        Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.pnlTop.Controls.Add(Me.lblTitulo)
-        Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
-        Me.pnlTop.Location = New System.Drawing.Point(0, 0)
-        Me.pnlTop.Name = "pnlTop"
-        Me.pnlTop.Size = New System.Drawing.Size(800, 60)
-        Me.pnlTop.TabIndex = 0
-        '
-        'lblTitulo
-        '
-        Me.lblTitulo.AutoSize = True
-        Me.lblTitulo.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTitulo.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTitulo.Location = New System.Drawing.Point(12, 18)
-        Me.lblTitulo.Name = "lblTitulo"
-        Me.lblTitulo.Size = New System.Drawing.Size(342, 25)
-        Me.lblTitulo.TabIndex = 0
-        Me.lblTitulo.Text = "Configuración de Rangos de Números"
-        '
-        'SplitContainer1
-        '
-        Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 60)
-        Me.SplitContainer1.Name = "SplitContainer1"
-        '
-        'SplitContainer1.Panel1
-        '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.dgvRangos)
-        Me.SplitContainer1.Panel1.Padding = New System.Windows.Forms.Padding(10)
-        '
-        'SplitContainer1.Panel2
-        '
-        Me.SplitContainer1.Panel2.BackColor = System.Drawing.Color.White
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnNuevo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.chkActivo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnEliminar)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnGuardar)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.numUltimo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label5)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.numFin)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label4)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.numInicio)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label3)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.txtNombre)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label2)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.cmbTipo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.Label1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(800, 390)
-        Me.SplitContainer1.SplitterDistance = 450
-        Me.SplitContainer1.TabIndex = 1
-        '
-        'dgvRangos
-        '
-        Me.dgvRangos.AllowUserToAddRows = False
-        Me.dgvRangos.AllowUserToDeleteRows = False
-        Me.dgvRangos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        Me.dgvRangos.BackgroundColor = System.Drawing.Color.White
-        Me.dgvRangos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvRangos.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvRangos.Location = New System.Drawing.Point(10, 10)
-        Me.dgvRangos.MultiSelect = False
-        Me.dgvRangos.Name = "dgvRangos"
-        Me.dgvRangos.ReadOnly = True
-        Me.dgvRangos.RowHeadersVisible = False
-        Me.dgvRangos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvRangos.Size = New System.Drawing.Size(430, 370)
-        Me.dgvRangos.TabIndex = 0
+        Me.pnlEditor.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlEditor.Controls.Add(Me.chkActivo)
+        Me.pnlEditor.Controls.Add(Me.btnCancelar)
+        Me.pnlEditor.Controls.Add(Me.btnGuardar)
+        Me.pnlEditor.Controls.Add(Me.txtUltimo)
+        Me.pnlEditor.Controls.Add(Me.lblUltimo)
+        Me.pnlEditor.Controls.Add(Me.txtFin)
+        Me.pnlEditor.Controls.Add(Me.lblFin)
+        Me.pnlEditor.Controls.Add(Me.txtInicio)
+        Me.pnlEditor.Controls.Add(Me.lblInicio)
+        Me.pnlEditor.Controls.Add(Me.txtNombre)
+        Me.pnlEditor.Controls.Add(Me.lblNombre)
+        Me.pnlEditor.Controls.Add(Me.cmbTipo)
+        Me.pnlEditor.Controls.Add(Me.lblTipo)
+        Me.pnlEditor.Enabled = False
+        Me.pnlEditor.Location = New System.Drawing.Point(12, 12)
+        Me.pnlEditor.Name = "pnlEditor"
+        Me.pnlEditor.Size = New System.Drawing.Size(760, 150)
+        Me.pnlEditor.TabIndex = 0
+        Me.pnlEditor.TabStop = False
+        Me.pnlEditor.Text = "Detalle del Rango"
         '
         'chkActivo
         '
         Me.chkActivo.AutoSize = True
         Me.chkActivo.Checked = True
         Me.chkActivo.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkActivo.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.chkActivo.Location = New System.Drawing.Point(23, 276)
+        Me.chkActivo.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.chkActivo.ForeColor = System.Drawing.Color.Green
+        Me.chkActivo.Location = New System.Drawing.Point(550, 30)
         Me.chkActivo.Name = "chkActivo"
-        Me.chkActivo.Size = New System.Drawing.Size(183, 19)
+        Me.chkActivo.Size = New System.Drawing.Size(134, 17)
         Me.chkActivo.TabIndex = 12
-        Me.chkActivo.Text = "Rango Activo (En uso actual)"
+        Me.chkActivo.Text = "RANGO VIGENTE"
         Me.chkActivo.UseVisualStyleBackColor = True
         '
-        'btnEliminar
+        'btnCancelar
         '
-        Me.btnEliminar.BackColor = System.Drawing.Color.IndianRed
-        Me.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnEliminar.ForeColor = System.Drawing.Color.White
-        Me.btnEliminar.Location = New System.Drawing.Point(23, 335)
-        Me.btnEliminar.Name = "btnEliminar"
-        Me.btnEliminar.Size = New System.Drawing.Size(80, 40)
-        Me.btnEliminar.TabIndex = 11
-        Me.btnEliminar.Text = "Eliminar"
-        Me.btnEliminar.UseVisualStyleBackColor = False
+        Me.btnCancelar.Location = New System.Drawing.Point(650, 100)
+        Me.btnCancelar.Name = "btnCancelar"
+        Me.btnCancelar.Size = New System.Drawing.Size(90, 35)
+        Me.btnCancelar.TabIndex = 11
+        Me.btnCancelar.Text = "Cancelar"
+        Me.btnCancelar.UseVisualStyleBackColor = True
         '
         'btnGuardar
         '
-        Me.btnGuardar.BackColor = System.Drawing.Color.SeaGreen
+        Me.btnGuardar.BackColor = System.Drawing.Color.SteelBlue
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnGuardar.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(123, 335)
+        Me.btnGuardar.Location = New System.Drawing.Point(540, 100)
         Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(199, 40)
+        Me.btnGuardar.Size = New System.Drawing.Size(100, 35)
         Me.btnGuardar.TabIndex = 10
-        Me.btnGuardar.Text = "GUARDAR RANGO"
+        Me.btnGuardar.Text = "GUARDAR"
         Me.btnGuardar.UseVisualStyleBackColor = False
         '
-        'numUltimo
+        'txtUltimo
         '
-        Me.numUltimo.Location = New System.Drawing.Point(23, 237)
-        Me.numUltimo.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
-        Me.numUltimo.Name = "numUltimo"
-        Me.numUltimo.Size = New System.Drawing.Size(299, 22)
-        Me.numUltimo.TabIndex = 9
+        Me.txtUltimo.Location = New System.Drawing.Point(400, 108)
+        Me.txtUltimo.Name = "txtUltimo"
+        Me.txtUltimo.Size = New System.Drawing.Size(100, 20)
+        Me.txtUltimo.TabIndex = 9
+        Me.txtUltimo.Text = "0"
         '
-        'Label5
+        'lblUltimo
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(20, 221)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(288, 13)
-        Me.Label5.TabIndex = 8
-        Me.Label5.Text = "Último número usado (Contador actual):"
-        Me.Label5.ForeColor = Color.DimGray
+        Me.lblUltimo.AutoSize = True
+        Me.lblUltimo.Location = New System.Drawing.Point(397, 92)
+        Me.lblUltimo.Name = "lblUltimo"
+        Me.lblUltimo.Size = New System.Drawing.Size(83, 13)
+        Me.lblUltimo.TabIndex = 8
+        Me.lblUltimo.Text = "Último Usado:"
         '
-        'numFin
+        'txtFin
         '
-        Me.numFin.Location = New System.Drawing.Point(183, 185)
-        Me.numFin.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
-        Me.numFin.Name = "numFin"
-        Me.numFin.Size = New System.Drawing.Size(139, 22)
-        Me.numFin.TabIndex = 7
+        Me.txtFin.Location = New System.Drawing.Point(280, 108)
+        Me.txtFin.Name = "txtFin"
+        Me.txtFin.Size = New System.Drawing.Size(100, 20)
+        Me.txtFin.TabIndex = 7
         '
-        'Label4
+        'lblFin
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(180, 169)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(71, 13)
-        Me.Label4.TabIndex = 6
-        Me.Label4.Text = "Número Fin:"
+        Me.lblFin.AutoSize = True
+        Me.lblFin.Location = New System.Drawing.Point(277, 92)
+        Me.lblFin.Name = "lblFin"
+        Me.lblFin.Size = New System.Drawing.Size(65, 13)
+        Me.lblFin.TabIndex = 6
+        Me.lblFin.Text = "Número Fin:"
         '
-        'numInicio
+        'txtInicio
         '
-        Me.numInicio.Location = New System.Drawing.Point(23, 185)
-        Me.numInicio.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
-        Me.numInicio.Name = "numInicio"
-        Me.numInicio.Size = New System.Drawing.Size(139, 22)
-        Me.numInicio.TabIndex = 5
+        Me.txtInicio.Location = New System.Drawing.Point(160, 108)
+        Me.txtInicio.Name = "txtInicio"
+        Me.txtInicio.Size = New System.Drawing.Size(100, 20)
+        Me.txtInicio.TabIndex = 5
         '
-        'Label3
+        'lblInicio
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(20, 169)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(83, 13)
-        Me.Label3.TabIndex = 4
-        Me.Label3.Text = "Número Inicio:"
+        Me.lblInicio.AutoSize = True
+        Me.lblInicio.Location = New System.Drawing.Point(157, 92)
+        Me.lblInicio.Name = "lblInicio"
+        Me.lblInicio.Size = New System.Drawing.Size(76, 13)
+        Me.lblInicio.TabIndex = 4
+        Me.lblInicio.Text = "Número Inicio:"
         '
         'txtNombre
         '
-        Me.txtNombre.Location = New System.Drawing.Point(23, 133)
+        Me.txtNombre.Location = New System.Drawing.Point(160, 50)
         Me.txtNombre.Name = "txtNombre"
-        Me.txtNombre.Size = New System.Drawing.Size(299, 22)
+        Me.txtNombre.Size = New System.Drawing.Size(340, 20)
         Me.txtNombre.TabIndex = 3
         '
-        'Label2
+        'lblNombre
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(20, 117)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(193, 13)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "Nombre del Rango (Ej: Libro 2026):"
+        Me.lblNombre.AutoSize = True
+        Me.lblNombre.Location = New System.Drawing.Point(157, 34)
+        Me.lblNombre.Name = "lblNombre"
+        Me.lblNombre.Size = New System.Drawing.Size(130, 13)
+        Me.lblNombre.TabIndex = 2
+        Me.lblNombre.Text = "Nombre (Ej: Oficios 2026):"
         '
         'cmbTipo
         '
         Me.cmbTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbTipo.FormattingEnabled = True
-        Me.cmbTipo.Location = New System.Drawing.Point(23, 80)
+        Me.cmbTipo.Location = New System.Drawing.Point(20, 50)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(299, 21)
+        Me.cmbTipo.Size = New System.Drawing.Size(120, 21)
         Me.cmbTipo.TabIndex = 1
         '
-        'Label1
+        'lblTipo
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(20, 64)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(111, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Tipo de Documento:"
+        Me.lblTipo.AutoSize = True
+        Me.lblTipo.Location = New System.Drawing.Point(17, 34)
+        Me.lblTipo.Name = "lblTipo"
+        Me.lblTipo.Size = New System.Drawing.Size(31, 13)
+        Me.lblTipo.TabIndex = 0
+        Me.lblTipo.Text = "Tipo:"
+        '
+        'dgvRangos
+        '
+        Me.dgvRangos.AllowUserToAddRows = False
+        Me.dgvRangos.AllowUserToDeleteRows = False
+        Me.dgvRangos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.dgvRangos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvRangos.Location = New System.Drawing.Point(12, 220)
+        Me.dgvRangos.MultiSelect = False
+        Me.dgvRangos.Name = "dgvRangos"
+        Me.dgvRangos.ReadOnly = True
+        Me.dgvRangos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgvRangos.Size = New System.Drawing.Size(760, 230)
+        Me.dgvRangos.TabIndex = 1
         '
         'btnNuevo
         '
-        Me.btnNuevo.Location = New System.Drawing.Point(247, 13)
+        Me.btnNuevo.Location = New System.Drawing.Point(12, 175)
         Me.btnNuevo.Name = "btnNuevo"
-        Me.btnNuevo.Size = New System.Drawing.Size(75, 23)
-        Me.btnNuevo.TabIndex = 13
-        Me.btnNuevo.Text = "Limpiar"
+        Me.btnNuevo.Size = New System.Drawing.Size(120, 35)
+        Me.btnNuevo.TabIndex = 2
+        Me.btnNuevo.Text = "+ NUEVO RANGO"
         Me.btnNuevo.UseVisualStyleBackColor = True
+        '
+        'btnEditar
+        '
+        Me.btnEditar.Location = New System.Drawing.Point(140, 175)
+        Me.btnEditar.Name = "btnEditar"
+        Me.btnEditar.Size = New System.Drawing.Size(120, 35)
+        Me.btnEditar.TabIndex = 3
+        Me.btnEditar.Text = "EDITAR / VER"
+        Me.btnEditar.UseVisualStyleBackColor = True
         '
         'frmGestionRangos
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
-        Me.Controls.Add(Me.SplitContainer1)
-        Me.Controls.Add(Me.pnlTop)
-        Me.Font = New System.Drawing.Font("Segoe UI", 8.25!)
+        Me.ClientSize = New System.Drawing.Size(784, 461)
+        Me.Controls.Add(Me.btnEditar)
+        Me.Controls.Add(Me.btnNuevo)
+        Me.Controls.Add(Me.dgvRangos)
+        Me.Controls.Add(Me.pnlEditor)
         Me.Name = "frmGestionRangos"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Gestión de Rangos"
-        Me.pnlTop.ResumeLayout(False)
-        Me.pnlTop.PerformLayout()
-        Me.SplitContainer1.Panel1.ResumeLayout(False)
-        Me.SplitContainer1.Panel2.ResumeLayout(False)
-        Me.SplitContainer1.Panel2.PerformLayout()
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.SplitContainer1.ResumeLayout(False)
+        Me.Text = "Gestión de Numeración y Rangos"
+        Me.pnlEditor.ResumeLayout(False)
+        Me.pnlEditor.PerformLayout()
         CType(Me.dgvRangos, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.numUltimo, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.numFin, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.numInicio, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents pnlTop As System.Windows.Forms.Panel
-    Friend WithEvents lblTitulo As System.Windows.Forms.Label
-    Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
-    Friend WithEvents dgvRangos As System.Windows.Forms.DataGridView
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents cmbTipo As System.Windows.Forms.ComboBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents pnlEditor As System.Windows.Forms.GroupBox
     Friend WithEvents txtNombre As System.Windows.Forms.TextBox
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents numInicio As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents numFin As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents numUltimo As System.Windows.Forms.NumericUpDown
-    Friend WithEvents btnGuardar As System.Windows.Forms.Button
-    Friend WithEvents btnEliminar As System.Windows.Forms.Button
+    Friend WithEvents lblNombre As System.Windows.Forms.Label
+    Friend WithEvents cmbTipo As System.Windows.Forms.ComboBox
+    Friend WithEvents lblTipo As System.Windows.Forms.Label
+    Friend WithEvents txtUltimo As System.Windows.Forms.TextBox
+    Friend WithEvents lblUltimo As System.Windows.Forms.Label
+    Friend WithEvents txtFin As System.Windows.Forms.TextBox
+    Friend WithEvents lblFin As System.Windows.Forms.Label
+    Friend WithEvents txtInicio As System.Windows.Forms.TextBox
+    Friend WithEvents lblInicio As System.Windows.Forms.Label
     Friend WithEvents chkActivo As System.Windows.Forms.CheckBox
+    Friend WithEvents btnCancelar As System.Windows.Forms.Button
+    Friend WithEvents btnGuardar As System.Windows.Forms.Button
+    Friend WithEvents dgvRangos As System.Windows.Forms.DataGridView
     Friend WithEvents btnNuevo As System.Windows.Forms.Button
+    Friend WithEvents btnEditar As System.Windows.Forms.Button
 End Class

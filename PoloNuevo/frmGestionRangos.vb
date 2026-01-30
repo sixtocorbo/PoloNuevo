@@ -1,180 +1,159 @@
-﻿Public Class frmGestionRangos
+﻿Imports System.Data.Entity
 
-    Private _idRangoEditar As Integer = 0
+Public Class frmGestionRangos
+
+    Private _idEdicion As Integer = 0
 
     Private Sub frmGestionRangos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarTipos()
-        CargarRangos()
-        Limpiar() ' Esto asegura que arranque limpio y sin selección
+        CargarGrilla()
+        ModoEdicion(False)
     End Sub
 
     Private Sub CargarTipos()
         Using db As New PoloNuevoEntities()
-            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").ToList()
+            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
         End Using
     End Sub
 
-    Private Sub CargarRangos()
+    Private Sub CargarGrilla()
         Using db As New PoloNuevoEntities()
-            Dim lista = db.NumeracionRangos _
+            Dim lista = db.NumeracionRangos.Include("TiposDocumento") _
                           .Select(Function(r) New With {
                               .Id = r.Id,
                               .Tipo = r.TiposDocumento.Nombre,
-                              .Rango = r.NombreRango,
+                              .Nombre = r.NombreRango,
                               .Inicio = r.NumeroInicio,
                               .Fin = r.NumeroFin,
                               .Actual = r.UltimoUtilizado,
                               .Activo = r.Activo
-                          }).ToList()
+                          }).OrderByDescending(Function(r) r.Id).ToList()
             dgvRangos.DataSource = lista
-            If dgvRangos.Columns("Id") IsNot Nothing Then dgvRangos.Columns("Id").Visible = False
+            dgvRangos.Columns("Id").Visible = False
         End Using
     End Sub
 
-    Private Sub Limpiar()
-        _idRangoEditar = 0
-        txtNombre.Text = ""
-        numInicio.Value = 1
-        numFin.Value = 1000
-        numUltimo.Value = 0
-        chkActivo.Checked = True
-        If cmbTipo.Items.Count > 0 Then cmbTipo.SelectedIndex = 0
+    Private Sub ModoEdicion(habilitar As Boolean)
+        pnlEditor.Enabled = habilitar
+        btnNuevo.Enabled = Not habilitar
+        btnEditar.Enabled = Not habilitar
+        dgvRangos.Enabled = Not habilitar
 
-        btnEliminar.Enabled = False
-        btnGuardar.Text = "GUARDAR RANGO"
-
-        ' === CORRECCIÓN CLAVE ===
-        ' Quitamos la selección visual de la grilla.
-        ' Esto permite que si el usuario vuelve a hacer clic en la misma fila,
-        ' el evento SelectionChanged se dispare de nuevo.
-        dgvRangos.ClearSelection()
-    End Sub
-
-    Private Sub dgvRangos_SelectionChanged(sender As Object, e As EventArgs) Handles dgvRangos.SelectionChanged
-        If dgvRangos.SelectedRows.Count > 0 Then
-            Dim id As Integer = Convert.ToInt32(dgvRangos.SelectedRows(0).Cells("Id").Value)
-            CargarEdicion(id)
+        If Not habilitar Then
+            ' Limpiar
+            txtNombre.Clear()
+            txtInicio.Text = "1"
+            txtFin.Text = "1000"
+            txtUltimo.Text = "0"
+            _idEdicion = 0
         End If
     End Sub
 
-    Private Sub CargarEdicion(id As Integer)
+    ' --- BOTONES ---
+
+    Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
+        ModoEdicion(True)
+        txtNombre.Focus()
+        chkActivo.Checked = True
+    End Sub
+
+    Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
+        If dgvRangos.SelectedRows.Count = 0 Then Return
+
+        _idEdicion = Convert.ToInt32(dgvRangos.SelectedRows(0).Cells("Id").Value)
         Using db As New PoloNuevoEntities()
-            Dim r = db.NumeracionRangos.Find(id)
+            Dim r = db.NumeracionRangos.Find(_idEdicion)
             If r IsNot Nothing Then
-                _idRangoEditar = r.Id
                 cmbTipo.SelectedValue = r.TipoDocumentoId
                 txtNombre.Text = r.NombreRango
-                numInicio.Value = r.NumeroInicio
-                numFin.Value = r.NumeroFin
-                numUltimo.Value = r.UltimoUtilizado
-                chkActivo.Checked = If(r.Activo.HasValue, r.Activo.Value, False)
-
-                btnEliminar.Enabled = True
-                btnGuardar.Text = "ACTUALIZAR RANGO"
+                txtInicio.Text = r.NumeroInicio.ToString()
+                txtFin.Text = r.NumeroFin.ToString()
+                txtUltimo.Text = r.UltimoUtilizado.ToString()
+                chkActivo.Checked = r.Activo
+                ModoEdicion(True)
             End If
         End Using
     End Sub
 
+    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
+        ModoEdicion(False)
+    End Sub
+
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        ' 1. Validaciones de Formulario (Básicas)
-        If txtNombre.Text.Trim = "" Then
-            MessageBox.Show("Ingrese un nombre para el rango (Ej: Libro A 2026).", "Falta Nombre", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ' 1. Validaciones de formulario (Interfaz)
+        If txtNombre.Text = "" Then
+            MessageBox.Show("Falta el nombre.")
             Return
         End If
-        If numInicio.Value >= numFin.Value Then
-            MessageBox.Show("El número de inicio debe ser menor al número de fin.", "Rango Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+        Dim ini, fin, ult As Integer
+        Integer.TryParse(txtInicio.Text, ini)
+        Integer.TryParse(txtFin.Text, fin)
+        Integer.TryParse(txtUltimo.Text, ult)
+
+        If ini >= fin Then
+            MessageBox.Show("El número de Inicio debe ser menor al número Fin.")
             Return
         End If
-        If numUltimo.Value < numInicio.Value - 1 Then
-            numUltimo.Value = numInicio.Value - 1
-        End If
 
-        Dim idTipo As Integer = Convert.ToInt32(cmbTipo.SelectedValue)
-        Dim nuevoInicio As Integer = Convert.ToInt32(numInicio.Value)
-        Dim nuevoFin As Integer = Convert.ToInt32(numFin.Value)
-
+        ' 2. Intento de Guardado en Base de Datos
         Try
             Using db As New PoloNuevoEntities()
-
-                ' =================================================================
-                ' 2. VALIDACIÓN DE SUPERPOSICIÓN Y UNICIDAD (NUEVO BLINDAJE)
-                ' =================================================================
-                If chkActivo.Checked Then
-                    ' Buscamos otros rangos del mismo tipo que estén ACTIVOS y que NO sean el que estoy editando
-                    Dim rangosActivos = db.NumeracionRangos _
-                                          .Where(Function(r) r.TipoDocumentoId = idTipo _
-                                                             And r.Activo = True _
-                                                             And r.Id <> _idRangoEditar) _
-                                          .ToList()
-
-                    For Each r In rangosActivos
-                        ' Fórmula matemática para detectar superposición de rangos:
-                        ' (InicioA <= FinB) y (FinA >= InicioB)
-                        If (nuevoInicio <= r.NumeroFin) And (nuevoFin >= r.NumeroInicio) Then
-                            MessageBox.Show($"ERROR CRÍTICO DE NUMERACIÓN:{vbCrLf}{vbCrLf}" &
-                                            $"El rango que intenta guardar ({nuevoInicio} - {nuevoFin}) " &
-                                            $"se superpone con otro rango ya activo:{vbCrLf}" &
-                                            $"NOMBRE: {r.NombreRango}{vbCrLf}" &
-                                            $"RANGO: {r.NumeroInicio} - {r.NumeroFin}{vbCrLf}{vbCrLf}" &
-                                            "Por seguridad, no se puede guardar. Desactive el rango anterior o modifique los números.",
-                                            "Conflicto de Rangos", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                            Return ' DETENEMOS TODO
-                        End If
-                    Next
-                End If
-                ' =================================================================
-
-                ' 3. Guardado (Si pasó las validaciones)
                 Dim rango As NumeracionRangos
-                If _idRangoEditar = 0 Then
+
+                ' Determinar si es Nuevo o Edición
+                If _idEdicion = 0 Then
                     rango = New NumeracionRangos()
                     db.NumeracionRangos.Add(rango)
                 Else
-                    rango = db.NumeracionRangos.Find(_idRangoEditar)
+                    rango = db.NumeracionRangos.Find(_idEdicion)
                 End If
 
-                rango.TipoDocumentoId = idTipo
+                ' Asignar valores desde los controles
+                rango.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
                 rango.NombreRango = txtNombre.Text.Trim()
-                rango.NumeroInicio = nuevoInicio
-                rango.NumeroFin = nuevoFin
-                rango.UltimoUtilizado = Convert.ToInt32(numUltimo.Value)
+                rango.NumeroInicio = ini
+                rango.NumeroFin = fin
+                rango.UltimoUtilizado = ult
                 rango.Activo = chkActivo.Checked
 
+                ' Regla de Negocio: Si este rango se activa, desactivar otros del mismo tipo
+                If rango.Activo Then
+                    Dim otros = db.NumeracionRangos.Where(Function(x) x.TipoDocumentoId = rango.TipoDocumentoId And x.Id <> rango.Id And x.Activo = True).ToList()
+                    For Each o In otros
+                        o.Activo = False
+                    Next
+                End If
+
+                ' Guardar Cambios
                 db.SaveChanges()
-                MessageBox.Show("Rango guardado y verificado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-                CargarRangos()
-                Limpiar()
+                MessageBox.Show("Rango guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                ' Limpiar y recargar
+                ModoEdicion(False)
+                CargarGrilla()
             End Using
+
+            ' --- CAPTURA DE ERRORES DE VALIDACIÓN (CORREGIDO) ---
+        Catch dbEx As System.Data.Entity.Validation.DbEntityValidationException
+            Dim mensaje As String = ""
+
+            ' CAMBIO: Usamos 'valResult' en lugar de 'err'
+            For Each valResult In dbEx.EntityValidationErrors
+                For Each validationError In valResult.ValidationErrors
+                    mensaje &= "- Campo: " & validationError.PropertyName & vbCrLf &
+                               "  Error: " & validationError.ErrorMessage & vbCrLf
+                Next
+            Next
+
+            MessageBox.Show("No se pudo guardar debido a los siguientes errores de validación:" & vbCrLf & vbCrLf & mensaje, "Error de Datos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+            ' --- CAPTURA DE OTROS ERRORES ---
         Catch ex As Exception
-            MessageBox.Show("Error técnico: " & ex.Message)
+            MessageBox.Show("Ocurrió un error inesperado: " & ex.Message, "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
-    End Sub
-
-    Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
-        If _idRangoEditar = 0 Then Return
-
-        If MessageBox.Show("¿Seguro que desea eliminar este rango?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
-            Try
-                Using db As New PoloNuevoEntities()
-                    Dim r = db.NumeracionRangos.Find(_idRangoEditar)
-                    If r IsNot Nothing Then
-                        db.NumeracionRangos.Remove(r)
-                        db.SaveChanges()
-                    End If
-                End Using
-
-                CargarRangos()
-                Limpiar()
-            Catch ex As Exception
-                MessageBox.Show("No se puede eliminar porque ya se usaron números de este rango. Desactívelo en su lugar.", "Error de Integridad")
-            End Try
-        End If
-    End Sub
-
-    Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Limpiar()
     End Sub
 End Class
