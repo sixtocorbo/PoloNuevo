@@ -25,7 +25,9 @@ Partial Class frmNuevoIngreso
         Me.lblNumero = New System.Windows.Forms.Label()
         Me.txtNumero = New System.Windows.Forms.TextBox()
         Me.lblOrigen = New System.Windows.Forms.Label()
-        Me.cmbOrigen = New System.Windows.Forms.ComboBox()
+        ' CAMBIO: Reemplazado ComboBox por TextBox
+        Me.txtOrigen = New System.Windows.Forms.TextBox()
+        Me.lstSugerenciasOrigen = New System.Windows.Forms.ListBox()
         Me.lblAsunto = New System.Windows.Forms.Label()
         Me.txtAsunto = New System.Windows.Forms.TextBox()
         Me.grpVinculacion = New System.Windows.Forms.GroupBox()
@@ -126,16 +128,27 @@ Partial Class frmNuevoIngreso
         Me.lblOrigen.TabIndex = 5
         Me.lblOrigen.Text = "Organismo de Origen:"
         '
-        'cmbOrigen
+        'txtOrigen (Reemplaza a cmbOrigen)
         '
-        Me.cmbOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmbOrigen.FormattingEnabled = True
-        Me.cmbOrigen.Location = New System.Drawing.Point(63, 246)
-        Me.cmbOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.cmbOrigen.Name = "cmbOrigen"
-        Me.cmbOrigen.Size = New System.Drawing.Size(796, 28)
-        Me.cmbOrigen.TabIndex = 6
+        Me.txtOrigen.Location = New System.Drawing.Point(63, 246)
+        Me.txtOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtOrigen.Name = "txtOrigen"
+        Me.txtOrigen.Size = New System.Drawing.Size(796, 26)
+        Me.txtOrigen.TabIndex = 6
+        '
+        'lstSugerenciasOrigen (Nuevo)
+        '
+        Me.lstSugerenciasOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstSugerenciasOrigen.FormattingEnabled = True
+        Me.lstSugerenciasOrigen.ItemHeight = 20
+        Me.lstSugerenciasOrigen.Location = New System.Drawing.Point(63, 272) ' Posición inicial aprox
+        Me.lstSugerenciasOrigen.Name = "lstSugerenciasOrigen"
+        Me.lstSugerenciasOrigen.Size = New System.Drawing.Size(796, 104)
+        Me.lstSugerenciasOrigen.TabIndex = 20 ' Indice alto para flotar
+        Me.lstSugerenciasOrigen.Visible = False
         '
         'lblAsunto
         '
@@ -364,6 +377,7 @@ Partial Class frmNuevoIngreso
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
         Me.ClientSize = New System.Drawing.Size(1101, 1050)
+        Me.Controls.Add(Me.lstSugerenciasOrigen) ' IMPORTANTE: Agregar la lista a los controles
         Me.Controls.Add(Me.grpRelacion)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
@@ -373,7 +387,7 @@ Partial Class frmNuevoIngreso
         Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.txtAsunto)
         Me.Controls.Add(Me.lblAsunto)
-        Me.Controls.Add(Me.cmbOrigen)
+        Me.Controls.Add(Me.txtOrigen) ' IMPORTANTE
         Me.Controls.Add(Me.lblOrigen)
         Me.Controls.Add(Me.txtNumero)
         Me.Controls.Add(Me.lblNumero)
@@ -406,7 +420,8 @@ Partial Class frmNuevoIngreso
     Friend WithEvents lblNumero As System.Windows.Forms.Label
     Friend WithEvents txtNumero As System.Windows.Forms.TextBox
     Friend WithEvents lblOrigen As System.Windows.Forms.Label
-    Friend WithEvents cmbOrigen As System.Windows.Forms.ComboBox
+    Friend WithEvents txtOrigen As System.Windows.Forms.TextBox ' Nuevo TextBox
+    Friend WithEvents lstSugerenciasOrigen As System.Windows.Forms.ListBox ' Nueva ListBox
     Friend WithEvents lblAsunto As System.Windows.Forms.Label
     Friend WithEvents txtAsunto As System.Windows.Forms.TextBox
     Friend WithEvents grpVinculacion As System.Windows.Forms.GroupBox

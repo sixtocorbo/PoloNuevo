@@ -42,6 +42,7 @@ Partial Class frmMesaEntrada
         Me.lblHistorial = New System.Windows.Forms.Label()
         Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
         Me.PrintDialog1 = New System.Windows.Forms.PrintDialog()
+        Me.btnVerHistorial = New System.Windows.Forms.Button()
         Me.pnlTop.SuspendLayout()
         Me.grpFiltros.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -55,6 +56,7 @@ Partial Class frmMesaEntrada
         'pnlTop
         '
         Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.btnVerHistorial)
         Me.pnlTop.Controls.Add(Me.btnActuar)
         Me.pnlTop.Controls.Add(Me.btnEliminar)
         Me.pnlTop.Controls.Add(Me.btnVerDigital)
@@ -376,6 +378,21 @@ Partial Class frmMesaEntrada
         '
         Me.PrintDialog1.UseEXDialog = True
         '
+        'btnVerHistorial
+        '
+        Me.btnVerHistorial.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVerHistorial.BackColor = System.Drawing.Color.SeaGreen
+        Me.btnVerHistorial.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnVerHistorial.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnVerHistorial.ForeColor = System.Drawing.Color.White
+        Me.btnVerHistorial.Location = New System.Drawing.Point(1254, 18)
+        Me.btnVerHistorial.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVerHistorial.Name = "btnVerHistorial"
+        Me.btnVerHistorial.Size = New System.Drawing.Size(240, 69)
+        Me.btnVerHistorial.TabIndex = 9
+        Me.btnVerHistorial.Text = "Ver Historial"
+        Me.btnVerHistorial.UseVisualStyleBackColor = False
+        '
         'frmMesaEntrada
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -426,4 +443,5 @@ Partial Class frmMesaEntrada
     Friend WithEvents PrintDialog1 As System.Windows.Forms.PrintDialog
     Friend WithEvents btnEliminar As System.Windows.Forms.Button
     Friend WithEvents btnActuar As System.Windows.Forms.Button ' <--- BOTÓN NUEVO AGREGADO
+    Friend WithEvents btnVerHistorial As Button
 End Class

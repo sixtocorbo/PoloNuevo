@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Data
 Imports System.Drawing
+Imports System.Linq ' Necesario para las consultas LINQ
 
 Public Class frmNuevoIngreso
 
@@ -9,6 +10,10 @@ Public Class frmNuevoIngreso
     ' =========================================================
     Private _idDocumentoEditar As Integer = 0
     Private _listaCompletaReclusos As New List(Of ReclusoItem)
+
+    ' NUEVA VARIABLE: Caché para la búsqueda rápida de orígenes
+    Private _todosOrigenes As New List(Of String)
+
     Private _archivoBytes As Byte() = Nothing
     Private _archivoNombre As String = ""
     Private _archivoExt As String = ""
@@ -47,6 +52,10 @@ Public Class frmNuevoIngreso
     Private Sub frmNuevoIngreso_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarListas()
 
+        ' Ajustes visuales para la lista de sugerencias
+        lstSugerenciasOrigen.Visible = False
+        lstSugerenciasOrigen.BringToFront()
+
         ' Si hubiera controles heredados no deseados, los ocultamos
         If Me.Controls.ContainsKey("grpDestino") Then Me.Controls("grpDestino").Visible = False
 
@@ -68,19 +77,118 @@ Public Class frmNuevoIngreso
 
             ActualizarListaReclusos(_listaCompletaReclusos)
 
-            ' 3. Cargar Orígenes (Autocompletado inteligente basado en historial)
-            Dim origenes = db.MovimientosDocumentos.Where(Function(m) m.Origen <> "" And m.Origen <> "SISTEMA") _
-                                                   .Select(Function(m) m.Origen).Distinct().ToList()
+            ' 3. Cargar Orígenes (AHORA EN UNA LISTA EN MEMORIA, NO EN COMBO)
+            Dim listaTemp = db.MovimientosDocumentos.Where(Function(m) m.Origen <> "" And m.Origen <> "SISTEMA") _
+                                                    .Select(Function(m) m.Origen).Distinct().ToList()
 
             Dim defaults As String() = {"JUZGADO LETRADO", "MINISTERIO DEL INTERIOR", "FISCALÍA", "DEFENSORÍA", "DIRECCIÓN", "JEFATURA DE SERVICIO", "OGLAST"}
+
             For Each def In defaults
-                If Not origenes.Contains(def) Then origenes.Add(def)
+                If Not listaTemp.Contains(def) Then listaTemp.Add(def)
             Next
-            origenes.Sort()
-            cmbOrigen.DataSource = origenes
-            cmbOrigen.SelectedIndex = -1
+
+            ' Ordenamos y guardamos en la variable global para búsqueda rápida
+            listaTemp.Sort()
+            _todosOrigenes = listaTemp
         End Using
     End Sub
+
+    ' =========================================================
+    ' LÓGICA DE BÚSQUEDA INTELIGENTE (ORIGEN)
+    ' =========================================================
+    Private Sub txtOrigen_TextChanged(sender As Object, e As EventArgs) Handles txtOrigen.TextChanged
+        Dim texto As String = txtOrigen.Text.Trim().ToLower()
+
+        ' Si está vacío, ocultamos la lista
+        If String.IsNullOrEmpty(texto) Then
+            lstSugerenciasOrigen.Visible = False
+            Return
+        End If
+
+        If _todosOrigenes Is Nothing Then Return
+
+        ' Algoritmo: Divide lo que escribes por espacios
+        Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
+
+        ' === CORRECCIÓN AQUÍ ===
+        ' Usamos una lambda de una sola línea (más estable en VB.NET)
+        ' Busca elementos donde TODAS (.All) las palabras escritas estén contenidas
+        Dim resultados = _todosOrigenes.Where(Function(o) palabras.All(Function(p) o.ToLower().Contains(p))) _
+                                       .Take(10) _
+                                       .ToList()
+        ' =======================
+
+        If resultados.Count > 0 Then
+            lstSugerenciasOrigen.DataSource = resultados
+            lstSugerenciasOrigen.Visible = True
+            ' Posicionamos la lista justo debajo del TextBox
+            lstSugerenciasOrigen.Top = txtOrigen.Bottom + 2
+            lstSugerenciasOrigen.Left = txtOrigen.Left
+            lstSugerenciasOrigen.Width = txtOrigen.Width
+            lstSugerenciasOrigen.BringToFront()
+        Else
+            lstSugerenciasOrigen.Visible = False
+        End If
+    End Sub
+    ' =========================================================
+    ' NAVEGACIÓN POR TECLADO EN EL BUSCADOR
+    ' =========================================================
+    Private Sub txtOrigen_KeyDown(sender As Object, e As KeyEventArgs) Handles txtOrigen.KeyDown
+        ' Solo actuamos si la lista de sugerencias está visible
+        If lstSugerenciasOrigen.Visible AndAlso lstSugerenciasOrigen.Items.Count > 0 Then
+            Select Case e.KeyCode
+                Case Keys.Down
+                    ' Flecha ABAJO: Mover selección hacia abajo
+                    e.Handled = True ' Evita que el cursor se mueva en el TextBox
+                    Dim index As Integer = lstSugerenciasOrigen.SelectedIndex
+                    If index < lstSugerenciasOrigen.Items.Count - 1 Then
+                        lstSugerenciasOrigen.SelectedIndex += 1
+                    ElseIf index = -1 Then
+                        ' Si no había nada seleccionado, seleccionar el primero
+                        lstSugerenciasOrigen.SelectedIndex = 0
+                    End If
+
+                Case Keys.Up
+                    ' Flecha ARRIBA: Mover selección hacia arriba
+                    e.Handled = True
+                    Dim index As Integer = lstSugerenciasOrigen.SelectedIndex
+                    If index > 0 Then
+                        lstSugerenciasOrigen.SelectedIndex -= 1
+                    End If
+
+                Case Keys.Enter
+                    ' ENTER: Confirmar selección
+                    e.SuppressKeyPress = True ' Evita el sonido "Ding" y el salto de línea
+                    If lstSugerenciasOrigen.SelectedItem IsNot Nothing Then
+                        txtOrigen.Text = lstSugerenciasOrigen.SelectedItem.ToString()
+                        lstSugerenciasOrigen.Visible = False
+                        txtOrigen.SelectionStart = txtOrigen.Text.Length ' Poner cursor al final
+                        txtOrigen.Focus()
+                    End If
+
+                Case Keys.Escape
+                    ' ESCAPE: Cerrar la lista si el usuario se arrepiente
+                    e.Handled = True
+                    lstSugerenciasOrigen.Visible = False
+            End Select
+        End If
+    End Sub
+    Private Sub lstSugerenciasOrigen_Click(sender As Object, e As EventArgs) Handles lstSugerenciasOrigen.Click
+        If lstSugerenciasOrigen.SelectedItem IsNot Nothing Then
+            txtOrigen.Text = lstSugerenciasOrigen.SelectedItem.ToString()
+            lstSugerenciasOrigen.Visible = False
+            txtOrigen.SelectionStart = txtOrigen.Text.Length
+            txtOrigen.Focus()
+        End If
+    End Sub
+
+    Private Sub txtOrigen_Leave(sender As Object, e As EventArgs) Handles txtOrigen.Leave
+        ' Pequeño hack: Si el foco se fue a la lista (porque hice clic), no la ocultes todavía
+        If Not lstSugerenciasOrigen.Focused Then
+            lstSugerenciasOrigen.Visible = False
+        End If
+    End Sub
+
 
     Private Sub CargarDatosEdicion()
         Try
@@ -126,16 +234,10 @@ Public Class frmNuevoIngreso
                     ' Intentar cargar Origen buscando el primer movimiento
                     Dim primerMov = doc.MovimientosDocumentos.OrderBy(Function(m) m.FechaMovimiento).FirstOrDefault()
                     If primerMov IsNot Nothing Then
-                        cmbOrigen.Text = primerMov.Origen
+                        ' CAMBIO: Ahora asignamos al TextBox
+                        txtOrigen.Text = primerMov.Origen
                     End If
 
-                    ' Si tiene padre, mostrarlo (Solo lectura en edición)
-                    ' NOTA: Asegúrate de haber actualizado el EDMX para que reconozca DocumentoPadreId
-                    ' If doc.DocumentoPadreId.HasValue Then
-                    '    chkEsRespuesta.Checked = True
-                    '    txtIdPadre.Text = doc.DocumentoPadreId.ToString()
-                    '    _idPadreVerificado = doc.DocumentoPadreId.Value
-                    ' End If
                 End If
             End Using
         Catch ex As Exception
@@ -234,10 +336,6 @@ Public Class frmNuevoIngreso
         fBuscar.ShowDialog()
     End Sub
 
-
-
-    ' EN frmNuevoIngreso.vb - Evento btnGuardar_Click
-
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         ' 1. Validaciones
         If String.IsNullOrWhiteSpace(txtAsunto.Text) Then
@@ -245,17 +343,19 @@ Public Class frmNuevoIngreso
             Return
         End If
 
+        ' CAMBIO: Validamos txtOrigen en lugar del combo
+        If String.IsNullOrWhiteSpace(txtOrigen.Text) Then
+            MessageBox.Show("Debe indicar el Organismo de Origen.", "Faltan datos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
         Try
             Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
 
-                ' =============================================================================
-                ' CORRECCIÓN: Declaramos las variables AQUÍ para que sean accesibles en todo el bloque
-                ' =============================================================================
                 Dim padreEstaEnMesa As Boolean = True
                 Dim destinoDelPadre As String = "MESA DE ENTRADA"
                 Dim referenciaPadre As String = ""
-                ' =============================================================================
 
                 ' ---------------------------------------------------------
                 ' PASO 1: GUARDAR DOCUMENTO (Datos Básicos)
@@ -270,9 +370,6 @@ Public Class frmNuevoIngreso
                 If cmbTipo.SelectedValue IsNot Nothing Then
                     nuevoDoc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
                 End If
-
-                ' NOTA: Solo descomentar si tienes la columna DocumentoPadreId en la BD
-                ' If _idPadreVerificado > 0 Then nuevoDoc.DocumentoPadreId = _idPadreVerificado
 
                 If _archivoBytes IsNot Nothing Then
                     nuevoDoc.Contenido = _archivoBytes
@@ -297,15 +394,12 @@ Public Class frmNuevoIngreso
                         Dim padre = db.Documentos.Find(_idPadreVerificado)
                         If padre IsNot Nothing Then
                             referenciaPadre = padre.ReferenciaExterna
-
-                            ' Buscamos el último movimiento para ver su ubicación real
                             Dim ultimoMov = padre.MovimientosDocumentos _
                                                  .OrderByDescending(Function(m) m.FechaMovimiento) _
                                                  .FirstOrDefault()
 
                             If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
                                 destinoDelPadre = ultimoMov.Destino
-                                ' Si su último destino NO es Mesa de Entrada, es que ya se fue.
                                 If destinoDelPadre <> "MESA DE ENTRADA" Then padreEstaEnMesa = False
                             End If
                         End If
@@ -315,7 +409,8 @@ Public Class frmNuevoIngreso
                     Dim movEntrada As New MovimientosDocumentos()
                     movEntrada.DocumentoId = nuevoDoc.Id
                     movEntrada.FechaMovimiento = DateTime.Now
-                    movEntrada.Origen = cmbOrigen.Text
+                    ' CAMBIO: Usamos el TextBox
+                    movEntrada.Origen = txtOrigen.Text.Trim().ToUpper()
                     movEntrada.Destino = "MESA DE ENTRADA"
                     movEntrada.EsSalida = False
 
@@ -326,17 +421,17 @@ Public Class frmNuevoIngreso
                     End If
 
                     db.MovimientosDocumentos.Add(movEntrada)
-                    db.SaveChanges() ' Guardamos para asegurar el orden cronológico
+                    db.SaveChanges()
 
-                    ' C) RUTEO AUTOMÁTICO (Aquí está la magia)
+                    ' C) RUTEO AUTOMÁTICO
                     If _idPadreVerificado > 0 Then
-
                         If padreEstaEnMesa Then
                             ' CASO 1: Padre sigue en Mesa (Pendiente) -> Se quedan juntos
                             Dim movUpdate As New MovimientosDocumentos()
                             movUpdate.DocumentoId = _idPadreVerificado
                             movUpdate.FechaMovimiento = DateTime.Now.AddSeconds(1)
-                            movUpdate.Origen = cmbOrigen.Text
+                            ' CAMBIO: Usamos el TextBox
+                            movUpdate.Origen = txtOrigen.Text.Trim().ToUpper()
                             movUpdate.Destino = "MESA DE ENTRADA"
                             movUpdate.EsSalida = False
                             movUpdate.Observaciones = "SE ADJUNTA INFORME/DOC: " & nuevoDoc.ReferenciaExterna
@@ -360,7 +455,6 @@ Public Class frmNuevoIngreso
                     End If
                 End If
 
-                ' Mensaje final estándar si no hubo ruteo automático
                 If _idDocumentoEditar > 0 Then
                     MessageBox.Show("Cambios guardados correctamente.", "Éxito")
                 ElseIf _idPadreVerificado = 0 OrElse (padreEstaEnMesa And _idPadreVerificado > 0) Then

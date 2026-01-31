@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Drawing.Printing
+Imports System.Data.Entity ' Necesario para Include y consultas avanzadas
 
 Public Class frmMesaEntrada
 
@@ -12,6 +13,17 @@ Public Class frmMesaEntrada
     Private _impDestino As String
     Private _impFecha As String
     Private _impUsuario As String = "Operador de Mesa"
+
+    ' =========================================================
+    ' CLASE AUXILIAR INTERNA PARA ORDENAR EL TIMELINE 360°
+    ' =========================================================
+    Private Class EventoTimeline
+        Public Property Fecha As DateTime
+        Public Property Icono As String
+        Public Property TextoPrincipal As String
+        Public Property Detalle As String
+        Public Property EsHijo As Boolean ' Para saber si es un evento externo
+    End Class
 
     Private Sub frmMesaEntrada_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarGrillaMovimientos()
@@ -33,21 +45,11 @@ Public Class frmMesaEntrada
                 ' 1. CONSULTA BASE
                 Dim query = db.Documentos.Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' ---------------------------------------------------------
                 ' 2. Filtro Pendientes (LÓGICA CORREGIDA)
-                ' ---------------------------------------------------------
                 If chkPendientes.Checked Then
-                    ' ANTES: Buscábamos si "EsSalida" era Falso. (Error: Mostraba cosas que estaban en otras oficinas internas)
-                    ' AHORA: Buscamos explícitamente que el documento ESTÉ ACTUALMENTE en "MESA DE ENTRADA".
-
                     query = query.Where(Function(d) d.MovimientosDocumentos _
                             .OrderByDescending(Function(m) m.FechaMovimiento) _
                             .FirstOrDefault().Destino = "MESA DE ENTRADA")
-
-                    ' EXPLICACIÓN:
-                    ' - Si hiciste un ingreso nuevo -> Su destino es "MESA DE ENTRADA" -> APARECE (Es correcto).
-                    ' - Si hiciste un pase a Director -> Su destino es "DIRECCION" -> DESAPARECE (Es correcto).
-                    ' - Si salió al Juzgado -> Su destino es "JUZGADO" -> DESAPARECE (Es correcto).
                 End If
 
                 ' 3. Buscador Inteligente
@@ -175,32 +177,21 @@ Public Class frmMesaEntrada
     End Sub
 
     ' =========================================================
-    ' BOTONES DE ACCIÓN (LO QUE PEDISTE)
+    ' BOTONES DE ACCIÓN
     ' =========================================================
 
-    ' 1. NUEVO INGRESO (Lo de ingreso)
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         Dim frm As New frmNuevoIngreso()
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
     End Sub
 
-
-    ' 3. ACTUAR / RESPONDER
     Private Sub btnActuar_Click(sender As Object, e As EventArgs) Handles btnActuar.Click
-        ' 1. Validación: Que haya algo seleccionado
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento para responder o actuar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-
-        ' ========================================================================
-        ' CAMBIO REALIZADO:
-        ' Ya no usamos frmGenerarDocumento.
-        ' Llamamos a frmNuevoPase pasándole el ID del documento padre.
-        ' El usuario decidirá dentro si marca "Generar Actuación" o hace un Pase simple.
-        ' ========================================================================
         Dim frm As New frmNuevoPase(idDoc)
 
         If frm.ShowDialog() = DialogResult.OK Then
@@ -209,7 +200,6 @@ Public Class frmMesaEntrada
         End If
     End Sub
 
-    ' 4. EDITAR / DETALLE
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Seleccione un documento de la lista para ver su detalle o editar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -223,7 +213,6 @@ Public Class frmMesaEntrada
         End If
     End Sub
 
-    ' 5. ELIMINAR
     Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         If dgvMesa.SelectedRows.Count = 0 Then
             MessageBox.Show("Por favor, seleccione el documento que desea eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -318,33 +307,108 @@ Public Class frmMesaEntrada
 
     Private Sub CargarHistorial(idDoc As Integer)
         Using db As New PoloNuevoEntities()
-            Dim historial = db.MovimientosDocumentos _
-                              .Where(Function(m) m.DocumentoId = idDoc) _
-                              .OrderBy(Function(m) m.FechaMovimiento) _
-                              .Select(Function(m) New With {
-                                  .IdMov = m.Id,
-                                  .Origen = m.Origen,
-                                .Tipo = If(m.EsSalida,
-           "SALIDA (" & If(m.Observaciones Is Nothing, "S/D", m.Observaciones) & ")",
-           "ENTRADA (" & If(m.Observaciones Is Nothing, "Pase", m.Observaciones) & ")"),
-                                  .Destino = If(m.Destino Is Nothing OrElse m.Destino = "", "SIN DESTINO", m.Destino),
-                                  .Fecha = m.FechaMovimiento
-                              }) _
-                              .ToList()
+            ' 1. Obtener referencia del documento actual para buscar vínculos
+            Dim docActual = db.Documentos.Find(idDoc)
+            Dim referenciaDoc As String = ""
+            If docActual IsNot Nothing Then
+                referenciaDoc = docActual.ReferenciaExterna
+            End If
 
-            dgvMovimientos.DataSource = historial
+            ' ---------------------------------------------------------
+            ' A) MOVIMIENTOS PROPIOS (Lo que el documento hizo)
+            ' ---------------------------------------------------------
+            Dim listaPropios = db.MovimientosDocumentos _
+                                 .Where(Function(m) m.DocumentoId = idDoc) _
+                                 .Select(Function(m) New With {
+                                     .IdMov = m.Id,
+                                     .Fecha = m.FechaMovimiento,
+                                     .Origen = m.Origen,
+                                     .Destino = If(m.Destino Is Nothing Or m.Destino = "", "SIN DESTINO", m.Destino),
+                                     .EsSalida = m.EsSalida,
+                                     .Observaciones = m.Observaciones,
+                                     .EsVinculoExterno = False,
+                                     .RefHijo = ""
+                                 }).ToList()
 
+            ' ---------------------------------------------------------
+            ' B) VINCULACIONES EXTERNAS (Lo que OTROS hicieron respondiendo a este)
+            ' ---------------------------------------------------------
+            Dim listaVinculados As New List(Of Object) ' Lista temporal vacía
+
+            If Not String.IsNullOrEmpty(referenciaDoc) Then
+                Dim textoBusqueda As String = "VINCULADO A: " & referenciaDoc
+
+                ' Buscamos en movimientos de OTROS documentos
+                Dim qVinculos = db.MovimientosDocumentos _
+                                  .Include("Documentos").Include("Documentos.TiposDocumento") _
+                                  .Where(Function(m) m.DocumentoId <> idDoc AndAlso m.Observaciones.Contains(textoBusqueda)) _
+                                  .Select(Function(m) New With {
+                                      .IdMov = m.Id,
+                                      .Fecha = m.FechaMovimiento,
+                                      .Origen = "MESA DE ENTRADA", ' Generalmente ingresan por Mesa
+                                      .Destino = "MESA DE ENTRADA",
+                                      .EsSalida = False,
+                                      .Observaciones = "RESPUESTA/VÍNCULO RECIBIDO",
+                                      .EsVinculoExterno = True,
+                                      .RefHijo = m.Documentos.TiposDocumento.Nombre & " " & m.Documentos.ReferenciaExterna
+                                  }).ToList()
+
+                ' Agregamos lo encontrado a la lista general (adaptando la estructura)
+                For Each item In qVinculos
+                    listaPropios.Add(New With {
+                        .IdMov = item.IdMov,
+                        .Fecha = item.Fecha,
+                        .Origen = item.Origen,
+                        .Destino = item.Destino,
+                        .EsSalida = item.EsSalida,
+                        .Observaciones = item.Observaciones,
+                        .EsVinculoExterno = True,
+                        .RefHijo = item.RefHijo
+                    })
+                Next
+            End If
+
+            ' ---------------------------------------------------------
+            ' C) UNIFICACIÓN Y VISUALIZACIÓN
+            ' ---------------------------------------------------------
+            ' Ordenamos todo por fecha para que tenga sentido cronológico
+            Dim historialFinal = listaPropios.OrderBy(Function(x) x.Fecha).Select(Function(x) New With {
+                .IdMov = x.IdMov,
+                .Origen = x.Origen,
+                .Tipo = If(x.EsVinculoExterno,
+                           "🔗 SE VINCULÓ: " & x.RefHijo,
+                           If(x.EsSalida,
+                              "SALIDA (" & If(x.Observaciones Is Nothing, "S/D", x.Observaciones) & ")",
+                              "ENTRADA (" & If(x.Observaciones Is Nothing, "Pase", x.Observaciones) & ")")),
+                .Destino = x.Destino,
+                .Fecha = x.Fecha
+            }).ToList()
+
+            dgvMovimientos.DataSource = historialFinal
+
+            ' Ajustes visuales de la grilla
             If dgvMovimientos.Columns("IdMov") IsNot Nothing Then dgvMovimientos.Columns("IdMov").Visible = False
-            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then dgvMovimientos.Columns("Tipo").Width = 300
+            If dgvMovimientos.Columns("Tipo") IsNot Nothing Then
+                dgvMovimientos.Columns("Tipo").Width = 350
+                dgvMovimientos.Columns("Tipo").HeaderText = "Movimiento / Evento"
+            End If
             If dgvMovimientos.Columns("Destino") IsNot Nothing Then
-                dgvMovimientos.Columns("Destino").HeaderText = "Destino"
+                dgvMovimientos.Columns("Destino").HeaderText = "Ubicación"
                 dgvMovimientos.Columns("Destino").Width = 180
             End If
             If dgvMovimientos.Columns("Fecha") IsNot Nothing Then
-                dgvMovimientos.Columns("Fecha").HeaderText = "Fecha mov."
+                dgvMovimientos.Columns("Fecha").HeaderText = "Fecha"
                 dgvMovimientos.Columns("Fecha").Width = 120
                 dgvMovimientos.Columns("Fecha").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
+
+            ' Colorear filas vinculadas para diferenciarlas (Opcional)
+            For Each row As DataGridViewRow In dgvMovimientos.Rows
+                If row.Cells("Tipo").Value.ToString().Contains("🔗") Then
+                    row.DefaultCellStyle.ForeColor = Color.Blue
+                    row.DefaultCellStyle.Font = New Font("Segoe UI", 8, FontStyle.Bold)
+                End If
+            Next
         End Using
     End Sub
 
@@ -465,5 +529,268 @@ Public Class frmMesaEntrada
         g.DrawString("Operador: " & _impUsuario, fuenteChica, Brushes.Gray, margenIzq, y + 15)
         e.HasMorePages = False
     End Sub
+
+    ' =========================================================
+    ' TIMELINE VISUAL AL PASAR EL MOUSE (HOVER - VERSIÓN LIGERA)
+    ' =========================================================
+    Private Sub dgvMesa_CellToolTipTextNeeded(sender As Object, e As DataGridViewCellToolTipTextNeededEventArgs) Handles dgvMesa.CellToolTipTextNeeded
+        ' ToolTip rápido solo con los movimientos propios
+        If e.RowIndex >= 0 Then
+            Dim colName As String = dgvMesa.Columns(e.ColumnIndex).Name
+            If colName = "Referencia" Or colName = "Asunto" Then
+                Dim idDoc As Integer = Convert.ToInt32(dgvMesa.Rows(e.RowIndex).Cells("Id").Value)
+                e.ToolTipText = GenerarTimelineSimple(idDoc)
+            End If
+        End If
+    End Sub
+
+    Private Function GenerarTimelineSimple(idDoc As Integer) As String
+        ' Versión simplificada para el Hover (para no saturar la BD)
+        Dim sb As New System.Text.StringBuilder()
+        Try
+            Using db As New PoloNuevoEntities()
+                Dim movimientos = db.MovimientosDocumentos _
+                                    .Where(Function(m) m.DocumentoId = idDoc) _
+                                    .OrderBy(Function(m) m.FechaMovimiento) _
+                                    .ToList()
+
+                If movimientos.Count = 0 Then Return "Sin movimientos."
+
+                sb.AppendLine("📋 HISTORIAL RÁPIDO")
+                sb.AppendLine(New String("-"c, 30))
+
+                ' CORRECCIÓN: Usamos 'For i' en lugar de 'For Each' para tener el índice
+                For i As Integer = 0 To movimientos.Count - 1
+                    Dim m = movimientos(i)
+                    Dim icono As String = If(m.EsSalida, "📤", "📥")
+
+                    sb.AppendLine($"{icono} {m.FechaMovimiento:dd/MM HH:mm} | {If(m.EsSalida, m.Destino, m.Origen)}")
+
+                    ' Ahora 'i' sí está declarado y funciona
+                    If i < movimientos.Count - 1 Then sb.AppendLine("      ⬇")
+                Next
+            End Using
+        Catch ex As Exception
+            Return "..."
+        End Try
+        Return sb.ToString()
+    End Function
+
+    ' =========================================================
+    ' BOTÓN HISTORIAL (VISUALIZADOR 360° - VERSIÓN COMPLETA)
+    ' =========================================================
+    Private Sub btnVerHistorial_Click(sender As Object, e As EventArgs) Handles btnVerHistorial.Click
+        ' 1. Validamos selección
+        If dgvMesa.SelectedRows.Count = 0 Then
+            MessageBox.Show("Por favor, seleccione un documento de la lista primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        ' 2. Obtenemos datos clave
+        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        Dim referencia As String = dgvMesa.SelectedRows(0).Cells("Referencia").Value.ToString()
+
+        ' 3. Generamos la historia visual 360
+        Try
+            Dim historia As String = GenerarTimeline360(idDoc)
+            ' 4. Mostramos el resultado
+            MessageBox.Show(historia, "Historial Completo: " & referencia, MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Catch ex As Exception
+            MessageBox.Show("Error al generar historial: " & ex.Message)
+        End Try
+    End Sub
+
+    ' =========================================================
+    ' LÓGICA DE ÁRBOL GENEALÓGICO (TRAZABILIDAD TOTAL BIDIRECCIONAL)
+    ' =========================================================
+    Private Function GenerarTimeline360(idDocInicial As Integer) As String
+        Dim sb As New System.Text.StringBuilder()
+
+        Using db As New PoloNuevoEntities()
+            ' ---------------------------------------------------------------------
+            ' PASO 1: ENCONTRAR LA VERDADERA RAÍZ (SUBIR EL RÍO)
+            ' ---------------------------------------------------------------------
+            Dim idRaiz As Integer = idDocInicial
+            Dim docRaiz As Documentos = Nothing
+            Dim buscandoRaiz As Boolean = True
+
+            ' Contador de seguridad para evitar bucles infinitos
+            Dim seguridad As Integer = 0
+
+            While buscandoRaiz AndAlso seguridad < 50
+                seguridad += 1
+                Dim docActual = db.Documentos.Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idRaiz)
+                If docActual Is Nothing Then Exit While
+
+                ' Construimos referencias seguras (evitando nulos)
+                Dim miRef As String = If(docActual.TiposDocumento IsNot Nothing, docActual.TiposDocumento.Nombre & " ", "") & If(docActual.ReferenciaExterna, "")
+                Dim miRefSoloNum As String = If(docActual.ReferenciaExterna, "")
+                Dim nuevoIdPadre As Integer = 0
+
+                ' ESTRATEGIA A: ¿Yo digo quién es mi padre? (Caso Ingreso respuesta)
+                ' Buscamos en MIS movimientos "VINCULADO A: ..."
+                Dim movVinculo = docActual.MovimientosDocumentos _
+                                          .FirstOrDefault(Function(m) m.Observaciones IsNot Nothing AndAlso m.Observaciones.Contains("VINCULADO A:"))
+
+                If movVinculo IsNot Nothing Then
+                    Dim partes = movVinculo.Observaciones.Split(New String() {"VINCULADO A:"}, StringSplitOptions.None)
+                    If partes.Length > 1 Then
+                        Dim refPadre = partes(1).Trim()
+                        Dim posiblePadre = db.Documentos.FirstOrDefault(Function(d) d.ReferenciaExterna = refPadre)
+                        If posiblePadre IsNot Nothing Then nuevoIdPadre = posiblePadre.Id
+                    End If
+                End If
+
+                ' ESTRATEGIA B: ¿Alguien dice ser mi padre? (Caso Pase Generador)
+                ' Buscamos si OTRO documento tiene un movimiento "ADJUNTO A NUEVO: ... [MI REF]"
+                If nuevoIdPadre = 0 AndAlso Not String.IsNullOrEmpty(miRefSoloNum) Then
+
+                    ' 1. Traemos solo los candidatos probables (los que tienen ADJUNTO A NUEVO)
+                    Dim candidatosPadres = db.MovimientosDocumentos _
+                                             .Where(Function(m) m.DocumentoId <> idRaiz AndAlso m.Observaciones.Contains("ADJUNTO A NUEVO")) _
+                                             .Select(Function(m) New With {.IdDoc = m.DocumentoId, .Obs = m.Observaciones}) _
+                                             .ToList()
+
+                    ' 2. Filtramos en memoria (seguro y rápido)
+                    For Each c In candidatosPadres
+                        If c.Obs IsNot Nothing AndAlso (c.Obs.Contains(miRef) Or c.Obs.Contains(" " & miRefSoloNum)) Then
+                            nuevoIdPadre = c.IdDoc
+                            Exit For
+                        End If
+                    Next
+                End If
+
+                ' DECISIÓN: Subir o quedarse
+                If nuevoIdPadre > 0 AndAlso nuevoIdPadre <> idRaiz Then
+                    idRaiz = nuevoIdPadre ' Subimos un escalón
+                Else
+                    docRaiz = docActual ' Llegamos a la cima
+                    buscandoRaiz = False
+                End If
+            End While
+
+            If docRaiz Is Nothing Then Return "No se pudo determinar la trazabilidad."
+
+            ' ---------------------------------------------------------------------
+            ' PASO 2: RECOLECTAR A TODA LA FAMILIA DESCENDENTE
+            ' ---------------------------------------------------------------------
+            Dim familiaIds As New List(Of Integer)
+            familiaIds.Add(idRaiz)
+
+            Dim colaBusqueda As New Queue(Of Integer)
+            colaBusqueda.Enqueue(idRaiz)
+
+            ' Reiniciamos seguridad para la bajada
+            seguridad = 0
+
+            While colaBusqueda.Count > 0 AndAlso seguridad < 500
+                seguridad += 1
+                Dim idActual = colaBusqueda.Dequeue()
+                Dim docActual = db.Documentos.Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idActual)
+                If docActual Is Nothing Then Continue While
+
+                Dim miRef = If(docActual.ReferenciaExterna, "")
+
+                ' 1. BUSCAR HIJOS TIPO A: Los que dicen "VINCULADO A: [MÍ]"
+                If Not String.IsNullOrEmpty(miRef) Then
+                    Dim textoVinculo = "VINCULADO A: " & miRef
+                    Dim hijosA = db.MovimientosDocumentos _
+                                   .Where(Function(m) m.Observaciones.Contains(textoVinculo)) _
+                                   .Select(Function(m) m.DocumentoId).Distinct().ToList()
+
+                    For Each hId In hijosA
+                        If Not familiaIds.Contains(hId) Then
+                            familiaIds.Add(hId)
+                            colaBusqueda.Enqueue(hId)
+                        End If
+                    Next
+                End If
+
+                ' 2. BUSCAR HIJOS TIPO B: A los que YO apunto con "ADJUNTO A NUEVO: ..."
+                Dim misMovs = docActual.MovimientosDocumentos _
+                                       .Where(Function(m) m.Observaciones IsNot Nothing AndAlso m.Observaciones.Contains("ADJUNTO A NUEVO:")) _
+                                       .ToList()
+
+                For Each mov In misMovs
+                    Dim partes = mov.Observaciones.Split(New String() {"ADJUNTO A NUEVO:"}, StringSplitOptions.None)
+
+                    If partes.Length > 1 Then
+                        Dim parteRef = partes(1).Trim()
+
+                        If Not String.IsNullOrEmpty(parteRef) Then
+                            ' Validación estricta para evitar errores con nulos
+                            Dim hijoEncontrado = db.Documentos _
+                                                   .AsEnumerable() _
+                                                   .FirstOrDefault(Function(d) d.ReferenciaExterna IsNot Nothing AndAlso parteRef.EndsWith(d.ReferenciaExterna))
+
+                            If hijoEncontrado IsNot Nothing Then
+                                If Not familiaIds.Contains(hijoEncontrado.Id) Then
+                                    familiaIds.Add(hijoEncontrado.Id)
+                                    colaBusqueda.Enqueue(hijoEncontrado.Id)
+                                End If
+                            End If
+                        End If
+                    End If
+                Next
+            End While
+
+            ' ---------------------------------------------------------------------
+            ' PASO 3: DIBUJAR EL REPORTE UNIFICADO
+            ' ---------------------------------------------------------------------
+            Dim todosLosMovimientos = db.MovimientosDocumentos _
+                                        .Include("Documentos").Include("Documentos.TiposDocumento") _
+                                        .Where(Function(m) familiaIds.Contains(m.DocumentoId)) _
+                                        .OrderBy(Function(m) m.FechaMovimiento) _
+                                        .ToList()
+
+            sb.AppendLine($"🌳 HISTORIAL COMPLETO DE EXPEDIENTE")
+            sb.AppendLine($"Documento Raíz: {docRaiz.TiposDocumento.Nombre} {docRaiz.ReferenciaExterna}")
+            sb.AppendLine(New String("-"c, 60))
+
+            For i As Integer = 0 To todosLosMovimientos.Count - 1
+                Dim m = todosLosMovimientos(i)
+                Dim docM = m.Documentos
+
+                ' === AQUÍ ESTÁ EL CAMBIO FINAL: Nombre completo natural ===
+                Dim nombreDoc = docM.TiposDocumento.Nombre & " " & docM.ReferenciaExterna
+
+                Dim icono As String = "⏺️"
+                If m.EsSalida Then icono = "📤" Else icono = "📥"
+                If m.Origen = "SISTEMA" Then icono = "✨"
+
+                ' Construcción de la línea visual
+                sb.Append($"{icono} {m.FechaMovimiento:dd/MM HH:mm} | ")
+
+                ' Destacamos con flecha si es el documento seleccionado
+                If m.DocumentoId = idDocInicial Then
+                    sb.Append($"[👉 {nombreDoc}] ")
+                Else
+                    sb.Append($"[{nombreDoc}] ")
+                End If
+
+                If m.EsSalida Then
+                    sb.Append($"De {m.Origen} -> {m.Destino}")
+                Else
+                    sb.Append($"En {m.Destino}")
+                End If
+
+                If Not String.IsNullOrEmpty(m.Observaciones) Then
+                    sb.Append($" ({m.Observaciones})")
+                End If
+                sb.AppendLine()
+
+                ' Flechita conectora
+                If i < todosLosMovimientos.Count - 1 Then
+                    sb.AppendLine("          ⬇")
+                End If
+            Next
+
+            sb.AppendLine(New String("-"c, 60))
+            sb.AppendLine($"Total documentos vinculados: {familiaIds.Count}")
+        End Using
+
+        Return sb.ToString()
+    End Function
+
 
 End Class

@@ -87,6 +87,7 @@ Public Class frmNuevoPase
         End Using
     End Sub
 
+
     ' =========================================================
     ' BUSCADOR INTELIGENTE DE DESTINOS
     ' =========================================================
@@ -99,22 +100,18 @@ Public Class frmNuevoPase
             Return
         End If
 
-        ' PROTECCIÓN EXTRA: Si la lista aún no cargó, salimos para evitar error
+        ' PROTECCIÓN: Si la lista aún no cargó
         If _todosDestinos Is Nothing Then Return
 
-        ' Algoritmo de Búsqueda Inteligente
+        ' Algoritmo: Divide lo que escribes por espacios
         Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
 
-        Dim filtrada As IEnumerable(Of String) = _todosDestinos
-
-        ' Filtramos secuencialmente
-        For Each palabra In palabras
-            Dim p = palabra
-            ' AQUI ESTA LA SOLUCIÓN: Agregamos "d IsNot Nothing" antes de evaluar
-            filtrada = filtrada.Where(Function(d) d IsNot Nothing AndAlso d.ToLower().Contains(p))
-        Next
-
-        Dim resultados = filtrada.Take(10).ToList()
+        ' === LÓGICA MEJORADA ===
+        ' Busca destinos donde TODAS las palabras escritas aparezcan, sin importar el orden.
+        Dim resultados = _todosDestinos.Where(Function(d) d IsNot Nothing AndAlso palabras.All(Function(p) d.ToLower().Contains(p))) _
+                                       .Take(10) _
+                                       .ToList()
+        ' =======================
 
         If resultados.Count > 0 Then
             lstSugerencias.DataSource = resultados
@@ -127,7 +124,47 @@ Public Class frmNuevoPase
             lstSugerencias.Visible = False
         End If
     End Sub
+    ' =========================================================
+    ' NAVEGACIÓN POR TECLADO (Flechas y Enter)
+    ' =========================================================
+    Private Sub txtDestino_KeyDown(sender As Object, e As KeyEventArgs) Handles txtDestino.KeyDown
+        If lstSugerencias.Visible AndAlso lstSugerencias.Items.Count > 0 Then
+            Select Case e.KeyCode
+                Case Keys.Down
+                    ' Mover selección ABAJO
+                    e.Handled = True
+                    Dim index As Integer = lstSugerencias.SelectedIndex
+                    If index < lstSugerencias.Items.Count - 1 Then
+                        lstSugerencias.SelectedIndex += 1
+                    ElseIf index = -1 Then
+                        lstSugerencias.SelectedIndex = 0
+                    End If
 
+                Case Keys.Up
+                    ' Mover selección ARRIBA
+                    e.Handled = True
+                    Dim index As Integer = lstSugerencias.SelectedIndex
+                    If index > 0 Then
+                        lstSugerencias.SelectedIndex -= 1
+                    End If
+
+                Case Keys.Enter
+                    ' ENTER para confirmar
+                    e.SuppressKeyPress = True ' Evita el sonido "Ding"
+                    If lstSugerencias.SelectedItem IsNot Nothing Then
+                        txtDestino.Text = lstSugerencias.SelectedItem.ToString()
+                        lstSugerencias.Visible = False
+                        txtDestino.SelectionStart = txtDestino.Text.Length
+                        txtDestino.Focus()
+                    End If
+
+                Case Keys.Escape
+                    ' ESCAPE para cerrar sugerencias
+                    e.Handled = True
+                    lstSugerencias.Visible = False
+            End Select
+        End If
+    End Sub
     Private Sub lstSugerencias_Click(sender As Object, e As EventArgs) Handles lstSugerencias.Click
         If lstSugerencias.SelectedItem IsNot Nothing Then
             txtDestino.Text = lstSugerencias.SelectedItem.ToString()
@@ -273,10 +310,10 @@ Public Class frmNuevoPase
 
                     If _idDocumento > 0 Then
                         Dim movPadre As New MovimientosDocumentos() With {
-                           .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
-                           .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True,
-                           .Observaciones = $"ADJUNTO A NUEVO: {docNuevo.ReferenciaExterna}"
-                        }
+    .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
+    .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True,    ' CORRECCIÓN: Agregamos cmbTipo.Text para que sea dinámico
+                        .Observaciones = $"ADJUNTO A NUEVO: {cmbTipo.Text} {docNuevo.ReferenciaExterna}"
+}
                         db.MovimientosDocumentos.Add(movPadre)
                     End If
 
