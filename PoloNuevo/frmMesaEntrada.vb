@@ -74,7 +74,6 @@ Public Class frmMesaEntrada
 
                 ' 5. Ejecución RÁPIDA
                 Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga) _
-                                   .Take(200) _
                                    .ToList()
 
                 ' 6. PROYECCIÓN EN MEMORIA (CON DESEMPATE POR ID)
