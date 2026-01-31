@@ -25,7 +25,6 @@ Partial Class frmNuevoIngreso
         Me.lblNumero = New System.Windows.Forms.Label()
         Me.txtNumero = New System.Windows.Forms.TextBox()
         Me.lblOrigen = New System.Windows.Forms.Label()
-        ' CAMBIO: Reemplazado ComboBox por TextBox
         Me.txtOrigen = New System.Windows.Forms.TextBox()
         Me.lstSugerenciasOrigen = New System.Windows.Forms.ListBox()
         Me.lblAsunto = New System.Windows.Forms.Label()
@@ -96,7 +95,7 @@ Partial Class frmNuevoIngreso
         Me.cmbTipo.Location = New System.Drawing.Point(63, 154)
         Me.cmbTipo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbTipo.Name = "cmbTipo"
-        Me.cmbTipo.Size = New System.Drawing.Size(289, 28)
+        Me.cmbTipo.Size = New System.Drawing.Size(237, 28)
         Me.cmbTipo.TabIndex = 2
         '
         'lblNumero
@@ -112,7 +111,7 @@ Partial Class frmNuevoIngreso
         'txtNumero
         '
         Me.txtNumero.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNumero.Location = New System.Drawing.Point(414, 154)
+        Me.txtNumero.Location = New System.Drawing.Point(362, 154)
         Me.txtNumero.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNumero.Name = "txtNumero"
         Me.txtNumero.Size = New System.Drawing.Size(445, 26)
@@ -128,26 +127,26 @@ Partial Class frmNuevoIngreso
         Me.lblOrigen.TabIndex = 5
         Me.lblOrigen.Text = "Organismo de Origen:"
         '
-        'txtOrigen (Reemplaza a cmbOrigen)
+        'txtOrigen
         '
         Me.txtOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOrigen.Location = New System.Drawing.Point(63, 246)
         Me.txtOrigen.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtOrigen.Name = "txtOrigen"
-        Me.txtOrigen.Size = New System.Drawing.Size(796, 26)
+        Me.txtOrigen.Size = New System.Drawing.Size(744, 26)
         Me.txtOrigen.TabIndex = 6
         '
-        'lstSugerenciasOrigen (Nuevo)
+        'lstSugerenciasOrigen
         '
         Me.lstSugerenciasOrigen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSugerenciasOrigen.FormattingEnabled = True
         Me.lstSugerenciasOrigen.ItemHeight = 20
-        Me.lstSugerenciasOrigen.Location = New System.Drawing.Point(63, 272) ' Posición inicial aprox
+        Me.lstSugerenciasOrigen.Location = New System.Drawing.Point(63, 272)
         Me.lstSugerenciasOrigen.Name = "lstSugerenciasOrigen"
-        Me.lstSugerenciasOrigen.Size = New System.Drawing.Size(796, 104)
-        Me.lstSugerenciasOrigen.TabIndex = 20 ' Indice alto para flotar
+        Me.lstSugerenciasOrigen.Size = New System.Drawing.Size(744, 104)
+        Me.lstSugerenciasOrigen.TabIndex = 20
         Me.lstSugerenciasOrigen.Visible = False
         '
         'lblAsunto
@@ -168,7 +167,7 @@ Partial Class frmNuevoIngreso
         Me.txtAsunto.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtAsunto.Multiline = True
         Me.txtAsunto.Name = "txtAsunto"
-        Me.txtAsunto.Size = New System.Drawing.Size(796, 90)
+        Me.txtAsunto.Size = New System.Drawing.Size(744, 90)
         Me.txtAsunto.TabIndex = 8
         '
         'grpVinculacion
@@ -182,7 +181,7 @@ Partial Class frmNuevoIngreso
         Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpVinculacion.Name = "grpVinculacion"
         Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Size = New System.Drawing.Size(801, 246)
+        Me.grpVinculacion.Size = New System.Drawing.Size(749, 246)
         Me.grpVinculacion.TabIndex = 11
         Me.grpVinculacion.TabStop = False
         Me.grpVinculacion.Text = "Asociación"
@@ -198,7 +197,7 @@ Partial Class frmNuevoIngreso
         Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
         Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lstReclusos.Name = "lstReclusos"
-        Me.lstReclusos.Size = New System.Drawing.Size(716, 84)
+        Me.lstReclusos.Size = New System.Drawing.Size(664, 84)
         Me.lstReclusos.TabIndex = 2
         '
         'txtBuscarRecluso
@@ -209,7 +208,7 @@ Partial Class frmNuevoIngreso
         Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
         Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(716, 26)
+        Me.txtBuscarRecluso.Size = New System.Drawing.Size(664, 26)
         Me.txtBuscarRecluso.TabIndex = 1
         '
         'chkVincular
@@ -233,7 +232,7 @@ Partial Class frmNuevoIngreso
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpArchivo.Size = New System.Drawing.Size(801, 138)
+        Me.grpArchivo.Size = New System.Drawing.Size(749, 138)
         Me.grpArchivo.TabIndex = 12
         Me.grpArchivo.TabStop = False
         Me.grpArchivo.Text = "Archivo Digital"
@@ -266,7 +265,7 @@ Partial Class frmNuevoIngreso
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(459, 1067)
+        Me.btnGuardar.Location = New System.Drawing.Point(407, 1067)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(405, 85)
@@ -377,7 +376,7 @@ Partial Class frmNuevoIngreso
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
         Me.ClientSize = New System.Drawing.Size(1101, 1050)
-        Me.Controls.Add(Me.lstSugerenciasOrigen) ' IMPORTANTE: Agregar la lista a los controles
+        Me.Controls.Add(Me.lstSugerenciasOrigen)
         Me.Controls.Add(Me.grpRelacion)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
@@ -387,7 +386,7 @@ Partial Class frmNuevoIngreso
         Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.txtAsunto)
         Me.Controls.Add(Me.lblAsunto)
-        Me.Controls.Add(Me.txtOrigen) ' IMPORTANTE
+        Me.Controls.Add(Me.txtOrigen)
         Me.Controls.Add(Me.lblOrigen)
         Me.Controls.Add(Me.txtNumero)
         Me.Controls.Add(Me.lblNumero)

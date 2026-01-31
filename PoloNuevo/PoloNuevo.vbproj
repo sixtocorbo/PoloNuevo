@@ -106,6 +106,9 @@
     <Compile Include="Documentos.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="DocumentoVinculos.vb">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Estados.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

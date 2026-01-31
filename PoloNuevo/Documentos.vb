@@ -28,5 +28,7 @@ Partial Public Class Documentos
     Public Overridable Property MovimientosDocumentos As ICollection(Of MovimientosDocumentos) = New HashSet(Of MovimientosDocumentos)
     Public Overridable Property Documentos1 As ICollection(Of Documentos) = New HashSet(Of Documentos)
     Public Overridable Property Documentos2 As Documentos
+    Public Overridable Property DocumentoVinculos As ICollection(Of DocumentoVinculos) = New HashSet(Of DocumentoVinculos)
+    Public Overridable Property DocumentoVinculos1 As ICollection(Of DocumentoVinculos) = New HashSet(Of DocumentoVinculos)
 
 End Class

@@ -57,6 +57,9 @@
         <EntityTypeShape EntityType="PoloNuevoModel.NumeracionRangos" Width="1.5" PointX="5.25" PointY="34.125" />
         <AssociationConnector Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" />
         <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Padre" />
+        <EntityTypeShape EntityType="PoloNuevoModel.DocumentoVinculos" Width="1.5" PointX="7.5" PointY="32.625" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Hijo" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Padre" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

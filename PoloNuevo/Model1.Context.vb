@@ -50,5 +50,6 @@ Partial Public Class PoloNuevoEntities
     Public Overridable Property AuditoriaDocumentos() As DbSet(Of AuditoriaDocumentos)
     Public Overridable Property AuditoriaMovimientos() As DbSet(Of AuditoriaMovimientos)
     Public Overridable Property NumeracionRangos() As DbSet(Of NumeracionRangos)
+    Public Overridable Property DocumentoVinculos() As DbSet(Of DocumentoVinculos)
 
 End Class

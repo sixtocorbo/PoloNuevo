@@ -382,10 +382,10 @@ Public Class frmNuevoIngreso
                 End If
 
                 If _idDocumentoEditar = 0 Then db.Documentos.Add(nuevoDoc)
-                db.SaveChanges()
+                db.SaveChanges() ' Guardamos para tener el ID del nuevo documento
 
                 ' ---------------------------------------------------------
-                ' PASO 2: LÓGICA DE MOVIMIENTOS INTELIGENTE
+                ' PASO 2: LÓGICA DE MOVIMIENTOS E VINCULACIÓN
                 ' ---------------------------------------------------------
                 If _idDocumentoEditar = 0 Then
 
@@ -402,6 +402,18 @@ Public Class frmNuevoIngreso
                                 destinoDelPadre = ultimoMov.Destino
                                 If destinoDelPadre <> "MESA DE ENTRADA" Then padreEstaEnMesa = False
                             End If
+
+                            ' =========================================================
+                            ' === [NUEVO] AQUÍ GUARDAMOS EL VÍNCULO SEGURO POR ID ===
+                            ' =========================================================
+                            Dim vinculo As New DocumentoVinculos()
+                            vinculo.IdDocumentoPadre = _idPadreVerificado ' El ID del Padre encontrado
+                            vinculo.IdDocumentoHijo = nuevoDoc.Id         ' El ID del Nuevo que acabamos de crear
+                            vinculo.TipoRelacion = "INGRESO RESPUESTA"
+                            vinculo.FechaVinculo = DateTime.Now
+
+                            db.DocumentoVinculos.Add(vinculo)
+                            ' =========================================================
                         End If
                     End If
 
@@ -409,7 +421,6 @@ Public Class frmNuevoIngreso
                     Dim movEntrada As New MovimientosDocumentos()
                     movEntrada.DocumentoId = nuevoDoc.Id
                     movEntrada.FechaMovimiento = DateTime.Now
-                    ' CAMBIO: Usamos el TextBox
                     movEntrada.Origen = txtOrigen.Text.Trim().ToUpper()
                     movEntrada.Destino = "MESA DE ENTRADA"
                     movEntrada.EsSalida = False
@@ -430,7 +441,6 @@ Public Class frmNuevoIngreso
                             Dim movUpdate As New MovimientosDocumentos()
                             movUpdate.DocumentoId = _idPadreVerificado
                             movUpdate.FechaMovimiento = DateTime.Now.AddSeconds(1)
-                            ' CAMBIO: Usamos el TextBox
                             movUpdate.Origen = txtOrigen.Text.Trim().ToUpper()
                             movUpdate.Destino = "MESA DE ENTRADA"
                             movUpdate.EsSalida = False

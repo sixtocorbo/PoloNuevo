@@ -256,6 +256,7 @@ Public Class frmNuevoPase
             Using db As New PoloNuevoEntities()
                 Dim destinoFinal As String = txtDestino.Text.Trim().ToUpper()
 
+                ' CASO 1: GENERAR NUEVO DOCUMENTO (ACTUACIÓN / RESPUESTA)
                 If chkGenerarActuacion.Checked Then
                     If Not _tieneRangoActivo Then
                         MessageBox.Show("ERROR BLOQUEANTE: Sin rango no se puede generar documento.", "Seguridad", MessageBoxButtons.OK, MessageBoxIcon.Stop)
@@ -266,6 +267,7 @@ Public Class frmNuevoPase
                         Return
                     End If
 
+                    ' 1. Crear el nuevo documento físico/digital
                     Dim docNuevo As New Documentos()
                     docNuevo.FechaCarga = DateTime.Now
                     docNuevo.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
@@ -282,6 +284,7 @@ Public Class frmNuevoPase
                         docNuevo.Extension = ".phy"
                     End If
 
+                    ' 2. Consumir rango de numeración
                     Dim rango = db.NumeracionRangos.Find(_rangoId)
                     If rango IsNot Nothing Then
                         Dim numUsar As Integer = Convert.ToInt32(docNuevo.ReferenciaExterna)
@@ -294,8 +297,9 @@ Public Class frmNuevoPase
                     End If
 
                     db.Documentos.Add(docNuevo)
-                    db.SaveChanges()
+                    db.SaveChanges() ' Guardamos para obtener el ID nuevo
 
+                    ' 3. Movimientos iniciales del nuevo documento
                     Dim movNacer As New MovimientosDocumentos() With {
                         .DocumentoId = docNuevo.Id, .FechaMovimiento = dtpFecha.Value,
                         .Origen = "SISTEMA", .Destino = "MESA DE ENTRADA", .EsSalida = False, .Observaciones = "Generación Inicial"
@@ -308,20 +312,34 @@ Public Class frmNuevoPase
                     }
                     db.MovimientosDocumentos.Add(movSalir)
 
+                    ' 4. VINCULACIÓN CON EL DOCUMENTO ANTERIOR (EL PADRE)
                     If _idDocumento > 0 Then
+                        ' A) Mantenemos el movimiento de texto por compatibilidad visual histórica
                         Dim movPadre As New MovimientosDocumentos() With {
-    .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
-    .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True,    ' CORRECCIÓN: Agregamos cmbTipo.Text para que sea dinámico
-                        .Observaciones = $"ADJUNTO A NUEVO: {cmbTipo.Text} {docNuevo.ReferenciaExterna}"
-}
+                            .DocumentoId = _idDocumento, .FechaMovimiento = dtpFecha.Value.AddSeconds(1),
+                            .Origen = "MESA DE ENTRADA", .Destino = destinoFinal, .EsSalida = True,
+                            .Observaciones = $"ADJUNTO A NUEVO: {cmbTipo.Text} {docNuevo.ReferenciaExterna}"
+                        }
                         db.MovimientosDocumentos.Add(movPadre)
+
+                        ' =========================================================
+                        ' === [NUEVO] VINCULACIÓN ESTRICTA POR ID EN BASE DE DATOS ===
+                        ' =========================================================
+                        Dim vinculo As New DocumentoVinculos()
+                        vinculo.IdDocumentoPadre = _idDocumento   ' El ID del expediente original
+                        vinculo.IdDocumentoHijo = docNuevo.Id     ' El ID de la respuesta generada
+                        vinculo.TipoRelacion = "ACTUACION"        ' Etiqueta para saber qué es
+                        vinculo.FechaVinculo = DateTime.Now
+
+                        db.DocumentoVinculos.Add(vinculo)
+                        ' =========================================================
                     End If
 
                     db.SaveChanges()
                     MessageBox.Show($"Documento Nº {docNuevo.ReferenciaExterna} generado y enviado a {destinoFinal}.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
                 Else
-                    ' PASE SIMPLE
+                    ' CASO 2: PASE SIMPLE (SOLO MOVER EL EXPEDIENTE)
                     If _idDocumento = 0 Then
                         MessageBox.Show("Error interno.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                         Return

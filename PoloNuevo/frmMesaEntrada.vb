@@ -600,142 +600,49 @@ Public Class frmMesaEntrada
         End Try
     End Sub
 
+
     ' =========================================================
-    ' LÓGICA DE ÁRBOL GENEALÓGICO (TRAZABILIDAD TOTAL BIDIRECCIONAL)
+    ' LÓGICA DE ÁRBOL GENEALÓGICO (VERSIÓN 2.0 - USANDO TABLA VINCULOS)
     ' =========================================================
     Private Function GenerarTimeline360(idDocInicial As Integer) As String
         Dim sb As New System.Text.StringBuilder()
 
         Using db As New PoloNuevoEntities()
             ' ---------------------------------------------------------------------
-            ' PASO 1: ENCONTRAR LA VERDADERA RAÍZ (SUBIR EL RÍO)
-            ' ---------------------------------------------------------------------
-            Dim idRaiz As Integer = idDocInicial
-            Dim docRaiz As Documentos = Nothing
-            Dim buscandoRaiz As Boolean = True
-
-            ' Contador de seguridad para evitar bucles infinitos
-            Dim seguridad As Integer = 0
-
-            While buscandoRaiz AndAlso seguridad < 50
-                seguridad += 1
-                Dim docActual = db.Documentos.Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idRaiz)
-                If docActual Is Nothing Then Exit While
-
-                ' Construimos referencias seguras (evitando nulos)
-                Dim miRef As String = If(docActual.TiposDocumento IsNot Nothing, docActual.TiposDocumento.Nombre & " ", "") & If(docActual.ReferenciaExterna, "")
-                Dim miRefSoloNum As String = If(docActual.ReferenciaExterna, "")
-                Dim nuevoIdPadre As Integer = 0
-
-                ' ESTRATEGIA A: ¿Yo digo quién es mi padre? (Caso Ingreso respuesta)
-                ' Buscamos en MIS movimientos "VINCULADO A: ..."
-                Dim movVinculo = docActual.MovimientosDocumentos _
-                                          .FirstOrDefault(Function(m) m.Observaciones IsNot Nothing AndAlso m.Observaciones.Contains("VINCULADO A:"))
-
-                If movVinculo IsNot Nothing Then
-                    Dim partes = movVinculo.Observaciones.Split(New String() {"VINCULADO A:"}, StringSplitOptions.None)
-                    If partes.Length > 1 Then
-                        Dim refPadre = partes(1).Trim()
-                        Dim posiblePadre = db.Documentos.FirstOrDefault(Function(d) d.ReferenciaExterna = refPadre)
-                        If posiblePadre IsNot Nothing Then nuevoIdPadre = posiblePadre.Id
-                    End If
-                End If
-
-                ' ESTRATEGIA B: ¿Alguien dice ser mi padre? (Caso Pase Generador)
-                ' Buscamos si OTRO documento tiene un movimiento "ADJUNTO A NUEVO: ... [MI REF]"
-                If nuevoIdPadre = 0 AndAlso Not String.IsNullOrEmpty(miRefSoloNum) Then
-
-                    ' 1. Traemos solo los candidatos probables (los que tienen ADJUNTO A NUEVO)
-                    Dim candidatosPadres = db.MovimientosDocumentos _
-                                             .Where(Function(m) m.DocumentoId <> idRaiz AndAlso m.Observaciones.Contains("ADJUNTO A NUEVO")) _
-                                             .Select(Function(m) New With {.IdDoc = m.DocumentoId, .Obs = m.Observaciones}) _
-                                             .ToList()
-
-                    ' 2. Filtramos en memoria (seguro y rápido)
-                    For Each c In candidatosPadres
-                        If c.Obs IsNot Nothing AndAlso (c.Obs.Contains(miRef) Or c.Obs.Contains(" " & miRefSoloNum)) Then
-                            nuevoIdPadre = c.IdDoc
-                            Exit For
-                        End If
-                    Next
-                End If
-
-                ' DECISIÓN: Subir o quedarse
-                If nuevoIdPadre > 0 AndAlso nuevoIdPadre <> idRaiz Then
-                    idRaiz = nuevoIdPadre ' Subimos un escalón
-                Else
-                    docRaiz = docActual ' Llegamos a la cima
-                    buscandoRaiz = False
-                End If
-            End While
-
-            If docRaiz Is Nothing Then Return "No se pudo determinar la trazabilidad."
-
-            ' ---------------------------------------------------------------------
-            ' PASO 2: RECOLECTAR A TODA LA FAMILIA DESCENDENTE
+            ' PASO 1: RECOLECTAR A TODA LA FAMILIA (PADRES, HIJOS, NIETOS...)
             ' ---------------------------------------------------------------------
             Dim familiaIds As New List(Of Integer)
-            familiaIds.Add(idRaiz)
+            familiaIds.Add(idDocInicial)
 
-            Dim colaBusqueda As New Queue(Of Integer)
-            colaBusqueda.Enqueue(idRaiz)
+            Dim nuevosEncontrados As Boolean = True
 
-            ' Reiniciamos seguridad para la bajada
-            seguridad = 0
+            ' Bucle para encontrar relaciones en cadena (Abuelo -> Padre -> Hijo -> Nieto)
+            While nuevosEncontrados
+                nuevosEncontrados = False
+                Dim listaActual = familiaIds.ToList() ' Copia para la consulta LINQ
 
-            While colaBusqueda.Count > 0 AndAlso seguridad < 500
-                seguridad += 1
-                Dim idActual = colaBusqueda.Dequeue()
-                Dim docActual = db.Documentos.Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idActual)
-                If docActual Is Nothing Then Continue While
+                ' Buscamos en la nueva tabla CUALQUIER vínculo donde aparezcan mis IDs conocidos
+                Dim vinculos = db.DocumentoVinculos _
+                                 .Where(Function(v) listaActual.Contains(v.IdDocumentoPadre) Or
+                                                    listaActual.Contains(v.IdDocumentoHijo)) _
+                                 .ToList()
 
-                Dim miRef = If(docActual.ReferenciaExterna, "")
-
-                ' 1. BUSCAR HIJOS TIPO A: Los que dicen "VINCULADO A: [MÍ]"
-                If Not String.IsNullOrEmpty(miRef) Then
-                    Dim textoVinculo = "VINCULADO A: " & miRef
-                    Dim hijosA = db.MovimientosDocumentos _
-                                   .Where(Function(m) m.Observaciones.Contains(textoVinculo)) _
-                                   .Select(Function(m) m.DocumentoId).Distinct().ToList()
-
-                    For Each hId In hijosA
-                        If Not familiaIds.Contains(hId) Then
-                            familiaIds.Add(hId)
-                            colaBusqueda.Enqueue(hId)
-                        End If
-                    Next
-                End If
-
-                ' 2. BUSCAR HIJOS TIPO B: A los que YO apunto con "ADJUNTO A NUEVO: ..."
-                Dim misMovs = docActual.MovimientosDocumentos _
-                                       .Where(Function(m) m.Observaciones IsNot Nothing AndAlso m.Observaciones.Contains("ADJUNTO A NUEVO:")) _
-                                       .ToList()
-
-                For Each mov In misMovs
-                    Dim partes = mov.Observaciones.Split(New String() {"ADJUNTO A NUEVO:"}, StringSplitOptions.None)
-
-                    If partes.Length > 1 Then
-                        Dim parteRef = partes(1).Trim()
-
-                        If Not String.IsNullOrEmpty(parteRef) Then
-                            ' Validación estricta para evitar errores con nulos
-                            Dim hijoEncontrado = db.Documentos _
-                                                   .AsEnumerable() _
-                                                   .FirstOrDefault(Function(d) d.ReferenciaExterna IsNot Nothing AndAlso parteRef.EndsWith(d.ReferenciaExterna))
-
-                            If hijoEncontrado IsNot Nothing Then
-                                If Not familiaIds.Contains(hijoEncontrado.Id) Then
-                                    familiaIds.Add(hijoEncontrado.Id)
-                                    colaBusqueda.Enqueue(hijoEncontrado.Id)
-                                End If
-                            End If
-                        End If
+                For Each v In vinculos
+                    ' Si el Padre del vínculo no lo tengo, lo agrego
+                    If Not familiaIds.Contains(v.IdDocumentoPadre) Then
+                        familiaIds.Add(v.IdDocumentoPadre)
+                        nuevosEncontrados = True
+                    End If
+                    ' Si el Hijo del vínculo no lo tengo, lo agrego
+                    If Not familiaIds.Contains(v.IdDocumentoHijo) Then
+                        familiaIds.Add(v.IdDocumentoHijo)
+                        nuevosEncontrados = True
                     End If
                 Next
             End While
 
             ' ---------------------------------------------------------------------
-            ' PASO 3: DIBUJAR EL REPORTE UNIFICADO
+            ' PASO 2: TRAER MOVIMIENTOS DE ESOS DOCUMENTOS IDENTIFICADOS
             ' ---------------------------------------------------------------------
             Dim todosLosMovimientos = db.MovimientosDocumentos _
                                         .Include("Documentos").Include("Documentos.TiposDocumento") _
@@ -743,29 +650,27 @@ Public Class frmMesaEntrada
                                         .OrderBy(Function(m) m.FechaMovimiento) _
                                         .ToList()
 
-            sb.AppendLine($"🌳 HISTORIAL COMPLETO DE EXPEDIENTE")
-            sb.AppendLine($"Documento Raíz: {docRaiz.TiposDocumento.Nombre} {docRaiz.ReferenciaExterna}")
+            ' ---------------------------------------------------------------------
+            ' PASO 3: DIBUJAR EL REPORTE (VISUALIZACIÓN)
+            ' ---------------------------------------------------------------------
+            sb.AppendLine($"🌳 HISTORIAL DE EXPEDIENTE (Documentos vinculados: {familiaIds.Count})")
             sb.AppendLine(New String("-"c, 60))
 
             For i As Integer = 0 To todosLosMovimientos.Count - 1
                 Dim m = todosLosMovimientos(i)
                 Dim docM = m.Documentos
-
-                ' === AQUÍ ESTÁ EL CAMBIO FINAL: Nombre completo natural ===
                 Dim nombreDoc = docM.TiposDocumento.Nombre & " " & docM.ReferenciaExterna
 
-                Dim icono As String = "⏺️"
-                If m.EsSalida Then icono = "📤" Else icono = "📥"
+                Dim icono As String = If(m.EsSalida, "📤", "📥")
                 If m.Origen = "SISTEMA" Then icono = "✨"
 
-                ' Construcción de la línea visual
                 sb.Append($"{icono} {m.FechaMovimiento:dd/MM HH:mm} | ")
 
-                ' Destacamos con flecha si es el documento seleccionado
+                ' Marcador visual para saber qué movimiento es de quién
                 If m.DocumentoId = idDocInicial Then
-                    sb.Append($"[👉 {nombreDoc}] ")
+                    sb.Append($"[📌 ESTE DOC] ")
                 Else
-                    sb.Append($"[{nombreDoc}] ")
+                    sb.Append($"[🔗 {nombreDoc}] ")
                 End If
 
                 If m.EsSalida Then
@@ -779,18 +684,18 @@ Public Class frmMesaEntrada
                 End If
                 sb.AppendLine()
 
-                ' Flechita conectora
+                ' Conector visual (flechita)
                 If i < todosLosMovimientos.Count - 1 Then
                     sb.AppendLine("          ⬇")
                 End If
             Next
 
             sb.AppendLine(New String("-"c, 60))
-            sb.AppendLine($"Total documentos vinculados: {familiaIds.Count}")
         End Using
 
         Return sb.ToString()
     End Function
+
 
 
 End Class
