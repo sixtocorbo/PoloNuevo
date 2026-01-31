@@ -228,6 +228,8 @@ Public Class frmMesaEntrada
                 Using db As New PoloNuevoEntities()
                     Dim doc = db.Documentos.Find(idDoc)
                     If doc IsNot Nothing Then
+
+                        ' 1. AUDITORÍA DEL DOCUMENTO (Igual que antes)
                         Dim auditoria As New AuditoriaDocumentos()
                         auditoria.FechaEliminacion = DateTime.Now
                         auditoria.UsuarioResponsable = "Operador de Mesa"
@@ -237,9 +239,10 @@ Public Class frmMesaEntrada
                         auditoria.DocAsunto = doc.Descripcion
                         auditoria.DocFechaCarga = doc.FechaCarga
                         db.AuditoriaDocumentos.Add(auditoria)
-                        db.SaveChanges()
+                        db.SaveChanges() ' Guardamos para tener el ID de auditoría
 
-                        For Each mov In doc.MovimientosDocumentos
+                        ' 2. AUDITORÍA DE MOVIMIENTOS (Igual que antes)
+                        For Each mov In doc.MovimientosDocumentos.ToList() ' ToList para evitar errores de colección modificada
                             Dim audMov As New AuditoriaMovimientos()
                             audMov.AuditoriaDocId = auditoria.Id
                             audMov.FechaMovimientoOriginal = mov.FechaMovimiento
@@ -250,17 +253,32 @@ Public Class frmMesaEntrada
                             db.AuditoriaMovimientos.Add(audMov)
                         Next
 
+                        ' =========================================================
+                        ' === [NUEVO] ELIMINAR VÍNCULOS EN LA TABLA INTERMEDIA ===
+                        ' =========================================================
+                        ' Si no hacemos esto, la base de datos bloqueará la eliminación
+                        Dim vinculos = db.DocumentoVinculos _
+                                         .Where(Function(v) v.IdDocumentoPadre = idDoc Or v.IdDocumentoHijo = idDoc) _
+                                         .ToList()
+
+                        If vinculos.Count > 0 Then
+                            db.DocumentoVinculos.RemoveRange(vinculos)
+                        End If
+                        ' =========================================================
+
+                        ' 3. ELIMINACIÓN FÍSICA
                         db.MovimientosDocumentos.RemoveRange(doc.MovimientosDocumentos)
                         db.Documentos.Remove(doc)
+
                         db.SaveChanges()
 
-                        MessageBox.Show("Eliminación completa. El historial ha sido resguardado.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        MessageBox.Show("Eliminación completa. El historial ha sido resguardado y los vínculos liberados.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         CargarMesa()
                         dgvMovimientos.DataSource = Nothing
                     End If
                 End Using
             Catch ex As Exception
-                MessageBox.Show("Error crítico: " & ex.Message)
+                MessageBox.Show("Error crítico al eliminar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
     End Sub

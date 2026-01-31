@@ -19,6 +19,7 @@ Partial Class frmMesaEntrada
     Private Sub InitializeComponent()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.btnVerHistorial = New System.Windows.Forms.Button()
         Me.btnActuar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.btnVerDigital = New System.Windows.Forms.Button()
@@ -42,7 +43,6 @@ Partial Class frmMesaEntrada
         Me.lblHistorial = New System.Windows.Forms.Label()
         Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
         Me.PrintDialog1 = New System.Windows.Forms.PrintDialog()
-        Me.btnVerHistorial = New System.Windows.Forms.Button()
         Me.pnlTop.SuspendLayout()
         Me.grpFiltros.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -71,6 +71,21 @@ Partial Class frmMesaEntrada
         Me.pnlTop.Name = "pnlTop"
         Me.pnlTop.Size = New System.Drawing.Size(1512, 185)
         Me.pnlTop.TabIndex = 0
+        '
+        'btnVerHistorial
+        '
+        Me.btnVerHistorial.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnVerHistorial.BackColor = System.Drawing.Color.SeaGreen
+        Me.btnVerHistorial.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnVerHistorial.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.btnVerHistorial.ForeColor = System.Drawing.Color.White
+        Me.btnVerHistorial.Location = New System.Drawing.Point(1254, 18)
+        Me.btnVerHistorial.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnVerHistorial.Name = "btnVerHistorial"
+        Me.btnVerHistorial.Size = New System.Drawing.Size(240, 69)
+        Me.btnVerHistorial.TabIndex = 9
+        Me.btnVerHistorial.Text = "Ver Historial"
+        Me.btnVerHistorial.UseVisualStyleBackColor = False
         '
         'btnActuar
         '
@@ -377,21 +392,6 @@ Partial Class frmMesaEntrada
         'PrintDialog1
         '
         Me.PrintDialog1.UseEXDialog = True
-        '
-        'btnVerHistorial
-        '
-        Me.btnVerHistorial.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnVerHistorial.BackColor = System.Drawing.Color.SeaGreen
-        Me.btnVerHistorial.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnVerHistorial.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.btnVerHistorial.ForeColor = System.Drawing.Color.White
-        Me.btnVerHistorial.Location = New System.Drawing.Point(1254, 18)
-        Me.btnVerHistorial.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnVerHistorial.Name = "btnVerHistorial"
-        Me.btnVerHistorial.Size = New System.Drawing.Size(240, 69)
-        Me.btnVerHistorial.TabIndex = 9
-        Me.btnVerHistorial.Text = "Ver Historial"
-        Me.btnVerHistorial.UseVisualStyleBackColor = False
         '
         'frmMesaEntrada
         '
