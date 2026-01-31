@@ -105,7 +105,7 @@ Public Class frmHistorial
 
                     ' REGLA DE FILTRADO: Ocultamos movimientos de "arrastre" técnico
                     ' No queremos ver líneas idénticas para cada hijo si el padre ya se movió.
-                    If obs.Contains("PASE ADJUNTO") Or obs.Contains("PASE ADJUNTOS") Then
+                    If obs.Contains("PASE ADJUNTO") Or obs.Contains("PASE ADJUNTOS") Or obs.Contains("ARRASTRE DE EXPEDIENTE") Then
                         mostrar = False
                     End If
 
