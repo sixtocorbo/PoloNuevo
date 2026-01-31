@@ -91,8 +91,8 @@ Public Class frmHistorial
                 Dim rawMovs = db.MovimientosDocumentos _
                                 .Include("Documentos").Include("Documentos.TiposDocumento") _
                                 .Where(Function(m) familiaIds.Contains(m.DocumentoId)) _
-                                .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                .ThenByDescending(Function(m) m.Id) _
+                                .OrderBy(Function(m) m.FechaMovimiento) _
+                                .ThenBy(Function(m) m.Id) _
                                 .ToList()
 
                 ' -----------------------------------------------------------
@@ -105,7 +105,7 @@ Public Class frmHistorial
 
                     ' REGLA DE FILTRADO: Ocultamos movimientos de "arrastre" técnico
                     ' No queremos ver líneas idénticas para cada hijo si el padre ya se movió.
-                    If obs.Contains("PASE ADJUNTO") Or obs.Contains("PASE ADJUNTO") Then
+                    If obs.Contains("PASE ADJUNTO") Or obs.Contains("PASE ADJUNTOS") Then
                         mostrar = False
                     End If
 
@@ -147,12 +147,15 @@ Public Class frmHistorial
                             nombreDoc = "   ↳ " & nombreDoc
                         End If
 
+                        Dim origenMostrar As String = If(String.IsNullOrWhiteSpace(m.Origen), "—", m.Origen)
+                        Dim destinoMostrar As String = If(String.IsNullOrWhiteSpace(m.Destino), "—", m.Destino)
+
                         dgvHistorial.Rows.Add(
                             m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"),
                             nombreDoc,
                             accionVisual,
-                            If(m.Origen, ""),
-                            If(m.Destino, "")
+                            origenMostrar,
+                            destinoMostrar
                         )
                     End If
                 Next
