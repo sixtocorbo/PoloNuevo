@@ -74,92 +74,86 @@ Partial Class frmMesaEntrada
         '
         'btnVerHistorial
         '
-        Me.btnVerHistorial.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnVerHistorial.BackColor = System.Drawing.Color.SeaGreen
         Me.btnVerHistorial.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnVerHistorial.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnVerHistorial.ForeColor = System.Drawing.Color.White
-        Me.btnVerHistorial.Location = New System.Drawing.Point(1254, 18)
+        Me.btnVerHistorial.Location = New System.Drawing.Point(1046, 7)
         Me.btnVerHistorial.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnVerHistorial.Name = "btnVerHistorial"
-        Me.btnVerHistorial.Size = New System.Drawing.Size(240, 69)
+        Me.btnVerHistorial.Size = New System.Drawing.Size(156, 69)
         Me.btnVerHistorial.TabIndex = 9
         Me.btnVerHistorial.Text = "Ver Historial"
         Me.btnVerHistorial.UseVisualStyleBackColor = False
         '
         'btnActuar
         '
-        Me.btnActuar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnActuar.BackColor = System.Drawing.Color.RoyalBlue
         Me.btnActuar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnActuar.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnActuar.ForeColor = System.Drawing.Color.White
-        Me.btnActuar.Location = New System.Drawing.Point(778, 18)
+        Me.btnActuar.Location = New System.Drawing.Point(266, 7)
         Me.btnActuar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnActuar.Name = "btnActuar"
-        Me.btnActuar.Size = New System.Drawing.Size(220, 69)
+        Me.btnActuar.Size = New System.Drawing.Size(156, 69)
         Me.btnActuar.TabIndex = 8
-        Me.btnActuar.Text = "⚡ ACTUAR / PASE"
+        Me.btnActuar.Text = "⚡ ACTUAR"
         Me.btnActuar.UseVisualStyleBackColor = False
         '
         'btnEliminar
         '
-        Me.btnEliminar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnEliminar.BackColor = System.Drawing.Color.Maroon
         Me.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnEliminar.Font = New System.Drawing.Font("Segoe UI", 8.0!, System.Drawing.FontStyle.Bold)
         Me.btnEliminar.ForeColor = System.Drawing.Color.White
-        Me.btnEliminar.Location = New System.Drawing.Point(122, 18)
+        Me.btnEliminar.Location = New System.Drawing.Point(890, 7)
         Me.btnEliminar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEliminar.Name = "btnEliminar"
-        Me.btnEliminar.Size = New System.Drawing.Size(110, 69)
+        Me.btnEliminar.Size = New System.Drawing.Size(156, 69)
         Me.btnEliminar.TabIndex = 7
         Me.btnEliminar.Text = "🗑 ELIMINAR"
         Me.btnEliminar.UseVisualStyleBackColor = False
         '
         'btnVerDigital
         '
-        Me.btnVerDigital.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnVerDigital.BackColor = System.Drawing.Color.SteelBlue
         Me.btnVerDigital.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnVerDigital.Font = New System.Drawing.Font("Segoe UI", 8.0!, System.Drawing.FontStyle.Bold)
         Me.btnVerDigital.ForeColor = System.Drawing.Color.White
-        Me.btnVerDigital.Location = New System.Drawing.Point(240, 18)
+        Me.btnVerDigital.Location = New System.Drawing.Point(734, 7)
         Me.btnVerDigital.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnVerDigital.Name = "btnVerDigital"
-        Me.btnVerDigital.Size = New System.Drawing.Size(120, 69)
+        Me.btnVerDigital.Size = New System.Drawing.Size(156, 69)
         Me.btnVerDigital.TabIndex = 6
         Me.btnVerDigital.Text = "👁 DIGITAL"
         Me.btnVerDigital.UseVisualStyleBackColor = False
         '
         'btnImprimirRecibo
         '
-        Me.btnImprimirRecibo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnImprimirRecibo.BackColor = System.Drawing.Color.DarkSlateGray
         Me.btnImprimirRecibo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnImprimirRecibo.Font = New System.Drawing.Font("Segoe UI", 8.0!, System.Drawing.FontStyle.Bold)
         Me.btnImprimirRecibo.ForeColor = System.Drawing.Color.White
-        Me.btnImprimirRecibo.Location = New System.Drawing.Point(368, 18)
+        Me.btnImprimirRecibo.Location = New System.Drawing.Point(578, 7)
         Me.btnImprimirRecibo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImprimirRecibo.Name = "btnImprimirRecibo"
-        Me.btnImprimirRecibo.Size = New System.Drawing.Size(140, 69)
+        Me.btnImprimirRecibo.Size = New System.Drawing.Size(156, 69)
         Me.btnImprimirRecibo.TabIndex = 5
         Me.btnImprimirRecibo.Text = "🖨 RECIBO"
         Me.btnImprimirRecibo.UseVisualStyleBackColor = False
         '
         'btnEditar
         '
-        Me.btnEditar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnEditar.BackColor = System.Drawing.Color.SlateGray
         Me.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnEditar.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnEditar.ForeColor = System.Drawing.Color.White
-        Me.btnEditar.Location = New System.Drawing.Point(516, 18)
+        Me.btnEditar.Location = New System.Drawing.Point(422, 7)
         Me.btnEditar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnEditar.Name = "btnEditar"
-        Me.btnEditar.Size = New System.Drawing.Size(254, 69)
+        Me.btnEditar.Size = New System.Drawing.Size(156, 69)
         Me.btnEditar.TabIndex = 4
-        Me.btnEditar.Text = "EDITAR / DETALLE"
+        Me.btnEditar.Text = "EDITAR"
         Me.btnEditar.UseVisualStyleBackColor = False
         '
         'grpFiltros
@@ -265,17 +259,16 @@ Partial Class frmMesaEntrada
         '
         'btnNuevo
         '
-        Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnNuevo.BackColor = System.Drawing.Color.SeaGreen
         Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnNuevo.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.btnNuevo.ForeColor = System.Drawing.Color.White
-        Me.btnNuevo.Location = New System.Drawing.Point(1006, 18)
+        Me.btnNuevo.Location = New System.Drawing.Point(110, 7)
         Me.btnNuevo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnNuevo.Name = "btnNuevo"
-        Me.btnNuevo.Size = New System.Drawing.Size(240, 69)
+        Me.btnNuevo.Size = New System.Drawing.Size(156, 69)
         Me.btnNuevo.TabIndex = 1
-        Me.btnNuevo.Text = "+ NUEVO INGRESO"
+        Me.btnNuevo.Text = "+ NUEVO"
         Me.btnNuevo.UseVisualStyleBackColor = False
         '
         'lblTitulo

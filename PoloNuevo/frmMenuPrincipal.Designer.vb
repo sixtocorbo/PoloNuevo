@@ -27,14 +27,16 @@ Partial Class frmMenuPrincipal
         Me.ComisionesLaboralesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReportesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AuditoriaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        ' --- NUEVO MENU CONFIGURACION ---
         Me.ConfiguracionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RangosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        ' --------------------------------
+        Me.SeguridadToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.btnGestionUsuarios = New System.Windows.Forms.ToolStripMenuItem()
         Me.VentanasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CerrarTodasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.lblEstado = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.lblUsuarioConectado = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.btnVerLogs = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -43,12 +45,11 @@ Partial Class frmMenuPrincipal
         '
         Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        ' Se agrega ConfiguracionToolStripMenuItem a la colección
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ArchivoToolStripMenuItem, Me.GestiónToolStripMenuItem, Me.ConfiguracionToolStripMenuItem, Me.VentanasToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ArchivoToolStripMenuItem, Me.GestiónToolStripMenuItem, Me.ConfiguracionToolStripMenuItem, Me.SeguridadToolStripMenuItem, Me.VentanasToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.MdiWindowListItem = Me.VentanasToolStripMenuItem
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1512, 35)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1512, 33)
         Me.MenuStrip1.TabIndex = 1
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -76,56 +77,69 @@ Partial Class frmMenuPrincipal
         '
         Me.DashboardToolStripMenuItem.Name = "DashboardToolStripMenuItem"
         Me.DashboardToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F12
-        Me.DashboardToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.DashboardToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.DashboardToolStripMenuItem.Text = "Panel de Control (Dashboard)"
         '
         'ReclusosToolStripMenuItem
         '
         Me.ReclusosToolStripMenuItem.Name = "ReclusosToolStripMenuItem"
         Me.ReclusosToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1
-        Me.ReclusosToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.ReclusosToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.ReclusosToolStripMenuItem.Text = "Listado de Reclusos"
         '
         'MesaDeEntradaToolStripMenuItem
         '
         Me.MesaDeEntradaToolStripMenuItem.Name = "MesaDeEntradaToolStripMenuItem"
         Me.MesaDeEntradaToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
-        Me.MesaDeEntradaToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.MesaDeEntradaToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.MesaDeEntradaToolStripMenuItem.Text = "Mesa de Entrada"
         '
         'ComisionesLaboralesToolStripMenuItem
         '
         Me.ComisionesLaboralesToolStripMenuItem.Name = "ComisionesLaboralesToolStripMenuItem"
         Me.ComisionesLaboralesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3
-        Me.ComisionesLaboralesToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.ComisionesLaboralesToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.ComisionesLaboralesToolStripMenuItem.Text = "Comisiones Laborales"
         '
         'ReportesToolStripMenuItem
         '
         Me.ReportesToolStripMenuItem.Name = "ReportesToolStripMenuItem"
         Me.ReportesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4
-        Me.ReportesToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.ReportesToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.ReportesToolStripMenuItem.Text = "Reportes Documentales"
         '
         'AuditoriaToolStripMenuItem
         '
         Me.AuditoriaToolStripMenuItem.ForeColor = System.Drawing.Color.DarkRed
         Me.AuditoriaToolStripMenuItem.Name = "AuditoriaToolStripMenuItem"
-        Me.AuditoriaToolStripMenuItem.Size = New System.Drawing.Size(395, 34)
+        Me.AuditoriaToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.AuditoriaToolStripMenuItem.Text = "Auditoría de Eliminaciones"
         '
-        'ConfiguracionToolStripMenuItem (NUEVO)
+        'ConfiguracionToolStripMenuItem
         '
         Me.ConfiguracionToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RangosToolStripMenuItem})
         Me.ConfiguracionToolStripMenuItem.Name = "ConfiguracionToolStripMenuItem"
         Me.ConfiguracionToolStripMenuItem.Size = New System.Drawing.Size(139, 29)
         Me.ConfiguracionToolStripMenuItem.Text = "Configuración"
         '
-        'RangosToolStripMenuItem (NUEVO)
+        'RangosToolStripMenuItem
         '
         Me.RangosToolStripMenuItem.Name = "RangosToolStripMenuItem"
-        Me.RangosToolStripMenuItem.Size = New System.Drawing.Size(325, 34)
+        Me.RangosToolStripMenuItem.Size = New System.Drawing.Size(300, 34)
         Me.RangosToolStripMenuItem.Text = "Rangos de Numeración"
+        '
+        'SeguridadToolStripMenuItem
+        '
+        Me.SeguridadToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btnGestionUsuarios, Me.btnVerLogs})
+        Me.SeguridadToolStripMenuItem.Name = "SeguridadToolStripMenuItem"
+        Me.SeguridadToolStripMenuItem.Size = New System.Drawing.Size(109, 29)
+        Me.SeguridadToolStripMenuItem.Text = "Seguridad"
+        '
+        'btnGestionUsuarios
+        '
+        Me.btnGestionUsuarios.Name = "btnGestionUsuarios"
+        Me.btnGestionUsuarios.Size = New System.Drawing.Size(270, 34)
+        Me.btnGestionUsuarios.Text = "Gestionar Usuarios"
         '
         'VentanasToolStripMenuItem
         '
@@ -143,7 +157,7 @@ Partial Class frmMenuPrincipal
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblEstado})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblEstado, Me.lblUsuarioConectado})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 1018)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(2, 0, 21, 0)
@@ -156,6 +170,20 @@ Partial Class frmMenuPrincipal
         Me.lblEstado.Name = "lblEstado"
         Me.lblEstado.Size = New System.Drawing.Size(376, 25)
         Me.lblEstado.Text = "Sistema de Gestión Penitenciaria Polo - v.2026"
+        '
+        'lblUsuarioConectado
+        '
+        Me.lblUsuarioConectado.Name = "lblUsuarioConectado"
+        Me.lblUsuarioConectado.Size = New System.Drawing.Size(1113, 25)
+        Me.lblUsuarioConectado.Spring = True
+        Me.lblUsuarioConectado.Text = "Usuario: ..."
+        Me.lblUsuarioConectado.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'btnVerLogs
+        '
+        Me.btnVerLogs.Name = "btnVerLogs"
+        Me.btnVerLogs.Size = New System.Drawing.Size(270, 34)
+        Me.btnVerLogs.Text = "Ver Log de Accesos"
         '
         'frmMenuPrincipal
         '
@@ -190,12 +218,16 @@ Partial Class frmMenuPrincipal
     Friend WithEvents ComisionesLaboralesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ReportesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AuditoriaToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    ' --- NUEVOS AMIGOS ---
     Friend WithEvents ConfiguracionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents RangosToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    ' ---------------------
+    ' --- SEGURIDAD ---
+    Friend WithEvents SeguridadToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnGestionUsuarios As System.Windows.Forms.ToolStripMenuItem
+    ' -----------------
     Friend WithEvents VentanasToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CerrarTodasToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
     Friend WithEvents lblEstado As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents lblUsuarioConectado As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents btnVerLogs As ToolStripMenuItem
 End Class

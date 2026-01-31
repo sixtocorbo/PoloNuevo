@@ -181,7 +181,16 @@ Public Class frmMesaEntrada
     ' =========================================================
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Dim frm As New frmNuevoIngreso()
+        Dim idCandidatoPadre As Integer = 0
+
+        ' Verificamos si hay un documento seleccionado en la grilla para sugerirlo como padre
+        If dgvMesa.SelectedRows.Count > 0 Then
+            idCandidatoPadre = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        End If
+
+        ' Usamos el nuevo constructor que acepta el ID sugerido
+        Dim frm As New frmNuevoIngreso(idCandidatoPadre, esVinculacion:=True)
+
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
     End Sub
 
@@ -594,25 +603,130 @@ Public Class frmMesaEntrada
         Return sb.ToString()
     End Function
 
+
     ' =========================================================
-    ' BOTÓN HISTORIAL (VISUALIZADOR 360° - VERSIÓN COMPLETA)
+    ' VISUALIZADOR DE HISTORIAL 360° (MODO GRILLA LIMPIA)
     ' =========================================================
     Private Sub btnVerHistorial_Click(sender As Object, e As EventArgs) Handles btnVerHistorial.Click
         ' 1. Validamos selección
         If dgvMesa.SelectedRows.Count = 0 Then
-            MessageBox.Show("Por favor, seleccione un documento de la lista primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Por favor, seleccione un documento primero.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
 
-        ' 2. Obtenemos datos clave
-        Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-        Dim referencia As String = dgvMesa.SelectedRows(0).Cells("Referencia").Value.ToString()
+        Dim idDocInicial As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        Dim refInicial As String = dgvMesa.SelectedRows(0).Cells("Referencia").Value.ToString()
 
-        ' 3. Generamos la historia visual 360
+        ' 2. Creamos el formulario visual al vuelo (Dashboard temporal)
+        Dim fHistorial As New Form() With {
+            .Text = "Historia Clínica del Documento: " & refInicial,
+            .Size = New Size(900, 500),
+            .StartPosition = FormStartPosition.CenterScreen,
+            .BackColor = Color.White
+        }
+
+        ' Una grilla limpia y moderna
+        Dim dgvH As New DataGridView() With {
+            .Dock = DockStyle.Fill,
+            .ReadOnly = True,
+            .RowHeadersVisible = False,
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            .BackgroundColor = Color.WhiteSmoke,
+            .BorderStyle = BorderStyle.None,
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
+            .AllowUserToAddRows = False
+        }
+
+        ' Estilo de cabecera
+        dgvH.EnableHeadersVisualStyles = False
+        dgvH.ColumnHeadersDefaultCellStyle.BackColor = Color.SteelBlue
+        dgvH.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgvH.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 10, FontStyle.Bold)
+        dgvH.DefaultCellStyle.Font = New Font("Segoe UI", 9)
+
+        fHistorial.Controls.Add(dgvH)
+
+        ' 3. Lógica de Datos (La parte inteligente)
         Try
-            Dim historia As String = GenerarTimeline360(idDoc)
-            ' 4. Mostramos el resultado
-            MessageBox.Show(historia, "Historial Completo: " & referencia, MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Using db As New PoloNuevoEntities()
+                ' A. ENCONTRAR LA FAMILIA (ÁRBOL DE VÍNCULOS)
+                Dim familiaIds As New List(Of Integer) From {idDocInicial}
+                Dim nuevosEncontrados As Boolean = True
+
+                While nuevosEncontrados
+                    nuevosEncontrados = False
+                    Dim listaActual = familiaIds.ToList()
+
+                    Dim vinculos = db.DocumentoVinculos _
+                                     .Where(Function(v) listaActual.Contains(v.IdDocumentoPadre) Or
+                                                        listaActual.Contains(v.IdDocumentoHijo)) _
+                                     .ToList()
+
+                    For Each v In vinculos
+                        If Not familiaIds.Contains(v.IdDocumentoPadre) Then
+                            familiaIds.Add(v.IdDocumentoPadre)
+                            nuevosEncontrados = True
+                        End If
+                        If Not familiaIds.Contains(v.IdDocumentoHijo) Then
+                            familiaIds.Add(v.IdDocumentoHijo)
+                            nuevosEncontrados = True
+                        End If
+                    Next
+                End While
+
+                ' B. TRAER MOVIMIENTOS
+                Dim listaMovimientos = db.MovimientosDocumentos _
+                                         .Include("Documentos").Include("Documentos.TiposDocumento") _
+                                         .Where(Function(m) familiaIds.Contains(m.DocumentoId)) _
+                                         .OrderBy(Function(m) m.FechaMovimiento) _
+                                         .ToList() _
+                                         .Select(Function(m)
+                                                     Dim accionHumana As String = "Trámite"
+
+                                                     If m.Origen = "SISTEMA" Then
+                                                         accionHumana = "✨ GENERACIÓN INICIAL"
+                                                     ElseIf Not String.IsNullOrEmpty(m.Observaciones) AndAlso (m.Observaciones.Contains("VINCULADO") Or m.Observaciones.Contains("ADJUNTO")) Then
+                                                         accionHumana = "🔗 VINCULACIÓN"
+                                                     ElseIf m.EsSalida Then
+                                                         accionHumana = "📤 PASE / ENVÍO"
+                                                     Else
+                                                         accionHumana = "📥 RECEPCIÓN"
+                                                     End If
+
+                                                     Dim docNombre As String = m.Documentos.TiposDocumento.Nombre & " " & m.Documentos.ReferenciaExterna
+                                                     If m.DocumentoId = idDocInicial Then docNombre = "➤ ESTE DOCUMENTO"
+
+                                                     Return New With {
+                                                         .Fecha = m.FechaMovimiento.ToString("dd/MM HH:mm"),
+                                                         .Documento = docNombre,
+                                                         .Acción = accionHumana,
+                                                         .Origen = m.Origen,
+                                                         .Destino = m.Destino,
+                                                         .Nota = m.Observaciones
+                                                     }
+                                                 End Function).ToList()
+
+                dgvH.DataSource = listaMovimientos
+
+                ' === CORRECCIÓN: PROTECCIÓN CONTRA LISTA VACÍA ===
+                ' Solo intentamos configurar columnas si realmente existen
+                If dgvH.Columns.Count > 0 Then
+                    dgvH.Columns("Fecha").Width = 110
+                    dgvH.Columns("Documento").Width = 150
+                    dgvH.Columns("Acción").Width = 140
+                    ' Verificamos si existe la columna Nota antes de ocultarla
+                    If dgvH.Columns.Contains("Nota") Then dgvH.Columns("Nota").Visible = False
+                Else
+                    ' Opcional: Mostrar aviso si no hay datos
+                    MessageBox.Show("Este documento no tiene movimientos registrados.", "Historial Vacío", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return ' Salimos para no mostrar un form vacío
+                End If
+            End Using
+
+            ' Mostrar el formulario
+            fHistorial.ShowDialog()
+
         Catch ex As Exception
             MessageBox.Show("Error al generar historial: " & ex.Message)
         End Try

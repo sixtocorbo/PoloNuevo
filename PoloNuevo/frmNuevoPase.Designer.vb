@@ -77,7 +77,7 @@ Partial Class frmNuevoPase
         Me.txtDestino.Location = New System.Drawing.Point(34, 134)
         Me.txtDestino.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtDestino.Name = "txtDestino"
-        Me.txtDestino.Size = New System.Drawing.Size(448, 34)
+        Me.txtDestino.Size = New System.Drawing.Size(465, 34)
         Me.txtDestino.TabIndex = 2
         '
         'lstSugerencias
@@ -87,7 +87,7 @@ Partial Class frmNuevoPase
         Me.lstSugerencias.Location = New System.Drawing.Point(34, 177)
         Me.lstSugerencias.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.lstSugerencias.Name = "lstSugerencias"
-        Me.lstSugerencias.Size = New System.Drawing.Size(448, 124)
+        Me.lstSugerencias.Size = New System.Drawing.Size(465, 124)
         Me.lstSugerencias.TabIndex = 3
         Me.lstSugerencias.Visible = False
         '
@@ -96,7 +96,7 @@ Partial Class frmNuevoPase
         Me.btnGuardar.BackColor = System.Drawing.Color.SteelBlue
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(260, 615)
+        Me.btnGuardar.Location = New System.Drawing.Point(274, 550)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(225, 62)
@@ -106,7 +106,7 @@ Partial Class frmNuevoPase
         '
         'btnCancelar
         '
-        Me.btnCancelar.Location = New System.Drawing.Point(34, 615)
+        Me.btnCancelar.Location = New System.Drawing.Point(34, 550)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(150, 62)
@@ -143,7 +143,7 @@ Partial Class frmNuevoPase
         Me.grpActuacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpActuacion.Name = "grpActuacion"
         Me.grpActuacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpActuacion.Size = New System.Drawing.Size(465, 354)
+        Me.grpActuacion.Size = New System.Drawing.Size(465, 302)
         Me.grpActuacion.TabIndex = 5
         Me.grpActuacion.TabStop = False
         Me.grpActuacion.Text = "Datos del Nuevo Documento"
@@ -248,7 +248,7 @@ Partial Class frmNuevoPase
         Me.AutoSize = True
         Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(531, 708)
+        Me.ClientSize = New System.Drawing.Size(531, 624)
         Me.Controls.Add(Me.lstSugerencias)
         Me.Controls.Add(Me.grpActuacion)
         Me.Controls.Add(Me.chkGenerarActuacion)
