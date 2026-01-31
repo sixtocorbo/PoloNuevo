@@ -251,10 +251,12 @@ Public Class frmNuevoPase
     ' =========================================================
     ' MÉTODO DE ARRASTRE TOTAL: Mueve a toda la familia junta
     ' =========================================================
-    Private Sub MoverFamiliaCompleta(db As PoloNuevoEntities, idPadreSupremo As Integer, destino As String, fecha As Date, idExcluir As Integer)
+    Private Sub MoverFamiliaCompleta(db As PoloNuevoEntities, idPadreSupremo As Integer, destino As String, fecha As Date, idExcluir As Integer, excluirPadreSupremo As Boolean)
         ' 1. Obtenemos TODOS los IDs que pertenecen a este expediente (Padre, hijos, nietos...)
         Dim familiaCompletaIds As New List(Of Integer)
-        familiaCompletaIds.Add(idPadreSupremo)
+        If Not excluirPadreSupremo Then
+            familiaCompletaIds.Add(idPadreSupremo)
+        End If
         ObtenerDescendenciaRecursiva(db, idPadreSupremo, familiaCompletaIds)
 
         ' 2. Recorremos cada miembro de la familia
@@ -426,7 +428,8 @@ Public Class frmNuevoPase
 
                 ' --- ARRASTRE DE FAMILIA ---
                 If _idMovimientoEditar = 0 And _idDocumento > 0 Then
-                    MoverFamiliaCompleta(db, idPadreSupremo, destinoFinal, fechaBase, idNuevoDoc)
+                    Dim excluirPadreSupremo As Boolean = True
+                    MoverFamiliaCompleta(db, idPadreSupremo, destinoFinal, fechaBase, idNuevoDoc, excluirPadreSupremo)
                 End If
 
                 db.SaveChanges()
