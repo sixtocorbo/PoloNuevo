@@ -32,61 +32,15 @@ Public Class frmDashboard
                 ' =========================================================
                 ' 1. LÓGICA DE PENDIENTES (CORREGIDA CON DESEMPATE POR ID)
                 ' =========================================================
-                Dim vinculos = db.DocumentoVinculos _
-                    .Select(Function(v) New With {.Padre = v.IdDocumentoPadre, .Hijo = v.IdDocumentoHijo}) _
-                    .ToList()
-                Dim padresPorHijo As Dictionary(Of Integer, Integer) = vinculos _
-                    .GroupBy(Function(v) v.Hijo) _
-                    .ToDictionary(Function(g) g.Key, Function(g) g.First().Padre)
-
                 Dim listaDocs = db.Documentos _
                                   .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO") _
                                   .Include("MovimientosDocumentos") _
                                   .ToList()
 
-                Dim ultimosMovimientos = listaDocs.ToDictionary(Function(d) d.Id,
-                                                                Function(d)
-                                                                    Return d.MovimientosDocumentos _
-                                                                        .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                                                        .ThenByDescending(Function(m) m.Id) _
-                                                                        .FirstOrDefault()
-                                                                End Function)
-
-                Dim padreSupremoPorDoc As New Dictionary(Of Integer, Integer)
-                For Each doc In listaDocs
-                    Dim idRastro As Integer = doc.Id
-                    Dim iteraciones As Integer = 0
-                    While padresPorHijo.ContainsKey(idRastro) AndAlso iteraciones < 50
-                        iteraciones += 1
-                        idRastro = padresPorHijo(idRastro)
-                    End While
-                    padreSupremoPorDoc(doc.Id) = idRastro
-                Next
-
-                Dim pendientePorPadre As New Dictionary(Of Integer, Integer)
-                For Each doc In listaDocs
-                    Dim ultimoMov = ultimosMovimientos(doc.Id)
-                    Dim destino As String = If(ultimoMov IsNot Nothing, If(ultimoMov.Destino, ""), "MESA DE ENTRADA")
-                    Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
-
-                    If enMesa Then
-                        Dim idPadre = padreSupremoPorDoc(doc.Id)
-                        If Not pendientePorPadre.ContainsKey(idPadre) Then
-                            pendientePorPadre(idPadre) = doc.Id
-                        Else
-                            Dim idActual = pendientePorPadre(idPadre)
-                            Dim movActual = ultimosMovimientos(idActual)
-                            Dim fechaActual As DateTime = If(movActual IsNot Nothing, movActual.FechaMovimiento, DateTime.MinValue)
-                            Dim fechaNuevo As DateTime = If(ultimoMov IsNot Nothing, ultimoMov.FechaMovimiento, DateTime.MinValue)
-                            Dim idMovActual As Integer = If(movActual IsNot Nothing, movActual.Id, 0)
-                            Dim idMovNuevo As Integer = If(ultimoMov IsNot Nothing, ultimoMov.Id, 0)
-
-                            If fechaNuevo > fechaActual OrElse (fechaNuevo = fechaActual AndAlso idMovNuevo > idMovActual) Then
-                                pendientePorPadre(idPadre) = doc.Id
-                            End If
-                        End If
-                    End If
-                Next
+                Dim vinculos = db.DocumentoVinculos.ToList()
+                Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(listaDocs)
+                Dim padreSupremoPorDoc = MesaEntradaInteligencia.ObtenerPadreSupremoPorDoc(listaDocs, vinculos)
+                Dim pendientePorPadre = MesaEntradaInteligencia.ObtenerPendientesPorPadre(listaDocs, ultimosMovimientos, padreSupremoPorDoc)
 
                 Dim conteoPendientes As Integer = pendientePorPadre.Count
                 lblNumPendientes.Text = conteoPendientes.ToString()
