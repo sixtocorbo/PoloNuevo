@@ -120,21 +120,23 @@ Public Class frmHistorial
                     ' --- SI EL MOVIMIENTO PASA EL FILTRO, SE DIBUJA ---
                     If mostrar Then
 
-                        ' 1. Definir la Acción (Máscara Visual sugerida por el usuario)
+                        Dim obsMostrar As String = If(String.IsNullOrWhiteSpace(m.Observaciones), "S/D", m.Observaciones)
+
+                        ' 1. Definir la Acción (más descriptiva, similar a la trazabilidad)
                         If m.Origen = "SISTEMA" Or obs.Contains("GENERACIÓN") Then
                             accionVisual = "✨ GESTIÓN / CREACIÓN"
 
                         ElseIf obs.Contains("RETORNO AUTOMÁTICO") Then
-                            ' Aquí aplicamos la máscara para que el usuario lea "RETORNO"
-                            accionVisual = "📥 RETORNO / REINGRESO"
+                            ' Más intuitivo: se muestra como retorno/ingreso
+                            accionVisual = "📥 RETORNO / REINGRESO (" & obsMostrar & ")"
 
                         ElseIf obs.Contains("VINCULACIÓN") Or obs.Contains("VINCULADO") Then
-                            accionVisual = "🔗 VINCULACIÓN"
+                            accionVisual = "🔗 SE VINCULÓ"
 
                         ElseIf m.EsSalida Then
-                            accionVisual = "📤 PASE / SALIDA"
+                            accionVisual = "📤 SALIDA (" & obsMostrar & ")"
                         Else
-                            accionVisual = "📥 RECEPCIÓN"
+                            accionVisual = "📥 ENTRADA (" & obsMostrar & ")"
                         End If
 
                         ' 2. Identificar el Documento
