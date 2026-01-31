@@ -247,6 +247,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="MesaEntradaInteligencia.vb" />
     <Compile Include="MotivosAusencia.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
