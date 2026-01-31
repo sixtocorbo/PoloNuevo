@@ -41,25 +41,16 @@ Public Class frmMesaEntrada
     Private Sub CargarMesa()
         Try
             Using db As New PoloNuevoEntities()
-                Dim idsVinculados As List(Of Integer) = db.DocumentoVinculos _
-                    .Select(Function(v) v.IdDocumentoPadre) _
-                    .Union(db.DocumentoVinculos.Select(Function(v) v.IdDocumentoHijo)) _
-                    .Distinct() _
+                Dim vinculos = db.DocumentoVinculos _
+                    .Select(Function(v) New With {.Padre = v.IdDocumentoPadre, .Hijo = v.IdDocumentoHijo}) _
                     .ToList()
+                Dim padresPorHijo As Dictionary(Of Integer, Integer) = vinculos _
+                    .GroupBy(Function(v) v.Hijo) _
+                    .ToDictionary(Function(g) g.Key, Function(g) g.First().Padre)
 
                 ' 1. CONSULTA BASE
                 Dim query = db.Documentos.Include("MovimientosDocumentos") _
                                          .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
-
-                ' 2. Filtro Pendientes (Lógica OPTIMIZADA CON DESEMPATE POR ID)
-                If chkPendientes.Checked Then
-                    query = query.Where(Function(d) d.MovimientosDocumentos _
-                                            .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                            .ThenByDescending(Function(m) m.Id) _ ' <<< ¡EL DESEMPATE CLAVE!
-                                            .Select(Function(m) m.Destino) _
-                                            .FirstOrDefault() = "MESA DE ENTRADA" _
-                                            Or idsVinculados.Contains(d.Id))
-                End If
 
                 ' 3. Buscador Inteligente
                 Dim texto = txtBuscar.Text.Trim()
@@ -87,23 +78,63 @@ Public Class frmMesaEntrada
                                    .ToList()
 
                 ' 6. PROYECCIÓN EN MEMORIA (CON DESEMPATE POR ID)
+                Dim ultimosMovimientos = rawList.ToDictionary(Function(d) d.Id,
+                                                              Function(d)
+                                                                  Dim ultimoMov = d.MovimientosDocumentos _
+                                                                      .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                                                      .ThenByDescending(Function(m) m.Id) _
+                                                                      .FirstOrDefault()
+                                                                  Return ultimoMov
+                                                              End Function)
+
+                Dim padreSupremoPorDoc As New Dictionary(Of Integer, Integer)
+                For Each doc In rawList
+                    Dim idRastro As Integer = doc.Id
+                    Dim iteraciones As Integer = 0
+                    While padresPorHijo.ContainsKey(idRastro) AndAlso iteraciones < 50
+                        iteraciones += 1
+                        idRastro = padresPorHijo(idRastro)
+                    End While
+                    padreSupremoPorDoc(doc.Id) = idRastro
+                Next
+
+                Dim pendientePorPadre As New Dictionary(Of Integer, Integer)
+                For Each doc In rawList
+                    Dim ultimoMov = ultimosMovimientos(doc.Id)
+                    Dim destino As String = If(ultimoMov IsNot Nothing, If(ultimoMov.Destino, ""), "MESA DE ENTRADA")
+                    Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
+
+                    If enMesa Then
+                        Dim idPadre = padreSupremoPorDoc(doc.Id)
+                        If Not pendientePorPadre.ContainsKey(idPadre) Then
+                            pendientePorPadre(idPadre) = doc.Id
+                        Else
+                            Dim idActual = pendientePorPadre(idPadre)
+                            Dim movActual = ultimosMovimientos(idActual)
+                            Dim fechaActual As DateTime = If(movActual IsNot Nothing, movActual.FechaMovimiento, DateTime.MinValue)
+                            Dim fechaNuevo As DateTime = If(ultimoMov IsNot Nothing, ultimoMov.FechaMovimiento, DateTime.MinValue)
+                            Dim idMovActual As Integer = If(movActual IsNot Nothing, movActual.Id, 0)
+                            Dim idMovNuevo As Integer = If(ultimoMov IsNot Nothing, ultimoMov.Id, 0)
+
+                            If fechaNuevo > fechaActual OrElse (fechaNuevo = fechaActual AndAlso idMovNuevo > idMovActual) Then
+                                pendientePorPadre(idPadre) = doc.Id
+                            End If
+                        End If
+                    End If
+                Next
+
                 Dim displayList = rawList.Select(Function(d)
+                                                     Dim ultimoMov = ultimosMovimientos(d.Id)
+                                                     Dim destino As String = If(ultimoMov IsNot Nothing, If(ultimoMov.Destino, ""), "MESA DE ENTRADA")
+                                                     Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
                                                      Dim estadoFinal As String = "MOVIDO"
 
-                                                     ' Obtenemos el último movimiento usando ID como desempate
-                                                     Dim ultimoMov = d.MovimientosDocumentos _
-                                                                      .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                                                      .ThenByDescending(Function(m) m.Id) _ ' <<< ¡AQUÍ TAMBIÉN!
-                                                                      .FirstOrDefault()
-
-                                                     If ultimoMov IsNot Nothing Then
-                                                         Dim destino As String = If(ultimoMov.Destino, "").Trim().ToUpper()
-
-                                                         Dim enMesa As Boolean = (destino = "MESA DE ENTRADA")
-                                                         Dim esVinculo As Boolean = idsVinculados.Contains(d.Id)
-
-                                                         If enMesa Or esVinculo Then
+                                                     If enMesa Then
+                                                         Dim idPadre = padreSupremoPorDoc(d.Id)
+                                                         If pendientePorPadre.ContainsKey(idPadre) AndAlso pendientePorPadre(idPadre) = d.Id Then
                                                              estadoFinal = "PENDIENTE"
+                                                         Else
+                                                             estadoFinal = "EN MESA"
                                                          End If
                                                      End If
 
@@ -120,7 +151,11 @@ Public Class frmMesaEntrada
                                                  End Function).ToList()
 
                 ' 7. Asignación a la Grilla
-                dgvMesa.DataSource = displayList
+                If chkPendientes.Checked Then
+                    dgvMesa.DataSource = displayList.Where(Function(d) d.Estado = "PENDIENTE").ToList()
+                Else
+                    dgvMesa.DataSource = displayList
+                End If
 
                 ' 8. Configuración Visual
                 If dgvMesa.Columns("Id") IsNot Nothing Then dgvMesa.Columns("Id").Visible = False
