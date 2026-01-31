@@ -1,129 +1,204 @@
 ﻿Imports System.Data.Entity
+Imports System.Linq
+Imports System.Drawing
 
 Public Class frmHistorial
 
-    Private _idDocInicial As Integer
+    Private _idDocSeleccionado As Integer
 
-    ' Constructor que recibe el ID y la Referencia para configurar la ventana
+    ' Constructor: Recibe el ID del documento para rastrear a toda la familia
     Public Sub New(idDoc As Integer, referencia As String)
         InitializeComponent()
-        _idDocInicial = idDoc
-        Me.Text = "Historia Clínica - " & referencia
+        _idDocSeleccionado = idDoc
+        Me.Text = "Historia Clínica Unificada - Exp. " & referencia
+
+        ' Ajustes de ventana
+        Me.StartPosition = FormStartPosition.CenterParent
+        Me.Size = New Size(950, 550)
     End Sub
 
     Private Sub frmHistorial_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        CargarDatos()
+        ConfigurarGrilla()
+        CargarHistoriaUnificada()
     End Sub
 
-    Private Sub CargarDatos()
+    Private Sub ConfigurarGrilla()
+        dgvHistorial.Rows.Clear()
+        dgvHistorial.Columns.Clear()
+
+        ' Definición de columnas para la narrativa del expediente
+        dgvHistorial.Columns.Add("colFecha", "Fecha")
+        dgvHistorial.Columns.Add("colDocumento", "Documento Protagonista")
+        dgvHistorial.Columns.Add("colAccion", "Acción / Evento")
+        dgvHistorial.Columns.Add("colOrigen", "Origen")
+        dgvHistorial.Columns.Add("colDestino", "Destino / Ubicación")
+
+        ' Configuración visual de anchos
+        dgvHistorial.Columns("colFecha").Width = 115
+        dgvHistorial.Columns("colDocumento").Width = 260
+        dgvHistorial.Columns("colAccion").Width = 180
+        dgvHistorial.Columns("colOrigen").Width = 180
+        dgvHistorial.Columns("colDestino").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+
+        ' Estética de la tabla
+        dgvHistorial.RowHeadersVisible = False
+        dgvHistorial.AllowUserToAddRows = False
+        dgvHistorial.ReadOnly = True
+        dgvHistorial.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvHistorial.GridColor = Color.WhiteSmoke
+        dgvHistorial.BackgroundColor = Color.White
+
+        ' Estilo moderno para la cabecera
+        dgvHistorial.EnableHeadersVisualStyles = False
+        dgvHistorial.ColumnHeadersDefaultCellStyle.BackColor = Color.SteelBlue
+        dgvHistorial.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        dgvHistorial.ColumnHeadersDefaultCellStyle.Font = New Font(dgvHistorial.Font, FontStyle.Bold)
+    End Sub
+
+    Private Sub CargarHistoriaUnificada()
         Try
-            dgvHistorial.Rows.Clear()
-
             Using db As New PoloNuevoEntities()
-                ' -----------------------------------------------------------
-                ' 1. BÚSQUEDA DE LA FAMILIA (RECURSIVA)
-                ' -----------------------------------------------------------
-                Dim familiaIds As New List(Of Integer) From {_idDocInicial}
-                Dim nuevosEncontrados As Boolean = True
-                Dim iteraciones As Integer = 0
 
-                While nuevosEncontrados AndAlso iteraciones < 50
-                    nuevosEncontrados = False
-                    iteraciones += 1
-                    Dim listaActual = familiaIds.ToList()
-                    Dim vinculos = db.DocumentoVinculos _
-                                     .Where(Function(v) listaActual.Contains(v.IdDocumentoPadre) Or listaActual.Contains(v.IdDocumentoHijo)) _
-                                     .ToList()
+                ' -----------------------------------------------------------
+                ' 1. BUSCAR LA RAÍZ (SUBIR HASTA EL PADRE SUPREMO)
+                ' -----------------------------------------------------------
+                Dim idRaiz As Integer = _idDocSeleccionado
+                Dim buscandoRaiz As Boolean = True
+                Dim seguridad As Integer = 0
 
-                    For Each v In vinculos
-                        If Not familiaIds.Contains(v.IdDocumentoPadre) Then
-                            familiaIds.Add(v.IdDocumentoPadre)
-                            nuevosEncontrados = True
-                        End If
-                        If Not familiaIds.Contains(v.IdDocumentoHijo) Then
-                            familiaIds.Add(v.IdDocumentoHijo)
-                            nuevosEncontrados = True
-                        End If
-                    Next
+                While buscandoRaiz AndAlso seguridad < 50
+                    seguridad += 1
+                    Dim idActual = idRaiz
+                    Dim vinculo = db.DocumentoVinculos.FirstOrDefault(Function(v) v.IdDocumentoHijo = idActual)
+
+                    If vinculo IsNot Nothing Then
+                        idRaiz = vinculo.IdDocumentoPadre
+                    Else
+                        buscandoRaiz = False
+                    End If
                 End While
 
                 ' -----------------------------------------------------------
-                ' 2. OBTENER MOVIMIENTOS
+                ' 2. BUSCAR TODA LA DESCENDENCIA (BAJAR POR TODAS LAS RAMAS)
                 ' -----------------------------------------------------------
-                Dim movimientos = db.MovimientosDocumentos _
-                                    .Include("Documentos").Include("Documentos.TiposDocumento") _
-                                    .Where(Function(m) familiaIds.Contains(m.DocumentoId)) _
-                                    .OrderBy(Function(m) m.FechaMovimiento) _
-                                    .ToList()
-
-                If movimientos.Count = 0 Then
-                    MessageBox.Show("No se encontraron movimientos para este expediente.", "Vacío", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    Return
-                End If
+                Dim familiaIds As New List(Of Integer)
+                familiaIds.Add(idRaiz)
+                ObtenerDescendenciaRecursiva(db, idRaiz, familiaIds)
 
                 ' -----------------------------------------------------------
-                ' 3. LLENADO MANUAL DE LA GRILLA (ESTO EVITA ERRORES)
+                ' 3. OBTENER MOVIMIENTOS UNIFICADOS (ORDENADOS POR FECHA E ID)
                 ' -----------------------------------------------------------
-                For Each m In movimientos
-                    ' a. Lógica visual de la acción
-                    Dim accionHumana As String = "Trámite"
+                Dim rawMovs = db.MovimientosDocumentos _
+                                .Include("Documentos").Include("Documentos.TiposDocumento") _
+                                .Where(Function(m) familiaIds.Contains(m.DocumentoId)) _
+                                .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                .ThenByDescending(Function(m) m.Id) _
+                                .ToList()
+
+                ' -----------------------------------------------------------
+                ' 4. FILTRADO Y TRADUCCIÓN VISUAL (SIN ALTERAR LA BD)
+                ' -----------------------------------------------------------
+                For Each m In rawMovs
+                    Dim mostrar As Boolean = True
                     Dim obs As String = If(m.Observaciones, "").ToUpper()
+                    Dim accionVisual As String = ""
 
-                    If m.Origen = "SISTEMA" Then
-                        accionHumana = "✨ GENERACIÓN INICIAL"
-                    ElseIf obs.Contains("VINCULADO") Or obs.Contains("ADJUNTO") Then
-                        accionHumana = "🔗 VINCULACIÓN"
-                    ElseIf m.EsSalida Then
-                        accionHumana = "📤 PASE / ENVÍO"
-                    Else
-                        accionHumana = "📥 RECEPCIÓN"
+                    ' REGLA DE FILTRADO: Ocultamos movimientos de "arrastre" técnico
+                    ' No queremos ver líneas idénticas para cada hijo si el padre ya se movió.
+                    If obs.Contains("PASE ADJUNTO") Or obs.Contains("PASE ADJUNTO") Then
+                        mostrar = False
                     End If
 
-                    ' b. Construcción segura del nombre del documento
-                    Dim docRef As String = "Desconocido"
-                    If m.Documentos IsNot Nothing Then
-                        Dim tipo As String = If(m.Documentos.TiposDocumento IsNot Nothing, m.Documentos.TiposDocumento.Nombre, "DOC")
-                        Dim ref As String = If(m.Documentos.ReferenciaExterna, "S/N")
-                        docRef = tipo & " " & ref
+                    ' EXCEPCIÓN: Si es el PADRE SUPREMO el que se mueve, lo mostramos SIEMPRE
+                    If m.DocumentoId = idRaiz Then mostrar = True
+
+                    ' EXCEPCIÓN: Si es un NACIMIENTO o VINCULACIÓN manual, lo mostramos SIEMPRE
+                    If m.Origen = "SISTEMA" Or obs.Contains("GENERACIÓN") Or obs.Contains("VINCULADO") Or obs.Contains("VINCULACIÓN") Then
+                        mostrar = True
                     End If
 
-                    ' c. Marcar si es el documento actual
-                    If m.DocumentoId = _idDocInicial Then
-                        docRef = "➤ " & docRef
-                    End If
+                    ' --- SI EL MOVIMIENTO PASA EL FILTRO, SE DIBUJA ---
+                    If mostrar Then
 
-                    ' d. Agregar Fila Directamente (Sin DataSource)
-                    ' Orden: Fecha, Documento, Acción, Origen, Destino, Nota
-                    dgvHistorial.Rows.Add(
-                        m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"),
-                        docRef,
-                        accionHumana,
-                        If(m.Origen, ""),
-                        If(m.Destino, ""),
-                        obs
-                    )
+                        ' 1. Definir la Acción (Máscara Visual sugerida por el usuario)
+                        If m.Origen = "SISTEMA" Or obs.Contains("GENERACIÓN") Then
+                            accionVisual = "✨ GESTIÓN / CREACIÓN"
+
+                        ElseIf obs.Contains("RETORNO AUTOMÁTICO") Then
+                            ' Aquí aplicamos la máscara para que el usuario lea "RETORNO"
+                            accionVisual = "📥 RETORNO / REINGRESO"
+
+                        ElseIf obs.Contains("VINCULACIÓN") Or obs.Contains("VINCULADO") Then
+                            accionVisual = "🔗 VINCULACIÓN"
+
+                        ElseIf m.EsSalida Then
+                            accionVisual = "📤 PASE / SALIDA"
+                        Else
+                            accionVisual = "📥 RECEPCIÓN"
+                        End If
+
+                        ' 2. Identificar el Documento
+                        Dim nombreDoc As String = m.Documentos.TiposDocumento.Nombre & " " & m.Documentos.ReferenciaExterna
+
+                        ' 3. Aplicar Sangría Jerárquica
+                        If m.DocumentoId = idRaiz Then
+                            nombreDoc = "📂 " & nombreDoc & " (Principal)"
+                        Else
+                            nombreDoc = "   ↳ " & nombreDoc
+                        End If
+
+                        dgvHistorial.Rows.Add(
+                            m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"),
+                            nombreDoc,
+                            accionVisual,
+                            If(m.Origen, ""),
+                            If(m.Destino, "")
+                        )
+                    End If
                 Next
 
-                ' Colorear filas especiales (opcional)
-                For Each row As DataGridViewRow In dgvHistorial.Rows
-                    Dim accion As String = row.Cells("colAccion").Value.ToString()
-                    If accion.Contains("VINCULACIÓN") Then
-                        row.DefaultCellStyle.ForeColor = Color.Blue
-                    ElseIf accion.Contains("GENERACIÓN") Then
-                        row.DefaultCellStyle.ForeColor = Color.Green
-                    End If
-                    ' Negrita para el documento seleccionado
-                    If row.Cells("colDocumento").Value.ToString().StartsWith("➤") Then
-                        row.DefaultCellStyle.Font = New Font(dgvHistorial.Font, FontStyle.Bold)
-                    End If
-                Next
-
-                dgvHistorial.ClearSelection()
+                AplicarColores()
 
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error al cargar historial: " & ex.Message)
+            MessageBox.Show("Error al cargar la historia unificada: " & ex.Message)
         End Try
+    End Sub
+
+    ' Función auxiliar para recorrer el árbol genealógico completo
+    Private Sub ObtenerDescendenciaRecursiva(db As PoloNuevoEntities, idPadre As Integer, ByRef listaIds As List(Of Integer))
+        Dim hijos = db.DocumentoVinculos.Where(Function(v) v.IdDocumentoPadre = idPadre).Select(Function(v) v.IdDocumentoHijo).ToList()
+        For Each idHijo In hijos
+            If Not listaIds.Contains(idHijo) Then
+                listaIds.Add(idHijo)
+                ObtenerDescendenciaRecursiva(db, idHijo, listaIds)
+            End If
+        Next
+    End Sub
+
+    Private Sub AplicarColores()
+        For Each row As DataGridViewRow In dgvHistorial.Rows
+            Dim doc As String = row.Cells("colDocumento").Value.ToString()
+            Dim accion As String = row.Cells("colAccion").Value.ToString()
+
+            ' Negrita y fondo suave para el documento Principal (Carpeta)
+            If doc.Contains("📂") Then
+                row.DefaultCellStyle.Font = New Font(dgvHistorial.Font, FontStyle.Bold)
+                row.DefaultCellStyle.BackColor = Color.AliceBlue
+            End If
+
+            ' Colores por tipo de evento
+            If accion.Contains("CREACIÓN") Then
+                row.DefaultCellStyle.ForeColor = Color.ForestGreen
+            ElseIf accion.Contains("VINCULACIÓN") Then
+                row.DefaultCellStyle.ForeColor = Color.Purple
+            ElseIf accion.Contains("RETORNO") Then
+                row.DefaultCellStyle.ForeColor = Color.DarkSlateBlue
+            ElseIf accion.Contains("SALIDA") Then
+                row.DefaultCellStyle.ForeColor = Color.DarkBlue
+            End If
+        Next
+        dgvHistorial.ClearSelection()
     End Sub
 
 End Class

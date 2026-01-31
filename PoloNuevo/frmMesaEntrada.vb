@@ -45,14 +45,13 @@ Public Class frmMesaEntrada
                 Dim query = db.Documentos.Include("MovimientosDocumentos") _
                                          .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' 2. Filtro Pendientes (Lógica OPTIMIZADA y COHERENTE con Dashboard)
+                ' 2. Filtro Pendientes (Lógica OPTIMIZADA CON DESEMPATE POR ID)
                 If chkPendientes.Checked Then
-                    ' Nota: Aquí hacemos un filtro aproximado en base de datos para velocidad.
-                    ' La validación fina la hace la proyección en memoria más abajo.
                     query = query.Where(Function(d) d.MovimientosDocumentos _
                                             .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                            .ThenByDescending(Function(m) m.Id) _ ' <<< ¡EL DESEMPATE CLAVE!
                                             .FirstOrDefault().Destino = "MESA DE ENTRADA" _
-                                            Or d.MovimientosDocumentos.OrderByDescending(Function(m) m.FechaMovimiento).FirstOrDefault().Observaciones.Contains("VINCULADO"))
+                                            Or d.MovimientosDocumentos.OrderByDescending(Function(m) m.FechaMovimiento).ThenByDescending(Function(m) m.Id).FirstOrDefault().Observaciones.Contains("VINCULADO"))
                 End If
 
                 ' 3. Buscador Inteligente
@@ -75,28 +74,26 @@ Public Class frmMesaEntrada
                     query = query.Where(Function(d) d.FechaCarga >= fDesde And d.FechaCarga <= fHasta)
                 End If
 
-                ' 5. Ejecución RÁPIDA (Traemos datos a memoria)
+                ' 5. Ejecución RÁPIDA
                 Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga) _
                                    .Take(200) _
                                    .ToList()
 
-                ' 6. PROYECCIÓN EN MEMORIA (AQUÍ ESTÁ LA CORRECCIÓN)
+                ' 6. PROYECCIÓN EN MEMORIA (CON DESEMPATE POR ID)
                 Dim displayList = rawList.Select(Function(d)
-                                                     ' Calculamos el estado EXACTAMENTE IGUAL que en el Dashboard
                                                      Dim estadoFinal As String = "MOVIDO"
 
+                                                     ' Obtenemos el último movimiento usando ID como desempate
                                                      Dim ultimoMov = d.MovimientosDocumentos _
                                                                       .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                                                      .ThenByDescending(Function(m) m.Id) _ ' <<< ¡AQUÍ TAMBIÉN!
                                                                       .FirstOrDefault()
 
                                                      If ultimoMov IsNot Nothing Then
                                                          Dim destino As String = If(ultimoMov.Destino, "").Trim().ToUpper()
                                                          Dim obs As String = If(ultimoMov.Observaciones, "").Trim().ToUpper()
 
-                                                         ' Condición 1: Está físicamente en Mesa
                                                          Dim enMesa As Boolean = (destino = "MESA DE ENTRADA")
-
-                                                         ' Condición 2: Fue vinculado recientemente (está en gestión administrativa)
                                                          Dim esVinculo As Boolean = (obs.Contains("VINCULADO") Or obs.Contains("SE VINCULÓ") Or obs.Contains("ADJUNTO"))
 
                                                          If enMesa Or esVinculo Then

@@ -30,9 +30,8 @@ Public Class frmDashboard
                 Dim manana As Date = hoy.AddDays(1)
 
                 ' =========================================================
-                ' 1. LÓGICA DE PENDIENTES (CORREGIDA PARA VINCULACIONES)
+                ' 1. LÓGICA DE PENDIENTES (CORREGIDA CON DESEMPATE POR ID)
                 ' =========================================================
-                ' Traemos todos los documentos activos y sus movimientos
                 Dim listaDocs = db.Documentos _
                                   .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO") _
                                   .Include("MovimientosDocumentos") _
@@ -41,24 +40,22 @@ Public Class frmDashboard
                 Dim conteoPendientes As Integer = 0
 
                 For Each doc In listaDocs
-                    ' Obtenemos el ÚLTIMO movimiento registrado (el más reciente)
+                    ' Obtenemos el ÚLTIMO movimiento (usando ID como desempate si las fechas son iguales)
                     Dim ultimoMov = doc.MovimientosDocumentos _
                                        .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                       .ThenByDescending(Function(m) m.Id) _ ' <<< ¡EL DESEMPATE CLAVE!
                                        .FirstOrDefault()
 
                     If ultimoMov IsNot Nothing Then
-                        ' Preparamos los textos para evitar errores de nulos
                         Dim destino As String = If(ultimoMov.Destino, "").Trim().ToUpper()
                         Dim obs As String = If(ultimoMov.Observaciones, "").Trim().ToUpper()
 
-                        ' CONDICIÓN 1: Físicamente enviado a Mesa
+                        ' Condición 1: Físicamente enviado a Mesa
                         Dim estaEnMesa As Boolean = (destino = "MESA DE ENTRADA")
 
-                        ' CONDICIÓN 2: Es una acción administrativa hecha en Mesa (Vinculación/Adjunto)
-                        ' Si lo último que se hizo fue vincularlo, significa que el papel lo tengo yo.
+                        ' Condición 2: Es una acción administrativa hecha en Mesa (Vinculación/Adjunto)
                         Dim esVinculacion As Boolean = (obs.Contains("VINCULADO") Or obs.Contains("SE VINCULÓ") Or obs.Contains("ADJUNTO"))
 
-                        ' Si cumple CUALQUIERA de las dos, está pendiente
                         If estaEnMesa Or esVinculacion Then
                             conteoPendientes += 1
                         End If
@@ -94,7 +91,6 @@ Public Class frmDashboard
 
             End Using
         Catch ex As Exception
-            ' En caso de error, mostramos guiones
             lblNumPendientes.Text = "-"
             lblNumPoblacion.Text = "-"
             lblNumLaboral.Text = "-"
