@@ -41,6 +41,12 @@ Public Class frmMesaEntrada
     Private Sub CargarMesa()
         Try
             Using db As New PoloNuevoEntities()
+                Dim idsVinculados As List(Of Integer) = db.DocumentoVinculos _
+                    .Select(Function(v) v.IdDocumentoPadre) _
+                    .Union(db.DocumentoVinculos.Select(Function(v) v.IdDocumentoHijo)) _
+                    .Distinct() _
+                    .ToList()
+
                 ' 1. CONSULTA BASE
                 Dim query = db.Documentos.Include("MovimientosDocumentos") _
                                          .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
@@ -50,8 +56,9 @@ Public Class frmMesaEntrada
                     query = query.Where(Function(d) d.MovimientosDocumentos _
                                             .OrderByDescending(Function(m) m.FechaMovimiento) _
                                             .ThenByDescending(Function(m) m.Id) _ ' <<< ¡EL DESEMPATE CLAVE!
-                                            .FirstOrDefault().Destino = "MESA DE ENTRADA" _
-                                            Or d.MovimientosDocumentos.OrderByDescending(Function(m) m.FechaMovimiento).ThenByDescending(Function(m) m.Id).FirstOrDefault().Observaciones.Contains("VINCULADO"))
+                                            .Select(Function(m) m.Destino) _
+                                            .FirstOrDefault() = "MESA DE ENTRADA" _
+                                            Or idsVinculados.Contains(d.Id))
                 End If
 
                 ' 3. Buscador Inteligente
@@ -91,10 +98,9 @@ Public Class frmMesaEntrada
 
                                                      If ultimoMov IsNot Nothing Then
                                                          Dim destino As String = If(ultimoMov.Destino, "").Trim().ToUpper()
-                                                         Dim obs As String = If(ultimoMov.Observaciones, "").Trim().ToUpper()
 
                                                          Dim enMesa As Boolean = (destino = "MESA DE ENTRADA")
-                                                         Dim esVinculo As Boolean = (obs.Contains("VINCULADO") Or obs.Contains("SE VINCULÓ") Or obs.Contains("ADJUNTO"))
+                                                         Dim esVinculo As Boolean = idsVinculados.Contains(d.Id)
 
                                                          If enMesa Or esVinculo Then
                                                              estadoFinal = "PENDIENTE"
@@ -343,10 +349,6 @@ Public Class frmMesaEntrada
 
     Private Sub CargarHistorial(idDoc As Integer)
         Using db As New PoloNuevoEntities()
-            Dim docActual = db.Documentos.Find(idDoc)
-            Dim referenciaDoc As String = ""
-            If docActual IsNot Nothing Then referenciaDoc = docActual.ReferenciaExterna
-
             ' A) MOVIMIENTOS PROPIOS
             Dim listaPropios = db.MovimientosDocumentos _
                                  .Where(Function(m) m.DocumentoId = idDoc) _
@@ -362,35 +364,29 @@ Public Class frmMesaEntrada
                                  }).ToList()
 
             ' B) VINCULACIONES EXTERNAS
-            If Not String.IsNullOrEmpty(referenciaDoc) Then
-                Dim textoBusqueda As String = "VINCULADO A: " & referenciaDoc
-                Dim qVinculos = db.MovimientosDocumentos _
-                                  .Include("Documentos").Include("Documentos.TiposDocumento") _
-                                  .Where(Function(m) m.DocumentoId <> idDoc AndAlso m.Observaciones.Contains(textoBusqueda)) _
-                                  .Select(Function(m) New With {
-                                      .IdMov = m.Id,
-                                      .Fecha = m.FechaMovimiento,
-                                      .Origen = "MESA DE ENTRADA",
-                                      .Destino = "MESA DE ENTRADA",
-                                      .EsSalida = False,
-                                      .Observaciones = "RESPUESTA/VÍNCULO RECIBIDO",
-                                      .EsVinculoExterno = True,
-                                      .RefHijo = m.Documentos.TiposDocumento.Nombre & " " & m.Documentos.ReferenciaExterna
-                                  }).ToList()
+            Dim hijos = db.DocumentoVinculos _
+                .Include("Documentos") _
+                .Include("Documentos.TiposDocumento") _
+                .Where(Function(v) v.IdDocumentoPadre = idDoc) _
+                .ToList()
 
-                For Each item In qVinculos
-                    listaPropios.Add(New With {
-                        .IdMov = item.IdMov,
-                        .Fecha = item.Fecha,
-                        .Origen = item.Origen,
-                        .Destino = item.Destino,
-                        .EsSalida = item.EsSalida,
-                        .Observaciones = item.Observaciones,
-                        .EsVinculoExterno = True,
-                        .RefHijo = item.RefHijo
-                    })
-                Next
-            End If
+            For Each v In hijos
+                Dim hijo = v.Documentos
+                Dim fechaEvento As DateTime = If(v.FechaVinculo.HasValue, v.FechaVinculo.Value, If(hijo IsNot Nothing AndAlso hijo.FechaCarga.HasValue, hijo.FechaCarga.Value, DateTime.Now))
+                Dim tipoHijo As String = If(hijo IsNot Nothing AndAlso hijo.TiposDocumento IsNot Nothing, hijo.TiposDocumento.Nombre, "DOCUMENTO")
+                Dim referenciaHijo As String = If(hijo IsNot Nothing, hijo.ReferenciaExterna, "SIN REFERENCIA")
+
+                listaPropios.Add(New With {
+                    .IdMov = 0,
+                    .Fecha = fechaEvento,
+                    .Origen = "MESA DE ENTRADA",
+                    .Destino = "MESA DE ENTRADA",
+                    .EsSalida = False,
+                    .Observaciones = "RESPUESTA/VÍNCULO RECIBIDO",
+                    .EsVinculoExterno = True,
+                    .RefHijo = tipoHijo & " " & referenciaHijo
+                })
+            Next
 
             ' C) UNIFICACIÓN
             Dim historialFinal = listaPropios.OrderBy(Function(x) x.Fecha).Select(Function(x) New With {
