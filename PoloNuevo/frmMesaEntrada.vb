@@ -210,6 +210,11 @@ Public Class frmMesaEntrada
             Return
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        Dim ubicacionActual As String = ""
+        If Not DocumentoEnMesaDeEntrada(idDoc, ubicacionActual) Then
+            MessageBox.Show($"No es posible actuar porque el documento se encuentra en {ubicacionActual}.", "Documento fuera de oficina", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
         If DocumentoTienePadre(idDoc) Then
             Dim idPadreSupremo As Integer = 0
             Dim ubicacionPadre As String = ""
@@ -474,6 +479,28 @@ Public Class frmMesaEntrada
             End If
 
             Return ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+        End Using
+    End Function
+
+    Private Function DocumentoEnMesaDeEntrada(idDoc As Integer, ByRef ubicacionActual As String) As Boolean
+        Using db As New PoloNuevoEntities()
+            Dim doc = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idDoc)
+            If doc Is Nothing Then
+                ubicacionActual = "MESA DE ENTRADA"
+                Return True
+            End If
+
+            Dim ultimoMov = doc.MovimientosDocumentos _
+                .OrderByDescending(Function(m) m.FechaMovimiento) _
+                .ThenByDescending(Function(m) m.Id) _
+                .FirstOrDefault()
+
+            ubicacionActual = "MESA DE ENTRADA"
+            If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
+                ubicacionActual = ultimoMov.Destino.Trim()
+            End If
+
+            Return ubicacionActual.Trim().ToUpper() = "MESA DE ENTRADA"
         End Using
     End Function
 
