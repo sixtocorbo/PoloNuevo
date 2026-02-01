@@ -27,6 +27,8 @@ Public Class frmReportesDocumentos
         dgvResultados.DataSource = Nothing
 
         Try
+            Me.Cursor = Cursors.WaitCursor
+
             Select Case cmbTipoReporte.SelectedIndex
                 Case 0 : ReporteEntradas(fDesde, fHasta)
                 Case 1 : ReporteSalidas(fDesde, fHasta)
@@ -40,18 +42,19 @@ Public Class frmReportesDocumentos
 
         Catch ex As Exception
             MessageBox.Show("Error al generar reporte: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            Me.Cursor = Cursors.Default
         End Try
     End Sub
 
     ' =========================================================
-    ' 1. LIBRO DE ENTRADAS (CORREGIDO: ToString fuera de LINQ)
+    ' 1. LIBRO DE ENTRADAS
     ' =========================================================
     Private Sub ReporteEntradas(desde As DateTime, hasta As DateTime)
         Using db As New PoloNuevoEntities()
-            ' ETAPA 1: Traer datos crudos de la BD (SQL)
-            ' NOTA: No usamos ToString() aquí adentro para evitar el error de Entity Framework
+            ' NOTA: Se eliminó el filtro .phy para que traiga TODO (Digital y Físico)
             Dim datosCrudos = db.Documentos _
-                          .Where(Function(d) d.Extension = ".phy" And d.FechaCarga >= desde And d.FechaCarga <= hasta) _
+                          .Where(Function(d) d.FechaCarga >= desde And d.FechaCarga <= hasta) _
                           .OrderBy(Function(d) d.FechaCarga) _
                           .Select(Function(d) New With {
                               .ID = d.Id,
@@ -63,16 +66,16 @@ Public Class frmReportesDocumentos
                                            d.MovimientosDocumentos.OrderBy(Function(m) m.FechaMovimiento).FirstOrDefault().Origen,
                                            "Inicio (S/D)")
                           }) _
-                          .ToList() ' <--- Aquí se ejecuta el SQL y se traen los datos a memoria
+                          .ToList()
 
-            ' ETAPA 2: Formatear en memoria (VB.NET)
+            ' Formateo en memoria
             Dim listaFinal = datosCrudos.Select(Function(x) New With {
-                              .Fecha = If(x.FechaRaw.HasValue, x.FechaRaw.Value.ToString("dd/MM/yyyy HH:mm"), ""),
-                              .Tipo = x.Tipo,
-                              .Numero = x.Numero,
-                              .Asunto = x.Asunto,
-                              .Origen = x.Origen
-                          }).ToList()
+                                      .Fecha = If(x.FechaRaw.HasValue, x.FechaRaw.Value.ToString("dd/MM/yyyy HH:mm"), ""),
+                                      .Tipo = x.Tipo,
+                                      .Numero = x.Numero,
+                                      .Asunto = x.Asunto,
+                                      .Origen = x.Origen
+                                  }).ToList()
 
             dgvResultados.DataSource = listaFinal
         End Using
@@ -84,10 +87,9 @@ Public Class frmReportesDocumentos
     ' =========================================================
     Private Sub ReporteSalidas(desde As DateTime, hasta As DateTime)
         Using db As New PoloNuevoEntities()
-            ' ETAPA 1: SQL
+            ' Se eliminó el filtro .phy
             Dim datosCrudos = db.MovimientosDocumentos _
                           .Where(Function(m) m.EsSalida = True _
-                                             And m.Documentos.Extension = ".phy" _
                                              And m.FechaMovimiento >= desde And m.FechaMovimiento <= hasta) _
                           .OrderBy(Function(m) m.FechaMovimiento) _
                           .Select(Function(m) New With {
@@ -99,14 +101,13 @@ Public Class frmReportesDocumentos
                           }) _
                           .ToList()
 
-            ' ETAPA 2: Memoria
             Dim listaFinal = datosCrudos.Select(Function(x) New With {
-                              .Fecha_Salida = x.FechaRaw.ToString("dd/MM/yyyy HH:mm"),
-                              .Tipo = x.Tipo,
-                              .Numero = x.Numero,
-                              .Destino = x.Destino,
-                              .Detalle_Salida = If(x.Observaciones Is Nothing, "", x.Observaciones)
-                          }).ToList()
+                                      .Fecha_Salida = x.FechaRaw.ToString("dd/MM/yyyy HH:mm"),
+                                      .Tipo = x.Tipo,
+                                      .Numero = x.Numero,
+                                      .Destino = x.Destino,
+                                      .Detalle_Salida = If(x.Observaciones Is Nothing, "", x.Observaciones)
+                                  }).ToList()
 
             dgvResultados.DataSource = listaFinal
         End Using
@@ -118,14 +119,14 @@ Public Class frmReportesDocumentos
     ' =========================================================
     Private Sub ReportePendientes(desde As DateTime, hasta As DateTime)
         Using db As New PoloNuevoEntities()
-            ' ETAPA 1: Traer documentos candidatos
+            ' Se eliminó el filtro .phy
             Dim queryDocs = db.Documentos _
-                              .Where(Function(d) d.Extension = ".phy" And d.FechaCarga >= desde And d.FechaCarga <= hasta) _
+                              .Where(Function(d) d.FechaCarga >= desde And d.FechaCarga <= hasta) _
                               .Include("MovimientosDocumentos") _
                               .Include("TiposDocumento") _
                               .ToList()
 
-            ' ETAPA 2: Lógica compleja en memoria (Aquí no falla LINQ)
+            ' Lógica: El último movimiento NO debe ser salida.
             Dim pendientes = queryDocs.Select(Function(d) New With {
                                     .Doc = d,
                                     .UltimoMov = d.MovimientosDocumentos.OrderByDescending(Function(m) m.FechaMovimiento).FirstOrDefault()
@@ -152,8 +153,9 @@ Public Class frmReportesDocumentos
     ' =========================================================
     Private Sub ReporteEstadisticas(desde As DateTime, hasta As DateTime)
         Using db As New PoloNuevoEntities()
+            ' Se eliminó el filtro .phy
             Dim lista = db.Documentos _
-                          .Where(Function(d) d.Extension = ".phy" And d.FechaCarga >= desde And d.FechaCarga <= hasta) _
+                          .Where(Function(d) d.FechaCarga >= desde And d.FechaCarga <= hasta) _
                           .GroupBy(Function(d) d.TiposDocumento.Nombre) _
                           .Select(Function(g) New With {
                               .Tipo_Documento = g.Key,

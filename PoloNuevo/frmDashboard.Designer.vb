@@ -21,14 +21,15 @@ Partial Class frmDashboard
         Me.lblNumPendientes = New System.Windows.Forms.Label()
         Me.lblTitPendientes = New System.Windows.Forms.Label()
         Me.pnlPoblacion = New System.Windows.Forms.Panel()
-        Me.lblNumPoblacion = New System.Windows.Forms.Label()
-        Me.lblTitPoblacion = New System.Windows.Forms.Label()
+        Me.lblNumActivos = New System.Windows.Forms.Label()
+        Me.lblTitActivos = New System.Windows.Forms.Label()
         Me.pnlLaboral = New System.Windows.Forms.Panel()
-        Me.lblNumLaboral = New System.Windows.Forms.Label()
-        Me.lblTitLaboral = New System.Windows.Forms.Label()
+        Me.lblNumSalidas = New System.Windows.Forms.Label()
+        Me.lblTitSalidas = New System.Windows.Forms.Label()
         Me.grpUltimos = New System.Windows.Forms.GroupBox()
         Me.dgvUltimos = New System.Windows.Forms.DataGridView()
         Me.lblBienvenida = New System.Windows.Forms.Label()
+        Me.btnActualizar = New System.Windows.Forms.Button()
         Me.pnlPendientes.SuspendLayout()
         Me.pnlPoblacion.SuspendLayout()
         Me.pnlLaboral.SuspendLayout()
@@ -64,73 +65,73 @@ Partial Class frmDashboard
         Me.lblTitPendientes.ForeColor = System.Drawing.Color.WhiteSmoke
         Me.lblTitPendientes.Location = New System.Drawing.Point(20, 15)
         Me.lblTitPendientes.Name = "lblTitPendientes"
-        Me.lblTitPendientes.Size = New System.Drawing.Size(130, 21)
+        Me.lblTitPendientes.Size = New System.Drawing.Size(163, 21)
         Me.lblTitPendientes.TabIndex = 0
-        Me.lblTitPendientes.Text = "DOCS. PENDIENTES"
+        Me.lblTitPendientes.Text = "EN MESA DE ENTRADA"
         '
-        'pnlPoblacion (AZUL - INFO)
+        'pnlPoblacion (AZUL - INFO) -> AHORA ES DOCS ACTIVOS
         '
         Me.pnlPoblacion.BackColor = System.Drawing.Color.SteelBlue
-        Me.pnlPoblacion.Controls.Add(Me.lblNumPoblacion)
-        Me.pnlPoblacion.Controls.Add(Me.lblTitPoblacion)
+        Me.pnlPoblacion.Controls.Add(Me.lblNumActivos)
+        Me.pnlPoblacion.Controls.Add(Me.lblTitActivos)
         Me.pnlPoblacion.Location = New System.Drawing.Point(310, 60)
         Me.pnlPoblacion.Name = "pnlPoblacion"
         Me.pnlPoblacion.Size = New System.Drawing.Size(250, 120)
         Me.pnlPoblacion.TabIndex = 1
         '
-        'lblNumPoblacion
+        'lblNumActivos
         '
-        Me.lblNumPoblacion.AutoSize = True
-        Me.lblNumPoblacion.Font = New System.Drawing.Font("Segoe UI", 36.0!, System.Drawing.FontStyle.Bold)
-        Me.lblNumPoblacion.ForeColor = System.Drawing.Color.White
-        Me.lblNumPoblacion.Location = New System.Drawing.Point(20, 40)
-        Me.lblNumPoblacion.Name = "lblNumPoblacion"
-        Me.lblNumPoblacion.Size = New System.Drawing.Size(56, 65)
-        Me.lblNumPoblacion.TabIndex = 1
-        Me.lblNumPoblacion.Text = "0"
+        Me.lblNumActivos.AutoSize = True
+        Me.lblNumActivos.Font = New System.Drawing.Font("Segoe UI", 36.0!, System.Drawing.FontStyle.Bold)
+        Me.lblNumActivos.ForeColor = System.Drawing.Color.White
+        Me.lblNumActivos.Location = New System.Drawing.Point(20, 40)
+        Me.lblNumActivos.Name = "lblNumActivos"
+        Me.lblNumActivos.Size = New System.Drawing.Size(56, 65)
+        Me.lblNumActivos.TabIndex = 1
+        Me.lblNumActivos.Text = "0"
         '
-        'lblTitPoblacion
+        'lblTitActivos
         '
-        Me.lblTitPoblacion.AutoSize = True
-        Me.lblTitPoblacion.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTitPoblacion.ForeColor = System.Drawing.Color.WhiteSmoke
-        Me.lblTitPoblacion.Location = New System.Drawing.Point(20, 15)
-        Me.lblTitPoblacion.Name = "lblTitPoblacion"
-        Me.lblTitPoblacion.Size = New System.Drawing.Size(155, 21)
-        Me.lblTitPoblacion.TabIndex = 0
-        Me.lblTitPoblacion.Text = "POBLACIÓN TOTAL"
+        Me.lblTitActivos.AutoSize = True
+        Me.lblTitActivos.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.lblTitActivos.ForeColor = System.Drawing.Color.WhiteSmoke
+        Me.lblTitActivos.Location = New System.Drawing.Point(20, 15)
+        Me.lblTitActivos.Name = "lblTitActivos"
+        Me.lblTitActivos.Size = New System.Drawing.Size(131, 21)
+        Me.lblTitActivos.TabIndex = 0
+        Me.lblTitActivos.Text = "DOCS. EN TRÁMITE"
         '
-        'pnlLaboral (VERDE - POSITIVO)
+        'pnlLaboral (VERDE) -> AHORA ES SALIDAS DEL DÍA
         '
         Me.pnlLaboral.BackColor = System.Drawing.Color.SeaGreen
-        Me.pnlLaboral.Controls.Add(Me.lblNumLaboral)
-        Me.pnlLaboral.Controls.Add(Me.lblTitLaboral)
+        Me.pnlLaboral.Controls.Add(Me.lblNumSalidas)
+        Me.pnlLaboral.Controls.Add(Me.lblTitSalidas)
         Me.pnlLaboral.Location = New System.Drawing.Point(590, 60)
         Me.pnlLaboral.Name = "pnlLaboral"
         Me.pnlLaboral.Size = New System.Drawing.Size(250, 120)
         Me.pnlLaboral.TabIndex = 2
         '
-        'lblNumLaboral
+        'lblNumSalidas
         '
-        Me.lblNumLaboral.AutoSize = True
-        Me.lblNumLaboral.Font = New System.Drawing.Font("Segoe UI", 36.0!, System.Drawing.FontStyle.Bold)
-        Me.lblNumLaboral.ForeColor = System.Drawing.Color.White
-        Me.lblNumLaboral.Location = New System.Drawing.Point(20, 40)
-        Me.lblNumLaboral.Name = "lblNumLaboral"
-        Me.lblNumLaboral.Size = New System.Drawing.Size(56, 65)
-        Me.lblNumLaboral.TabIndex = 1
-        Me.lblNumLaboral.Text = "0"
+        Me.lblNumSalidas.AutoSize = True
+        Me.lblNumSalidas.Font = New System.Drawing.Font("Segoe UI", 36.0!, System.Drawing.FontStyle.Bold)
+        Me.lblNumSalidas.ForeColor = System.Drawing.Color.White
+        Me.lblNumSalidas.Location = New System.Drawing.Point(20, 40)
+        Me.lblNumSalidas.Name = "lblNumSalidas"
+        Me.lblNumSalidas.Size = New System.Drawing.Size(56, 65)
+        Me.lblNumSalidas.TabIndex = 1
+        Me.lblNumSalidas.Text = "0"
         '
-        'lblTitLaboral
+        'lblTitSalidas
         '
-        Me.lblTitLaboral.AutoSize = True
-        Me.lblTitLaboral.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTitLaboral.ForeColor = System.Drawing.Color.WhiteSmoke
-        Me.lblTitLaboral.Location = New System.Drawing.Point(20, 15)
-        Me.lblTitLaboral.Name = "lblTitLaboral"
-        Me.lblTitLaboral.Size = New System.Drawing.Size(120, 21)
-        Me.lblTitLaboral.TabIndex = 0
-        Me.lblTitLaboral.Text = "TRABAJANDO"
+        Me.lblTitSalidas.AutoSize = True
+        Me.lblTitSalidas.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.lblTitSalidas.ForeColor = System.Drawing.Color.WhiteSmoke
+        Me.lblTitSalidas.Location = New System.Drawing.Point(20, 15)
+        Me.lblTitSalidas.Name = "lblTitSalidas"
+        Me.lblTitSalidas.Size = New System.Drawing.Size(142, 21)
+        Me.lblTitSalidas.TabIndex = 0
+        Me.lblTitSalidas.Text = "SALIDAS DEL DÍA"
         '
         'grpUltimos
         '
@@ -144,7 +145,7 @@ Partial Class frmDashboard
         Me.grpUltimos.Size = New System.Drawing.Size(810, 300)
         Me.grpUltimos.TabIndex = 3
         Me.grpUltimos.TabStop = False
-        Me.grpUltimos.Text = "Últimos Movimientos en Mesa de Entrada"
+        Me.grpUltimos.Text = "Últimos Movimientos en el Sistema"
         '
         'dgvUltimos
         '
@@ -170,7 +171,17 @@ Partial Class frmDashboard
         Me.lblBienvenida.Name = "lblBienvenida"
         Me.lblBienvenida.Size = New System.Drawing.Size(264, 37)
         Me.lblBienvenida.TabIndex = 4
-        Me.lblBienvenida.Text = "Resumen de Situación"
+        Me.lblBienvenida.Text = "Tablero de Control"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnActualizar.Location = New System.Drawing.Point(740, 25)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(100, 30)
+        Me.btnActualizar.TabIndex = 5
+        Me.btnActualizar.Text = "Actualizar"
+        Me.btnActualizar.UseVisualStyleBackColor = True
         '
         'frmDashboard
         '
@@ -178,6 +189,7 @@ Partial Class frmDashboard
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(884, 561)
+        Me.Controls.Add(Me.btnActualizar)
         Me.Controls.Add(Me.lblBienvenida)
         Me.Controls.Add(Me.grpUltimos)
         Me.Controls.Add(Me.pnlLaboral)
@@ -202,12 +214,13 @@ Partial Class frmDashboard
     Friend WithEvents lblNumPendientes As System.Windows.Forms.Label
     Friend WithEvents lblTitPendientes As System.Windows.Forms.Label
     Friend WithEvents pnlPoblacion As System.Windows.Forms.Panel
-    Friend WithEvents lblNumPoblacion As System.Windows.Forms.Label
-    Friend WithEvents lblTitPoblacion As System.Windows.Forms.Label
+    Friend WithEvents lblNumActivos As System.Windows.Forms.Label
+    Friend WithEvents lblTitActivos As System.Windows.Forms.Label
     Friend WithEvents pnlLaboral As System.Windows.Forms.Panel
-    Friend WithEvents lblNumLaboral As System.Windows.Forms.Label
-    Friend WithEvents lblTitLaboral As System.Windows.Forms.Label
+    Friend WithEvents lblNumSalidas As System.Windows.Forms.Label
+    Friend WithEvents lblTitSalidas As System.Windows.Forms.Label
     Friend WithEvents grpUltimos As System.Windows.Forms.GroupBox
     Friend WithEvents dgvUltimos As System.Windows.Forms.DataGridView
     Friend WithEvents lblBienvenida As System.Windows.Forms.Label
+    Friend WithEvents btnActualizar As System.Windows.Forms.Button
 End Class

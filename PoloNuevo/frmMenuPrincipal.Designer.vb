@@ -159,7 +159,7 @@ Partial Class frmMenuPrincipal
         '
         Me.lblEstado.Name = "lblEstado"
         Me.lblEstado.Size = New System.Drawing.Size(376, 25)
-        Me.lblEstado.Text = "Sistema de Gestión Penitenciaria Polo - v.2026"
+        Me.lblEstado.Text = "Sistema de Gestión Documental Polo - v.2026"
         '
         'lblUsuarioConectado
         '
@@ -181,7 +181,7 @@ Partial Class frmMenuPrincipal
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmMenuPrincipal"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Sistema POLO - Gestión Integral"
+        Me.Text = "Sistema POLO - Gestión Documental"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
@@ -202,10 +202,8 @@ Partial Class frmMenuPrincipal
     Friend WithEvents AuditoriaToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ConfiguracionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents RangosToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    ' --- SEGURIDAD ---
     Friend WithEvents SeguridadToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnGestionUsuarios As System.Windows.Forms.ToolStripMenuItem
-    ' -----------------
     Friend WithEvents VentanasToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CerrarTodasToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip

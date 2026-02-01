@@ -10,90 +10,106 @@ Public Class frmDashboard
     End Sub
 
     Private Sub frmDashboard_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+        ' Recargar al volver al dashboard para ver cambios recientes
+        CargarIndicadores()
+        CargarUltimosMovimientos()
+    End Sub
+
+    Private Sub btnActualizar_Click(sender As Object, e As EventArgs) Handles btnActualizar.Click
         CargarIndicadores()
         CargarUltimosMovimientos()
     End Sub
 
     Private Sub ConfigurarTitulos()
-        lblTitPendientes.Text = "EN MESA DE ENTRADA"
-        lblTitPoblacion.Text = "INGRESADOS HOY"
+        ' Panel Rojo
+        lblTitPendientes.Text = "PENDIENTES EN MESA"
+
+        ' Panel Azul (Antes Población, ahora Ingresos del día)
+        lblTitActivos.Text = "INGRESADOS HOY"
         pnlPoblacion.BackColor = Color.SteelBlue
 
-        lblTitLaboral.Text = "SALIDAS / PASES HOY"
+        ' Panel Verde (Antes Laboral, ahora Salidas)
+        lblTitSalidas.Text = "SALIDAS / PASES HOY"
         pnlLaboral.BackColor = Color.SeaGreen
     End Sub
 
     Private Sub CargarIndicadores()
         Try
+            Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
                 Dim hoy As Date = DateTime.Today
                 Dim manana As Date = hoy.AddDays(1)
 
                 ' =========================================================
-                ' 1. LÓGICA DE PENDIENTES (CORREGIDA - CONTEO FÍSICO REAL)
+                ' 1. LÓGICA DE PENDIENTES (Documentos físicamente en Mesa)
                 ' =========================================================
-                ' Obtenemos todos los documentos activos
+                ' Traemos todos los documentos activos con sus movimientos
                 Dim listaDocs = db.Documentos _
                                   .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO") _
                                   .Include("MovimientosDocumentos") _
                                   .ToList()
 
-                ' Obtenemos solo el último movimiento de cada uno para ver dónde están
-                Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(listaDocs)
-
                 Dim conteoPendientes As Integer = 0
 
                 For Each doc In listaDocs
-                    Dim ultimoMov As MovimientosDocumentos = Nothing
+                    ' Buscamos el último movimiento de cada documento
+                    Dim ultimoMov = doc.MovimientosDocumentos _
+                                       .OrderByDescending(Function(m) m.FechaMovimiento) _
+                                       .ThenByDescending(Function(m) m.Id) _
+                                       .FirstOrDefault()
 
-                    ' Si tiene movimientos, revisamos el destino del último.
-                    ' Si NO tiene movimientos, asumimos que acaba de nacer en MESA DE ENTRADA.
                     Dim ubicacionActual As String = "MESA DE ENTRADA"
 
-                    If ultimosMovimientos.TryGetValue(doc.Id, ultimoMov) Then
-                        If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
-                            ubicacionActual = ultimoMov.Destino
-                        End If
+                    ' Si tiene movimientos, tomamos el destino del último
+                    If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
+                        ubicacionActual = ultimoMov.Destino.Trim().ToUpper()
                     End If
 
-                    ' Si la ubicación es Mesa, suma al contador
-                    If ubicacionActual.Trim().ToUpper() = "MESA DE ENTRADA" Then
+                    ' Si la ubicación actual es MESA DE ENTRADA, suma al contador
+                    If ubicacionActual = "MESA DE ENTRADA" Then
                         conteoPendientes += 1
                     End If
                 Next
 
                 lblNumPendientes.Text = conteoPendientes.ToString()
 
-                ' Alerta visual
+                ' Alerta visual si se acumulan muchos papeles
                 If conteoPendientes > 15 Then
-                    pnlPendientes.BackColor = Color.Firebrick
+                    pnlPendientes.BackColor = Color.Firebrick ' Rojo oscuro alarma
                 Else
-                    pnlPendientes.BackColor = Color.IndianRed
+                    pnlPendientes.BackColor = Color.IndianRed ' Rojo suave normal
                 End If
 
                 ' =========================================================
-                ' 2. INGRESOS DEL DÍA
+                ' 2. INGRESOS DEL DÍA (Panel Azul)
                 ' =========================================================
                 Dim ingresosHoy = db.Documentos _
                                     .Where(Function(d) d.FechaCarga >= hoy And d.FechaCarga < manana) _
                                     .Count()
-                lblNumPoblacion.Text = ingresosHoy.ToString()
+
+                ' Usamos lblNumActivos porque así se llama en el Designer que pasaste
+                lblNumActivos.Text = ingresosHoy.ToString()
 
                 ' =========================================================
-                ' 3. SALIDAS / PASES DEL DÍA
+                ' 3. SALIDAS / PASES DEL DÍA (Panel Verde)
                 ' =========================================================
                 Dim salidasHoy = db.MovimientosDocumentos _
                                    .Where(Function(m) m.EsSalida = True And
-                                                     m.FechaMovimiento >= hoy And
-                                                     m.FechaMovimiento < manana) _
+                                                      m.FechaMovimiento >= hoy And
+                                                      m.FechaMovimiento < manana) _
                                    .Count()
-                lblNumLaboral.Text = salidasHoy.ToString()
+
+                ' Usamos lblNumSalidas porque así se llama en el Designer que pasaste
+                lblNumSalidas.Text = salidasHoy.ToString()
 
             End Using
         Catch ex As Exception
+            ' En caso de error (ej: base de datos desconectada), mostramos guiones
             lblNumPendientes.Text = "-"
-            lblNumPoblacion.Text = "-"
-            lblNumLaboral.Text = "-"
+            lblNumActivos.Text = "-"
+            lblNumSalidas.Text = "-"
+        Finally
+            Me.Cursor = Cursors.Default
         End Try
     End Sub
 
@@ -108,7 +124,7 @@ Public Class frmDashboard
                               .Select(Function(m) New With {
                                   .Fecha = m.FechaMovimiento.ToString("HH:mm"),
                                   .Referencia = m.Documentos.TiposDocumento.Nombre & " " & m.Documentos.ReferenciaExterna,
-                                  .Accion = If(m.Origen = "SISTEMA", "✨ NUEVO", If(m.EsSalida, "📤 SALIDA", "📥 ENTRADA")),
+                                  .Accion = If(m.Origen = "SISTEMA" Or m.Origen = "CARGA MANUAL", "✨ NUEVO", If(m.EsSalida, "📤 SALIDA", "📥 ENTRADA")),
                                   .Detalle = If(m.EsSalida, "-> " & m.Destino, "<- " & m.Origen),
                                   .Obs = m.Observaciones
                               }) _
@@ -118,6 +134,7 @@ Public Class frmDashboard
                 ConfigurarGrilla()
             End Using
         Catch ex As Exception
+            ' Fallo silencioso en la grilla para no interrumpir el dashboard
         End Try
     End Sub
 
@@ -126,6 +143,7 @@ Public Class frmDashboard
         With dgvUltimos
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             .RowHeadersVisible = False
+
             If .Columns("Fecha") IsNot Nothing Then
                 .Columns("Fecha").Width = 60
                 .Columns("Fecha").HeaderText = "Hora"
@@ -138,6 +156,7 @@ Public Class frmDashboard
             If .Columns("Accion") IsNot Nothing Then
                 .Columns("Accion").Width = 90
                 .Columns("Accion").HeaderText = "Acción"
+                .Columns("Accion").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
             End If
             If .Columns("Detalle") IsNot Nothing Then
                 .Columns("Detalle").Width = 180

@@ -29,10 +29,6 @@ Partial Class frmNuevoIngreso
         Me.lstSugerenciasOrigen = New System.Windows.Forms.ListBox()
         Me.lblAsunto = New System.Windows.Forms.Label()
         Me.txtAsunto = New System.Windows.Forms.TextBox()
-        Me.grpVinculacion = New System.Windows.Forms.GroupBox()
-        Me.lstReclusos = New System.Windows.Forms.ListBox()
-        Me.txtBuscarRecluso = New System.Windows.Forms.TextBox()
-        Me.chkVincular = New System.Windows.Forms.CheckBox()
         Me.grpArchivo = New System.Windows.Forms.GroupBox()
         Me.lblArchivoNombre = New System.Windows.Forms.Label()
         Me.btnAdjuntar = New System.Windows.Forms.Button()
@@ -46,7 +42,6 @@ Partial Class frmNuevoIngreso
         Me.chkEsRespuesta = New System.Windows.Forms.CheckBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.pnlTop.SuspendLayout()
-        Me.grpVinculacion.SuspendLayout()
         Me.grpArchivo.SuspendLayout()
         Me.grpRelacion.SuspendLayout()
         Me.SuspendLayout()
@@ -159,61 +154,11 @@ Partial Class frmNuevoIngreso
         Me.txtAsunto.Size = New System.Drawing.Size(616, 90)
         Me.txtAsunto.TabIndex = 8
         '
-        'grpVinculacion
-        '
-        Me.grpVinculacion.Controls.Add(Me.lstReclusos)
-        Me.grpVinculacion.Controls.Add(Me.txtBuscarRecluso)
-        Me.grpVinculacion.Controls.Add(Me.chkVincular)
-        Me.grpVinculacion.Location = New System.Drawing.Point(59, 551)
-        Me.grpVinculacion.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Name = "grpVinculacion"
-        Me.grpVinculacion.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.grpVinculacion.Size = New System.Drawing.Size(619, 246)
-        Me.grpVinculacion.TabIndex = 11
-        Me.grpVinculacion.TabStop = False
-        Me.grpVinculacion.Text = "Asociación"
-        '
-        'lstReclusos
-        '
-        Me.lstReclusos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstReclusos.Enabled = False
-        Me.lstReclusos.FormattingEnabled = True
-        Me.lstReclusos.ItemHeight = 20
-        Me.lstReclusos.Location = New System.Drawing.Point(33, 138)
-        Me.lstReclusos.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.lstReclusos.Name = "lstReclusos"
-        Me.lstReclusos.Size = New System.Drawing.Size(534, 84)
-        Me.lstReclusos.TabIndex = 2
-        '
-        'txtBuscarRecluso
-        '
-        Me.txtBuscarRecluso.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtBuscarRecluso.Enabled = False
-        Me.txtBuscarRecluso.Location = New System.Drawing.Point(33, 92)
-        Me.txtBuscarRecluso.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.txtBuscarRecluso.Name = "txtBuscarRecluso"
-        Me.txtBuscarRecluso.Size = New System.Drawing.Size(534, 26)
-        Me.txtBuscarRecluso.TabIndex = 1
-        '
-        'chkVincular
-        '
-        Me.chkVincular.AutoSize = True
-        Me.chkVincular.Location = New System.Drawing.Point(33, 46)
-        Me.chkVincular.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.chkVincular.Name = "chkVincular"
-        Me.chkVincular.Size = New System.Drawing.Size(185, 24)
-        Me.chkVincular.TabIndex = 0
-        Me.chkVincular.Text = "¿Vincular a Recluso?"
-        Me.chkVincular.UseVisualStyleBackColor = True
-        '
         'grpArchivo
         '
         Me.grpArchivo.Controls.Add(Me.lblArchivoNombre)
         Me.grpArchivo.Controls.Add(Me.btnAdjuntar)
-        Me.grpArchivo.Location = New System.Drawing.Point(60, 807)
+        Me.grpArchivo.Location = New System.Drawing.Point(61, 560)
         Me.grpArchivo.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grpArchivo.Name = "grpArchivo"
         Me.grpArchivo.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -249,7 +194,7 @@ Partial Class frmNuevoIngreso
         Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGuardar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.btnGuardar.ForeColor = System.Drawing.Color.White
-        Me.btnGuardar.Location = New System.Drawing.Point(316, 917)
+        Me.btnGuardar.Location = New System.Drawing.Point(316, 685)
         Me.btnGuardar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnGuardar.Name = "btnGuardar"
         Me.btnGuardar.Size = New System.Drawing.Size(364, 85)
@@ -259,7 +204,7 @@ Partial Class frmNuevoIngreso
         '
         'btnCancelar
         '
-        Me.btnCancelar.Location = New System.Drawing.Point(60, 917)
+        Me.btnCancelar.Location = New System.Drawing.Point(60, 685)
         Me.btnCancelar.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCancelar.Name = "btnCancelar"
         Me.btnCancelar.Size = New System.Drawing.Size(247, 85)
@@ -337,13 +282,12 @@ Partial Class frmNuevoIngreso
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(685, 1050)
+        Me.ClientSize = New System.Drawing.Size(685, 800)
         Me.Controls.Add(Me.lstSugerenciasOrigen)
         Me.Controls.Add(Me.grpRelacion)
         Me.Controls.Add(Me.btnCancelar)
         Me.Controls.Add(Me.btnGuardar)
         Me.Controls.Add(Me.grpArchivo)
-        Me.Controls.Add(Me.grpVinculacion)
         Me.Controls.Add(Me.dtpVencimiento)
         Me.Controls.Add(Me.chkVencimiento)
         Me.Controls.Add(Me.txtAsunto)
@@ -363,8 +307,6 @@ Partial Class frmNuevoIngreso
         Me.Text = "Gestión de Ingreso"
         Me.pnlTop.ResumeLayout(False)
         Me.pnlTop.PerformLayout()
-        Me.grpVinculacion.ResumeLayout(False)
-        Me.grpVinculacion.PerformLayout()
         Me.grpArchivo.ResumeLayout(False)
         Me.grpArchivo.PerformLayout()
         Me.grpRelacion.ResumeLayout(False)
@@ -385,10 +327,6 @@ Partial Class frmNuevoIngreso
     Friend WithEvents lstSugerenciasOrigen As System.Windows.Forms.ListBox
     Friend WithEvents lblAsunto As System.Windows.Forms.Label
     Friend WithEvents txtAsunto As System.Windows.Forms.TextBox
-    Friend WithEvents grpVinculacion As System.Windows.Forms.GroupBox
-    Friend WithEvents chkVincular As System.Windows.Forms.CheckBox
-    Friend WithEvents txtBuscarRecluso As System.Windows.Forms.TextBox
-    Friend WithEvents lstReclusos As System.Windows.Forms.ListBox
     Friend WithEvents grpArchivo As System.Windows.Forms.GroupBox
     Friend WithEvents btnAdjuntar As System.Windows.Forms.Button
     Friend WithEvents lblArchivoNombre As System.Windows.Forms.Label
