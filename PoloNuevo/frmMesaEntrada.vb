@@ -219,7 +219,7 @@ Public Class frmMesaEntrada
             If Not String.IsNullOrWhiteSpace(asunto) Then
                 detalleDocumento = $"{detalleDocumento} ({asunto})"
             End If
-            MessageBox.Show($"No es posible actuar porque el documento {detalleDocumento} se encuentra localizado en {ubicacionActual}.", "Documento fuera de oficina", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show($"No es posible actuar porque el {detalleDocumento} se encuentra localizado en {ubicacionActual}.", "Documento fuera de oficina", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
         If DocumentoTienePadre(idDoc) Then
