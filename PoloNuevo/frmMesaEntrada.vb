@@ -222,7 +222,8 @@ Public Class frmMesaEntrada
             Return
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-        Dim frm As New frmNuevoPase(idDoc)
+        Dim idDocPase As Integer = ObtenerDocumentoPase(idDoc)
+        Dim frm As New frmNuevoPase(idDocPase)
         If frm.ShowDialog() = DialogResult.OK Then
             CargarMesa()
             CargarHistorial(idDoc)
@@ -419,6 +420,26 @@ Public Class frmMesaEntrada
             Next
         End Using
     End Sub
+
+    Private Function ObtenerDocumentoPase(idDoc As Integer) As Integer
+        Using db As New PoloNuevoEntities()
+            Dim ultimoVinculo = db.DocumentoVinculos _
+                .Include("Documentos") _
+                .Where(Function(v) v.IdDocumentoPadre = idDoc) _
+                .OrderByDescending(Function(v) If(v.FechaVinculo.HasValue,
+                                                 v.FechaVinculo.Value,
+                                                 If(v.Documentos IsNot Nothing AndAlso v.Documentos.FechaCarga.HasValue,
+                                                    v.Documentos.FechaCarga.Value,
+                                                    DateTime.MinValue))) _
+                .FirstOrDefault()
+
+            If ultimoVinculo IsNot Nothing Then
+                Return ultimoVinculo.IdDocumentoHijo
+            End If
+        End Using
+
+        Return idDoc
+    End Function
 
     Private Sub btnVerDigital_Click(sender As Object, e As EventArgs) Handles btnVerDigital.Click
         If dgvMesa.SelectedRows.Count = 0 Then
