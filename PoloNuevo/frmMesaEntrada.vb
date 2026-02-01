@@ -386,17 +386,26 @@ Public Class frmMesaEntrada
 
             For Each v In hijos
                 Dim hijo = v.Documentos
-                Dim fechaEvento As DateTime = If(v.FechaVinculo.HasValue, v.FechaVinculo.Value, If(hijo IsNot Nothing AndAlso hijo.FechaCarga.HasValue, hijo.FechaCarga.Value, DateTime.Now))
+                Dim movInicial = db.MovimientosDocumentos _
+                    .Where(Function(m) m.DocumentoId = v.IdDocumentoHijo) _
+                    .OrderBy(Function(m) m.FechaMovimiento) _
+                    .ThenBy(Function(m) m.Id) _
+                    .FirstOrDefault()
+
+                Dim fechaEvento As DateTime = If(movInicial IsNot Nothing, movInicial.FechaMovimiento, If(v.FechaVinculo.HasValue, v.FechaVinculo.Value, If(hijo IsNot Nothing AndAlso hijo.FechaCarga.HasValue, hijo.FechaCarga.Value, DateTime.Now)))
                 Dim tipoHijo As String = If(hijo IsNot Nothing AndAlso hijo.TiposDocumento IsNot Nothing, hijo.TiposDocumento.Nombre, "DOCUMENTO")
                 Dim referenciaHijo As String = If(hijo IsNot Nothing, hijo.ReferenciaExterna, "SIN REFERENCIA")
+                Dim origenHijo As String = If(movInicial IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(movInicial.Origen), movInicial.Origen, "MESA DE ENTRADA")
+                Dim destinoHijo As String = If(movInicial IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(movInicial.Destino), movInicial.Destino, "MESA DE ENTRADA")
+                Dim observacionHijo As String = If(movInicial IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(movInicial.Observaciones), movInicial.Observaciones, "VINCULADO AL EXPEDIENTE")
 
                 listaPropios.Add(New With {
                     .IdMov = 0,
                     .Fecha = fechaEvento,
-                    .Origen = "MESA DE ENTRADA",
-                    .Destino = "MESA DE ENTRADA",
+                    .Origen = origenHijo,
+                    .Destino = destinoHijo,
                     .EsSalida = False,
-                    .Observaciones = "RESPUESTA/VÍNCULO RECIBIDO",
+                    .Observaciones = observacionHijo,
                     .EsVinculoExterno = True,
                     .RefHijo = tipoHijo & " " & referenciaHijo
                 })
@@ -406,7 +415,11 @@ Public Class frmMesaEntrada
             Dim historialFinal = listaPropios.OrderBy(Function(x) x.Fecha).Select(Function(x) New With {
                 .IdMov = x.IdMov,
                 .Origen = x.Origen,
-                .Tipo = If(x.EsVinculoExterno, "🔗 SE VINCULÓ: " & x.RefHijo, If(x.EsSalida, "SALIDA (" & If(x.Observaciones Is Nothing, "S/D", x.Observaciones) & ")", "ENTRADA (" & If(x.Observaciones Is Nothing, "Pase", x.Observaciones) & ")")),
+                .Tipo = If(x.EsVinculoExterno,
+                           "ENTRADA (" & If(String.IsNullOrWhiteSpace(x.Observaciones), "VINCULADO AL EXPEDIENTE", x.Observaciones) & ") - " & x.RefHijo,
+                           If(x.EsSalida,
+                              "SALIDA (" & If(x.Observaciones Is Nothing, "S/D", x.Observaciones) & ")",
+                              "ENTRADA (" & If(x.Observaciones Is Nothing, "Pase", x.Observaciones) & ")")),
                 .Destino = x.Destino,
                 .Fecha = x.Fecha
             }).ToList()
@@ -430,7 +443,7 @@ Public Class frmMesaEntrada
             End If
 
             For Each row As DataGridViewRow In dgvMovimientos.Rows
-                If row.Cells("Tipo").Value.ToString().Contains("🔗") Then
+                If row.Cells("Tipo").Value.ToString().Contains("VINCULADO") Then
                     row.DefaultCellStyle.ForeColor = Color.Blue
                     row.DefaultCellStyle.Font = New Font("Segoe UI", 8, FontStyle.Bold)
                 End If
