@@ -111,6 +111,14 @@ Public Class frmAsistenteDocumento
         Using db As New PoloNuevoEntities()
             _info = New InfoVinculacion()
 
+            Dim docCandidato = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idDoc)
+            If docCandidato Is Nothing Then
+                _info.EsPosibleVincular = False
+                _info.MensajeEstado = "Error: No se encontró el documento seleccionado."
+                ConfigurarOpcionesVinculacion()
+                Return
+            End If
+
             ' 1. Encontrar al "Padre Supremo" (Raíz del Expediente)
             Dim idRastro As Integer = idDoc
             Dim encontrado As Boolean = True
@@ -139,21 +147,26 @@ Public Class frmAsistenteDocumento
             End If
 
             ' Obtenemos el último movimiento de la RAÍZ
-            Dim ultimoMov = raiz.MovimientosDocumentos _
+            Dim ultimoMovRaiz = raiz.MovimientosDocumentos _
                                 .OrderByDescending(Function(m) m.FechaMovimiento) _
                                 .ThenByDescending(Function(m) m.Id) _
                                 .FirstOrDefault()
 
-            Dim ubicacionActual As String = "MESA DE ENTRADA" ' Default
-            If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
-                ubicacionActual = ultimoMov.Destino.Trim().ToUpper()
-            End If
+            Dim ultimoMovCandidato = docCandidato.MovimientosDocumentos _
+                .OrderByDescending(Function(m) m.FechaMovimiento) _
+                .ThenByDescending(Function(m) m.Id) _
+                .FirstOrDefault()
+
+            Dim ubicacionCandidato = ObtenerUbicacionActual(ultimoMovCandidato)
+            Dim ubicacionRaiz = ObtenerUbicacionActual(ultimoMovRaiz)
+
+            Dim ubicacionActual As String = If(ubicacionCandidato <> "MESA DE ENTRADA", ubicacionCandidato, ubicacionRaiz)
 
             ' =========================================================================
             ' 3. REGLA DE NEGOCIO CORREGIDA:
             ' Permitir vincular SOLO si el expediente NO está en MESA DE ENTRADA.
             ' =========================================================================
-            If ubicacionActual <> "MESA DE ENTRADA" Then
+            If ubicacionCandidato <> "MESA DE ENTRADA" OrElse ubicacionRaiz <> "MESA DE ENTRADA" Then
 
                 ' CASO: El expediente está fuera (Fiscalía, Juzgado, etc.) -> PERMITIR VINCULAR
                 _info.EsPosibleVincular = True
@@ -163,7 +176,7 @@ Public Class frmAsistenteDocumento
                 _info.ColorEstado = Color.Green
 
                 ' Inteligencia Predictiva
-                If ultimoMov IsNot Nothing Then
+                If ultimoMovRaiz IsNot Nothing Then
                     ' Si está en Fiscalía, sugerimos que viene de Fiscalía
                     _info.SugerenciaOrigen = ubicacionActual
                 End If
@@ -181,6 +194,30 @@ Public Class frmAsistenteDocumento
             ConfigurarOpcionesVinculacion()
         End Using
     End Sub
+
+    Private Function ObtenerUbicacionActual(ultimoMov As MovimientosDocumentos) As String
+        If ultimoMov Is Nothing Then
+            Return "MESA DE ENTRADA"
+        End If
+
+        Dim destino = If(ultimoMov.Destino, "").Trim()
+        Dim origen = If(ultimoMov.Origen, "").Trim()
+
+        If ultimoMov.EsSalida Then
+            If destino <> "" Then
+                Return destino.ToUpper()
+            End If
+            If origen <> "" Then
+                Return origen.ToUpper()
+            End If
+        End If
+
+        If destino <> "" Then
+            Return destino.ToUpper()
+        End If
+
+        Return "MESA DE ENTRADA"
+    End Function
 
     Private Sub ConfigurarOpcionesVinculacion()
         lblDetalleVinculo.Text = _info.MensajeEstado
