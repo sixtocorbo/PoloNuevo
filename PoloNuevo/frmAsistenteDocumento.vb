@@ -104,12 +104,14 @@ Public Class frmAsistenteDocumento
     ' =========================================================
     ' CEREBRO: ANALIZAR SI SE PUEDE VINCULAR
     ' =========================================================
+    ' =========================================================
+    ' CEREBRO: ANALIZAR SI SE PUEDE VINCULAR
+    ' =========================================================
     Private Sub AnalizarCandidato(idDoc As Integer)
         Using db As New PoloNuevoEntities()
             _info = New InfoVinculacion()
 
             ' 1. Encontrar al "Padre Supremo" (Raíz del Expediente)
-            '    Si el doc seleccionado no tiene padre, él es el padre.
             Dim idRastro As Integer = idDoc
             Dim encontrado As Boolean = True
             Dim iteraciones As Integer = 0
@@ -131,49 +133,49 @@ Public Class frmAsistenteDocumento
 
             If raiz Is Nothing Then
                 _info.EsPosibleVincular = False
-                _info.MensajeEstado = "Error de datos: No se encontró el expediente raíz."
+                _info.MensajeEstado = "Error: No se encontró el expediente raíz."
                 ConfigurarOpcionesVinculacion()
                 Return
             End If
 
-            ' Obtenemos el último movimiento de la RAÍZ (el expediente físico)
+            ' Obtenemos el último movimiento de la RAÍZ
             Dim ultimoMov = raiz.MovimientosDocumentos _
                                 .OrderByDescending(Function(m) m.FechaMovimiento) _
                                 .ThenByDescending(Function(m) m.Id) _
                                 .FirstOrDefault()
 
-            Dim ubicacionActual As String = "MESA DE ENTRADA" ' Default si es nuevo
+            Dim ubicacionActual As String = "MESA DE ENTRADA" ' Default
             If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
                 ubicacionActual = ultimoMov.Destino.Trim().ToUpper()
             End If
 
-            ' 3. REGLA DE ORO: Solo se puede vincular si el expediente está en MESA DE ENTRADA
-            If ubicacionActual = "MESA DE ENTRADA" Then
+            ' =========================================================================
+            ' 3. REGLA DE NEGOCIO CORREGIDA:
+            ' Permitir vincular SOLO si el expediente NO está en MESA DE ENTRADA.
+            ' =========================================================================
+            If ubicacionActual <> "MESA DE ENTRADA" Then
+
+                ' CASO: El expediente está fuera (Fiscalía, Juzgado, etc.) -> PERMITIR VINCULAR
                 _info.EsPosibleVincular = True
                 _info.IdPadreRaiz = raiz.Id
                 _info.ReferenciaVisual = $"{raiz.TiposDocumento.Nombre} {raiz.ReferenciaExterna}"
-                _info.MensajeEstado = $"VINCULACIÓN DISPONIBLE: Expediente {raiz.ReferenciaExterna} en Mesa."
+                _info.MensajeEstado = $"UBICACIÓN: {ubicacionActual} -> Se generará retorno automático."
                 _info.ColorEstado = Color.Green
 
-                ' -- INTELIGENCIA PREDICTIVA --
-                ' Preparamos sugerencias para el Paso 2
-
-                ' a) Origen Sugerido: Si el último mov fue entrada desde "X", sugerimos "X".
+                ' Inteligencia Predictiva
                 If ultimoMov IsNot Nothing Then
-                    If Not ultimoMov.EsSalida Then
-                        _info.SugerenciaOrigen = ultimoMov.Origen ' Vino de la Fiscalía, seguramente respondemos a Fiscalía
-                    Else
-                        _info.SugerenciaOrigen = ultimoMov.Destino ' Fue a Jurídica, vuelve de Jurídica
-                    End If
+                    ' Si está en Fiscalía, sugerimos que viene de Fiscalía
+                    _info.SugerenciaOrigen = ubicacionActual
                 End If
-
-                ' b) Asunto Sugerido: Usamos la descripción de lo último que pasó
                 _info.SugerenciaAsunto = "Ref: " & raiz.Descripcion
 
             Else
+
+                ' CASO: El expediente YA está en Mesa de Entrada -> BLOQUEAR VINCULACIÓN DE RETORNO
                 _info.EsPosibleVincular = False
-                _info.MensajeEstado = $"NO SE PUEDE VINCULAR: El expediente original se encuentra en {ubicacionActual}."
-                _info.ColorEstado = Color.Firebrick
+                _info.MensajeEstado = $"El expediente {raiz.ReferenciaExterna} ya se encuentra físico en MESA DE ENTRADA."
+                _info.ColorEstado = Color.DimGray
+
             End If
 
             ConfigurarOpcionesVinculacion()
