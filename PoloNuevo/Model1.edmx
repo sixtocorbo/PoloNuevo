@@ -55,6 +55,9 @@
           <Property Name="ReferenciaExterna" Type="nvarchar" MaxLength="100" />
           <Property Name="FechaVencimiento" Type="datetime" />
           <Property Name="DocumentoPadreId" Type="int" />
+          <Property Name="IdExpedienteRaiz" Type="int" />
+          <Property Name="UbicacionActual" Type="nvarchar" MaxLength="100" />
+          <Property Name="FechaUltimaNovedad" Type="datetime" />
         </EntityType>
         <EntityType Name="DocumentoVinculos">
           <Key>
@@ -128,69 +131,6 @@
           <Property Name="NombreUsuario" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Clave" Type="nvarchar" MaxLength="256" Nullable="false" />
           <Property Name="Rol" Type="nvarchar" MaxLength="50" />
-        </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_DocumentosDetalle' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
-        <EntityType Name="vw_DocumentosDetalle">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Tipo" />
-            <PropertyRef Name="Formato" />
-          </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" />
-          <Property Name="Tipo" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Descripcion" Type="nvarchar(max)" />
-          <Property Name="FechaCarga" Type="datetime" />
-          <Property Name="Extension" Type="nvarchar" MaxLength="10" />
-          <Property Name="Formato" Type="varchar" MaxLength="14" Nullable="false" />
-          <Property Name="NombreArchivo" Type="nvarchar" MaxLength="250" />
-        </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_PlanillaMensual' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
-        <EntityType Name="vw_PlanillaMensual">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Recluso" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="Tarea" />
-            <PropertyRef Name="Mes" />
-            <PropertyRef Name="Anio" />
-            <PropertyRef Name="DiasTrabajados" />
-            <PropertyRef Name="TotalHoras" />
-          </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="Recluso" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Cedula" Type="int" Nullable="false" />
-          <Property Name="Tarea" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Mes" Type="int" Nullable="false" />
-          <Property Name="Anio" Type="int" Nullable="false" />
-          <Property Name="DiasTrabajados" Type="int" Nullable="false" />
-          <Property Name="TotalHoras" Type="int" Nullable="false" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
-        </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
-        <EntityType Name="vw_ReclusosMaestro">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Nombre" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="Modulo" />
-            <PropertyRef Name="Estado" />
-            <PropertyRef Name="FechaNacimiento" />
-            <PropertyRef Name="SituacionLaboral" />
-          </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="Nombre" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Cedula" Type="int" Nullable="false" />
-          <Property Name="Modulo" Type="int" Nullable="false" />
-          <Property Name="Estado" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="FechaNacimiento" Type="date" Nullable="false" />
-          <Property Name="Edad" Type="int" />
-          <Property Name="Peculio" Type="nvarchar" MaxLength="10" />
-          <Property Name="CantDocumentos" Type="int" />
-          <Property Name="SituacionLaboral" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
         <Association Name="FK__Auditoria__Audit__73BA3083">
           <End Role="AuditoriaDocumentos" Type="Self.AuditoriaDocumentos" Multiplicity="1" />
@@ -301,45 +241,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySet Name="NumeracionRangos" EntityType="Self.NumeracionRangos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TiposDocumento" EntityType="Self.TiposDocumento" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="vw_DocumentosDetalle" EntityType="Self.vw_DocumentosDetalle" store:Type="Views" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [vw_DocumentosDetalle].[Id] AS [Id], 
-    [vw_DocumentosDetalle].[ReclusoId] AS [ReclusoId], 
-    [vw_DocumentosDetalle].[Tipo] AS [Tipo], 
-    [vw_DocumentosDetalle].[Descripcion] AS [Descripcion], 
-    [vw_DocumentosDetalle].[FechaCarga] AS [FechaCarga], 
-    [vw_DocumentosDetalle].[Extension] AS [Extension], 
-    [vw_DocumentosDetalle].[Formato] AS [Formato], 
-    [vw_DocumentosDetalle].[NombreArchivo] AS [NombreArchivo]
-    FROM [dbo].[vw_DocumentosDetalle] AS [vw_DocumentosDetalle]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="vw_PlanillaMensual" EntityType="Self.vw_PlanillaMensual" store:Type="Views" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [vw_PlanillaMensual].[Id] AS [Id], 
-    [vw_PlanillaMensual].[Recluso] AS [Recluso], 
-    [vw_PlanillaMensual].[Cedula] AS [Cedula], 
-    [vw_PlanillaMensual].[Tarea] AS [Tarea], 
-    [vw_PlanillaMensual].[Mes] AS [Mes], 
-    [vw_PlanillaMensual].[Anio] AS [Anio], 
-    [vw_PlanillaMensual].[DiasTrabajados] AS [DiasTrabajados], 
-    [vw_PlanillaMensual].[TotalHoras] AS [TotalHoras], 
-    [vw_PlanillaMensual].[Observaciones] AS [Observaciones]
-    FROM [dbo].[vw_PlanillaMensual] AS [vw_PlanillaMensual]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="vw_ReclusosMaestro" EntityType="Self.vw_ReclusosMaestro" store:Type="Views" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [vw_ReclusosMaestro].[Id] AS [Id], 
-    [vw_ReclusosMaestro].[Nombre] AS [Nombre], 
-    [vw_ReclusosMaestro].[Cedula] AS [Cedula], 
-    [vw_ReclusosMaestro].[Modulo] AS [Modulo], 
-    [vw_ReclusosMaestro].[Estado] AS [Estado], 
-    [vw_ReclusosMaestro].[FechaNacimiento] AS [FechaNacimiento], 
-    [vw_ReclusosMaestro].[Edad] AS [Edad], 
-    [vw_ReclusosMaestro].[Peculio] AS [Peculio], 
-    [vw_ReclusosMaestro].[CantDocumentos] AS [CantDocumentos], 
-    [vw_ReclusosMaestro].[SituacionLaboral] AS [SituacionLaboral]
-    FROM [dbo].[vw_ReclusosMaestro] AS [vw_ReclusosMaestro]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="Self.FK__Auditoria__Audit__73BA3083">
             <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
             <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
@@ -430,6 +331,9 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="ReferenciaExterna" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="FechaVencimiento" Type="DateTime" Precision="3" />
           <Property Name="DocumentoPadreId" Type="Int32" />
+          <Property Name="IdExpedienteRaiz" Type="Int32" />
+          <Property Name="UbicacionActual" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="FechaUltimaNovedad" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Documentos1" Relationship="Self.FK_Documentos_Padre" FromRole="Documentos" ToRole="Documentos1" />
           <NavigationProperty Name="Documentos2" Relationship="Self.FK_Documentos_Padre" FromRole="Documentos1" ToRole="Documentos" />
           <NavigationProperty Name="TiposDocumento" Relationship="Self.FK_Documentos_Tipos" FromRole="Documentos" ToRole="TiposDocumento" />
@@ -517,63 +421,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Clave" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Rol" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="EventosSistema" Relationship="Self.FK_Eventos_Usuarios" FromRole="Usuarios" ToRole="EventosSistema" />
-        </EntityType>
-        <EntityType Name="vw_DocumentosDetalle">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Tipo" />
-            <PropertyRef Name="Formato" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="ReclusoId" Type="Int32" />
-          <Property Name="Tipo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="FechaCarga" Type="DateTime" Precision="3" />
-          <Property Name="Extension" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
-          <Property Name="Formato" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="NombreArchivo" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="vw_PlanillaMensual">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Recluso" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="Tarea" />
-            <PropertyRef Name="Mes" />
-            <PropertyRef Name="Anio" />
-            <PropertyRef Name="DiasTrabajados" />
-            <PropertyRef Name="TotalHoras" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Recluso" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Cedula" Type="Int32" Nullable="false" />
-          <Property Name="Tarea" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Mes" Type="Int32" Nullable="false" />
-          <Property Name="Anio" Type="Int32" Nullable="false" />
-          <Property Name="DiasTrabajados" Type="Int32" Nullable="false" />
-          <Property Name="TotalHoras" Type="Int32" Nullable="false" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="vw_ReclusosMaestro">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Nombre" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="Modulo" />
-            <PropertyRef Name="Estado" />
-            <PropertyRef Name="FechaNacimiento" />
-            <PropertyRef Name="SituacionLaboral" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Nombre" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Cedula" Type="Int32" Nullable="false" />
-          <Property Name="Modulo" Type="Int32" Nullable="false" />
-          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="FechaNacimiento" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Edad" Type="Int32" />
-          <Property Name="Peculio" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
-          <Property Name="CantDocumentos" Type="Int32" />
-          <Property Name="SituacionLaboral" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
         <Association Name="FK__Auditoria__Audit__73BA3083">
           <End Role="AuditoriaDocumentos" Type="Self.AuditoriaDocumentos" Multiplicity="1" />
@@ -684,9 +531,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySet Name="NumeracionRangos" EntityType="Self.NumeracionRangos" />
           <EntitySet Name="TiposDocumento" EntityType="Self.TiposDocumento" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" />
-          <EntitySet Name="vw_DocumentosDetalle" EntityType="Self.vw_DocumentosDetalle" />
-          <EntitySet Name="vw_PlanillaMensual" EntityType="Self.vw_PlanillaMensual" />
-          <EntitySet Name="vw_ReclusosMaestro" EntityType="Self.vw_ReclusosMaestro" />
           <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="Self.FK__Auditoria__Audit__73BA3083">
             <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
             <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
@@ -778,6 +622,9 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
                 <ScalarProperty Name="ReferenciaExterna" ColumnName="ReferenciaExterna" />
                 <ScalarProperty Name="FechaVencimiento" ColumnName="FechaVencimiento" />
                 <ScalarProperty Name="DocumentoPadreId" ColumnName="DocumentoPadreId" />
+                <ScalarProperty Name="IdExpedienteRaiz" ColumnName="IdExpedienteRaiz" />
+                <ScalarProperty Name="UbicacionActual" ColumnName="UbicacionActual" />
+                <ScalarProperty Name="FechaUltimaNovedad" ColumnName="FechaUltimaNovedad" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -859,51 +706,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
                 <ScalarProperty Name="NombreUsuario" ColumnName="NombreUsuario" />
                 <ScalarProperty Name="Clave" ColumnName="Clave" />
                 <ScalarProperty Name="Rol" ColumnName="Rol" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_DocumentosDetalle">
-            <EntityTypeMapping TypeName="PoloNuevoModel.vw_DocumentosDetalle">
-              <MappingFragment StoreEntitySet="vw_DocumentosDetalle">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
-                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
-                <ScalarProperty Name="FechaCarga" ColumnName="FechaCarga" />
-                <ScalarProperty Name="Extension" ColumnName="Extension" />
-                <ScalarProperty Name="Formato" ColumnName="Formato" />
-                <ScalarProperty Name="NombreArchivo" ColumnName="NombreArchivo" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_PlanillaMensual">
-            <EntityTypeMapping TypeName="PoloNuevoModel.vw_PlanillaMensual">
-              <MappingFragment StoreEntitySet="vw_PlanillaMensual">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Recluso" ColumnName="Recluso" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
-                <ScalarProperty Name="Tarea" ColumnName="Tarea" />
-                <ScalarProperty Name="Mes" ColumnName="Mes" />
-                <ScalarProperty Name="Anio" ColumnName="Anio" />
-                <ScalarProperty Name="DiasTrabajados" ColumnName="DiasTrabajados" />
-                <ScalarProperty Name="TotalHoras" ColumnName="TotalHoras" />
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_ReclusosMaestro">
-            <EntityTypeMapping TypeName="PoloNuevoModel.vw_ReclusosMaestro">
-              <MappingFragment StoreEntitySet="vw_ReclusosMaestro">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
-                <ScalarProperty Name="Modulo" ColumnName="Modulo" />
-                <ScalarProperty Name="Estado" ColumnName="Estado" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="Edad" ColumnName="Edad" />
-                <ScalarProperty Name="Peculio" ColumnName="Peculio" />
-                <ScalarProperty Name="CantDocumentos" ColumnName="CantDocumentos" />
-                <ScalarProperty Name="SituacionLaboral" ColumnName="SituacionLaboral" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

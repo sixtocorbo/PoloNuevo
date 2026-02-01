@@ -392,13 +392,18 @@ Public Class frmAsistenteDocumento
             Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
 
-                ' 1. Crear el Documento
+                ' 1. Crear el Objeto Documento
                 Dim nuevoDoc As New Documentos()
                 nuevoDoc.FechaCarga = DateTime.Now
                 nuevoDoc.Descripcion = txtAsunto.Text.Trim()
                 nuevoDoc.ReferenciaExterna = If(txtNumero IsNot Nothing, txtNumero.Text.Trim(), "")
                 nuevoDoc.TipoDocumentoId = Convert.ToInt32(cmbTipoDoc.SelectedValue)
 
+                ' NUEVO: Inicializamos valores de caché
+                nuevoDoc.FechaUltimaNovedad = nuevoDoc.FechaCarga
+                nuevoDoc.UbicacionActual = "MESA DE ENTRADA" ' Nace en mesa
+
+                ' Adjunto (Tu código original)
                 If _archivoBytes IsNot Nothing Then
                     nuevoDoc.Contenido = _archivoBytes
                     nuevoDoc.NombreArchivo = _archivoNombre
@@ -409,26 +414,60 @@ Public Class frmAsistenteDocumento
                     nuevoDoc.Extension = ".phy"
                 End If
 
+                ' 2. Lógica de Herencia (Clave para la nueva base de datos)
+                If _idPadreFinal > 0 Then
+                    ' Es un hijo/anexo. Su raíz es el padre seleccionado (o la raíz de ese padre)
+                    ' Buscamos al padre para saber quién es EL JEFE SUPREMO
+                    Dim docPadre = db.Documentos.FirstOrDefault(Function(d) d.Id = _idPadreFinal)
+
+                    ' Heredamos la raíz del padre (si el padre ya tiene raíz, usamos esa, sino el padre es la raíz)
+                    If docPadre.IdExpedienteRaiz.HasValue Then
+                        nuevoDoc.IdExpedienteRaiz = docPadre.IdExpedienteRaiz
+                    Else
+                        nuevoDoc.IdExpedienteRaiz = docPadre.Id ' El padre es el jefe
+                    End If
+
+                    ' *** MAGIA: ACTUALIZAR AL PADRE PARA QUE SUBA EN LA LISTA ***
+                    ' Como entró un anexo nuevo, el expediente "se movió" hoy.
+                    ' Además, si "TraerFamilia" lo devuelve a Mesa, nos aseguramos que la etiqueta diga MESA.
+                    If docPadre.IdExpedienteRaiz.HasValue Then
+                        ' Actualizamos al Jefe Supremo
+                        Dim jefe = db.Documentos.FirstOrDefault(Function(d) d.Id = docPadre.IdExpedienteRaiz)
+                        If jefe IsNot Nothing Then
+                            jefe.FechaUltimaNovedad = DateTime.Now
+                            jefe.UbicacionActual = "MESA DE ENTRADA" ' Confirmamos que está activo aquí
+                        End If
+                    Else
+                        ' El padre directo es el jefe
+                        docPadre.FechaUltimaNovedad = DateTime.Now
+                        docPadre.UbicacionActual = "MESA DE ENTRADA"
+                    End If
+
+                Else
+                    ' Es un documento independiente. Él es su propia raíz.
+                    nuevoDoc.IdExpedienteRaiz = Nothing ' Se asignará su propio ID tras guardar o lo forzamos luego
+                End If
+
                 db.Documentos.Add(nuevoDoc)
                 db.SaveChanges()
 
-                ' 2. Movimiento Inicial
+                ' Corrección pequeña: Si es independiente, su IdRaiz es su propio Id generado
+                If _idPadreFinal <= 0 Then
+                    nuevoDoc.IdExpedienteRaiz = nuevoDoc.Id
+                    db.SaveChanges()
+                End If
+
+                ' 3. Movimiento Inicial (Tu código original)
                 Dim movEntrada As New MovimientosDocumentos()
                 movEntrada.DocumentoId = nuevoDoc.Id
                 movEntrada.FechaMovimiento = nuevoDoc.FechaCarga
                 movEntrada.Origen = txtOrigen.Text.Trim().ToUpper()
                 movEntrada.Destino = "MESA DE ENTRADA"
                 movEntrada.EsSalida = False
-
-                If _idPadreFinal > 0 Then
-                    movEntrada.Observaciones = "VINCULADO AL EXPEDIENTE"
-                Else
-                    movEntrada.Observaciones = "INGRESO INDEPENDIENTE"
-                End If
-
+                movEntrada.Observaciones = If(_idPadreFinal > 0, "VINCULADO AL EXPEDIENTE", "INGRESO INDEPENDIENTE")
                 db.MovimientosDocumentos.Add(movEntrada)
 
-                ' 3. Generar Vínculo (Si aplica)
+                ' 4. Generar Vínculo y Retornos (Tu código original)
                 If _idPadreFinal > 0 Then
                     Dim vinculo As New DocumentoVinculos()
                     vinculo.IdDocumentoPadre = _idPadreFinal
@@ -437,7 +476,7 @@ Public Class frmAsistenteDocumento
                     vinculo.FechaVinculo = nuevoDoc.FechaCarga
                     db.DocumentoVinculos.Add(vinculo)
 
-                    ' TRAER FAMILIA (Retorno automático del expediente a Mesa)
+                    ' TraerFamiliaCompleta se encarga de crear los movimientos de retorno "físicos"
                     TraerFamiliaCompleta(db, _idPadreFinal, txtOrigen.Text.Trim(), nuevoDoc.FechaCarga)
                 End If
 

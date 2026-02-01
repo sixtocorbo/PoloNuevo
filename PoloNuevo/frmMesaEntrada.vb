@@ -31,106 +31,60 @@ Public Class frmMesaEntrada
         Try
             Using db As New PoloNuevoEntities()
                 ' =========================================================
-                ' 1. CONSULTA BASE (Traemos todo menos lo archivado)
+                ' 1. CONSULTA OPTIMIZADA (Base de Datos "Inteligente")
                 ' =========================================================
-                Dim query = db.Documentos.Include("MovimientosDocumentos") _
-                                         .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
+                ' Regla de Oro: Solo traemos documentos que son "Raíz" (Jefes de familia)
+                ' y que su ubicación actual marcada sea "MESA DE ENTRADA".
+                Dim query = db.Documentos.Where(Function(d) d.IdExpedienteRaiz = d.Id _
+                                                AndAlso d.UbicacionActual = "MESA DE ENTRADA")
 
                 ' =========================================================
-                ' 2. APLICACIÓN DE FILTROS (Buscador y Fechas)
+                ' 2. FILTROS (Buscador y Fechas - Se mantienen igual)
                 ' =========================================================
-                ' A) Buscador Inteligente (SOLO DOCUMENTOS)
                 Dim texto = txtBuscar.Text.Trim()
                 If Not String.IsNullOrEmpty(texto) Then
-                    Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
-                    For Each palabra In palabras
-                        Dim termino = palabra
-                        query = query.Where(Function(d) d.ReferenciaExterna.Contains(termino) Or
-                                                        d.TiposDocumento.Nombre.Contains(termino) Or
-                                                        d.Descripcion.Contains(termino))
-                    Next
+                    ' Buscamos coincidencias en Referencia, Tipo o Asunto
+                    query = query.Where(Function(d) d.ReferenciaExterna.Contains(texto) Or
+                                                    d.TiposDocumento.Nombre.Contains(texto) Or
+                                                    d.Descripcion.Contains(texto))
                 End If
 
-                ' B) Filtro de Fechas
                 If chkFechas.Checked Then
                     Dim fDesde = dtpDesde.Value.Date
                     Dim fHasta = dtpHasta.Value.Date.AddDays(1).AddSeconds(-1)
-                    query = query.Where(Function(d) d.FechaCarga >= fDesde And d.FechaCarga <= fHasta)
+                    ' Usamos FechaUltimaNovedad para que el usuario vea cuándo se movió por última vez
+                    query = query.Where(Function(d) d.FechaUltimaNovedad >= fDesde And d.FechaUltimaNovedad <= fHasta)
                 End If
 
                 ' =========================================================
-                ' 3. EJECUCIÓN Y PROYECCIÓN EN MEMORIA
+                ' 3. PROYECCIÓN DIRECTA (Sin cálculos complejos en memoria)
                 ' =========================================================
-                ' Ejecutamos la consulta base
-                Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga).ToList()
-
-                ' Obtenemos los últimos movimientos para saber dónde está cada documento
-                Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(rawList)
-
-                ' Resolvemos el padre supremo y el único pendiente por familia (si están en mesa)
-                Dim vinculos = db.DocumentoVinculos.ToList()
-                Dim padreSupremoPorDoc = MesaEntradaInteligencia.ObtenerPadreSupremoPorDoc(rawList, vinculos)
-                Dim pendientePorPadre = MesaEntradaInteligencia.ObtenerPendientesPorPadre(rawList, ultimosMovimientos, padreSupremoPorDoc)
-
-                ' Proyectamos los datos para la grilla
-                Dim displayList = rawList.Select(Function(d)
-                                                     Dim ultimoMov As MovimientosDocumentos = Nothing
-                                                     ultimosMovimientos.TryGetValue(d.Id, ultimoMov)
-
-                                                     ' Determinamos ubicación física
-                                                     Dim destino As String = "MESA DE ENTRADA"
-                                                     If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
-                                                         destino = ultimoMov.Destino
-                                                     End If
-
-                                                     Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
-
-                                                     ' Determinamos el estado para la columna visual
-                                                     Dim estadoFinal As String = "DERIVADO"
-                                                     If enMesa Then
-                                                         Dim idPadre = padreSupremoPorDoc(d.Id)
-                                                         Dim idPendiente As Integer = 0
-                                                         pendientePorPadre.TryGetValue(idPadre, idPendiente)
-                                                         If idPendiente = d.Id Then
-                                                             estadoFinal = "PENDIENTE"
-                                                         End If
-                                                     End If
-
-                                                     Return New With {
-                                                         .Id = d.Id,
-                                                         .Fecha = d.FechaCarga,
-                                                         .Referencia = d.TiposDocumento.Nombre & " " & d.ReferenciaExterna,
-                                                         .Asunto = d.Descripcion,
-                                                         .Estado = estadoFinal,
-                                                         .Digital = If(d.Extension <> ".phy", "SI", "NO"),
-                                                         .Vencimiento = d.FechaVencimiento
-                                                     }
-                                                 End Function).ToList()
+                ' Ordenamos por la última novedad (así lo más fresco sale arriba)
+                Dim listaFinal = query.OrderByDescending(Function(d) d.FechaUltimaNovedad) _
+                                      .Select(Function(d) New With {
+                                          .Id = d.Id,
+                                          .Fecha = d.FechaUltimaNovedad,
+                                          .Referencia = d.TiposDocumento.Nombre & " " & d.ReferenciaExterna,
+                                          .Asunto = d.Descripcion,
+                                          .Estado = "PENDIENTE",
+                                          .Digital = If(d.Extension <> ".phy", "SI", "NO"),
+                                          .Vencimiento = d.FechaVencimiento
+                                      }).ToList()
 
                 ' =========================================================
                 ' 4. ASIGNACIÓN A LA GRILLA
                 ' =========================================================
-                If chkPendientes.Checked Then
-                    dgvMesa.DataSource = displayList.Where(Function(d) d.Estado = "PENDIENTE").ToList()
-                Else
-                    dgvMesa.DataSource = displayList
-                End If
-
-                ' =========================================================
-                ' 5. CONFIGURACIÓN VISUAL
-                ' =========================================================
-                If dgvMesa.Columns("Id") IsNot Nothing Then dgvMesa.Columns("Id").Visible = False
-                If dgvMesa.Columns("Vencimiento") IsNot Nothing Then dgvMesa.Columns("Vencimiento").Visible = False
+                dgvMesa.DataSource = listaFinal
 
                 ConfigurarColumnas()
                 ColorearPendientes()
 
-                ' Limpiamos la grilla de historial si no hay documentos listados
-                If displayList.Count = 0 Then dgvMovimientos.DataSource = Nothing
+                ' Limpieza si está vacío
+                If listaFinal.Count = 0 Then dgvMovimientos.DataSource = Nothing
 
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error al cargar datos: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error al cargar la bandeja optimizada: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 

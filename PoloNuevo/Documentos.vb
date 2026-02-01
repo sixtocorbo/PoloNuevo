@@ -21,6 +21,9 @@ Partial Public Class Documentos
     Public Property ReferenciaExterna As String
     Public Property FechaVencimiento As Nullable(Of Date)
     Public Property DocumentoPadreId As Nullable(Of Integer)
+    Public Property IdExpedienteRaiz As Nullable(Of Integer)
+    Public Property UbicacionActual As String
+    Public Property FechaUltimaNovedad As Nullable(Of Date)
 
     Public Overridable Property Documentos1 As ICollection(Of Documentos) = New HashSet(Of Documentos)
     Public Overridable Property Documentos2 As Documentos

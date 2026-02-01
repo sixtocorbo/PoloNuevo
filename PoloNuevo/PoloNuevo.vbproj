@@ -238,15 +238,6 @@
     <Compile Include="Usuarios.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="vw_DocumentosDetalle.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="vw_PlanillaMensual.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="vw_ReclusosMaestro.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmMenuPrincipal.resx">
