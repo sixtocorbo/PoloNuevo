@@ -197,7 +197,11 @@ Public Class frmMesaEntrada
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
         ' Creamos una instancia del nuevo Asistente
-        Dim wizard As New frmAsistenteDocumento()
+        Dim idCandidato As Integer = 0
+        If dgvMesa.SelectedRows.Count > 0 Then
+            idCandidato = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        End If
+        Dim wizard As New frmAsistenteDocumento(idCandidato)
 
         ' Lo mostramos como un cuadro de diálogo (modal)
         ' Esto detiene la ejecución aquí hasta que el usuario termine o cancele el asistente.
