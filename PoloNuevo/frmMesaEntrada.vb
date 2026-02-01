@@ -67,6 +67,11 @@ Public Class frmMesaEntrada
                 ' Obtenemos los últimos movimientos para saber dónde está cada documento
                 Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(rawList)
 
+                ' Resolvemos el padre supremo y el único pendiente por familia (si están en mesa)
+                Dim vinculos = db.DocumentoVinculos.ToList()
+                Dim padreSupremoPorDoc = MesaEntradaInteligencia.ObtenerPadreSupremoPorDoc(rawList, vinculos)
+                Dim pendientePorPadre = MesaEntradaInteligencia.ObtenerPendientesPorPadre(rawList, ultimosMovimientos, padreSupremoPorDoc)
+
                 ' Proyectamos los datos para la grilla
                 Dim displayList = rawList.Select(Function(d)
                                                      Dim ultimoMov As MovimientosDocumentos = Nothing
@@ -82,7 +87,14 @@ Public Class frmMesaEntrada
 
                                                      ' Determinamos el estado para la columna visual
                                                      Dim estadoFinal As String = "DERIVADO"
-                                                     If enMesa Then estadoFinal = "PENDIENTE"
+                                                     If enMesa Then
+                                                         Dim idPadre = padreSupremoPorDoc(d.Id)
+                                                         Dim idPendiente As Integer = 0
+                                                         pendientePorPadre.TryGetValue(idPadre, idPendiente)
+                                                         If idPendiente = d.Id Then
+                                                             estadoFinal = "PENDIENTE"
+                                                         End If
+                                                     End If
 
                                                      Return New With {
                                                          .Id = d.Id,
