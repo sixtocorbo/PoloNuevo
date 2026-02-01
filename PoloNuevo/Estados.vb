@@ -14,7 +14,4 @@ Partial Public Class Estados
     Public Property Id As Integer
     Public Property Descripcion As String
 
-    Public Overridable Property Obras As ICollection(Of Obras) = New HashSet(Of Obras)
-    Public Overridable Property Reclusos As ICollection(Of Reclusos) = New HashSet(Of Reclusos)
-
 End Class

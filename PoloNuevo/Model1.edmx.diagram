@@ -4,62 +4,30 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a991fb03239d41d2baff94172dac2878" Name="Diagram1">
-        <EntityTypeShape EntityType="PoloNuevoModel.ActividadesObras" Width="1.5" PointX="7.5" PointY="13" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.CandidatosLaborales" Width="1.5" PointX="5.25" PointY="20.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Comisiones" Width="1.5" PointX="8.25" PointY="19.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Comunicados" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Documentos" Width="1.5" PointX="5.25" PointY="24.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Estados" Width="1.5" PointX="0.75" PointY="19" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.EventosSistema" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.GestionObras" Width="1.5" PointX="5.25" PointY="16.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Idoneidades" Width="1.5" PointX="3" PointY="24.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Licencias" Width="1.5" PointX="8.25" PointY="16" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.MotivosAusencia" Width="1.5" PointX="6" PointY="10.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.MovimientosDocumentos" Width="1.5" PointX="7.5" PointY="29" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Notificaciones" Width="1.5" PointX="5.25" PointY="30.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Obras" Width="1.5" PointX="3" PointY="12.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.PlanillasLaborales" Width="1.5" PointX="8.25" PointY="24.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Reclusos" Width="1.5" PointX="3" PointY="18.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.SalidasTransitorias" Width="1.5" PointX="5.25" PointY="37.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Tareas" Width="1.5" PointX="6" PointY="7.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Tarjetas" Width="1.5" PointX="5.25" PointY="41" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.TiposDocumento" Width="1.5" PointX="3" PointY="27.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.Usuarios" Width="1.5" PointX="0.75" PointY="0.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.VencimientosLegales" Width="1.5" PointX="5.25" PointY="44" IsExpanded="true" />
-        <EntityTypeShape EntityType="PoloNuevoModel.vw_ReclusosMaestro" Width="1.5" PointX="2.75" PointY="3.75" IsExpanded="true" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Actividades_Gestion" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Candidatos_Idoneidad" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Candidatos_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Comisiones_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Comisiones_Tareas" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Reclusos" ManuallyRouted="false" />
+      <Diagram DiagramId="a6631008fc81488dbe6e4ae543511c23" Name="Diagram1" ZoomLevel="78">
+        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaDocumentos" Width="1.5" PointX="7.75" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaMovimientos" Width="1.5" PointX="10" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.Comunicados" Width="1.5" PointX="5.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.Documentos" Width="1.5" PointX="3" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.DocumentoVinculos" Width="1.5" PointX="5.25" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.Estados" Width="1.5" PointX="7.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.EventosSistema" Width="1.5" PointX="10" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.MotivosAusencia" Width="1.5" PointX="9.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.MovimientosDocumentos" Width="1.5" PointX="5.25" PointY="4.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.NumeracionRangos" Width="1.5" PointX="3" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.TiposDocumento" Width="1.5" PointX="0.75" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.Usuarios" Width="1.5" PointX="7.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.vw_DocumentosDetalle" Width="1.5" PointX="5.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.vw_PlanillaMensual" Width="1.5" PointX="7.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PoloNuevoModel.vw_ReclusosMaestro" Width="1.5" PointX="9.75" PointY="10.75" IsExpanded="true" />
+        <AssociationConnector Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" ManuallyRouted="false" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Padre" ManuallyRouted="false" />
         <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Tipos" ManuallyRouted="false" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Hijo" ManuallyRouted="false" />
         <AssociationConnector Association="PoloNuevoModel.FK_Movimientos_Documentos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Obras_Estados" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Reclusos_Estados" ManuallyRouted="false" />
+        <AssociationConnector Association="PoloNuevoModel.FK_Padre" ManuallyRouted="false" />
         <AssociationConnector Association="PoloNuevoModel.FK_Eventos_Usuarios" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_GestionObras_Obras" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_GestionObras_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Licencias_Motivos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Licencias_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Notificaciones_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Planillas_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Planillas_Tareas" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Tarjetas_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Transitorias_Reclusos" ManuallyRouted="false" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Vencimientos_Reclusos" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="PoloNuevoModel.vw_DocumentosDetalle" Width="1.5" PointX="5.375" PointY="0.75" />
-        <EntityTypeShape EntityType="PoloNuevoModel.vw_PlanillaMensual" Width="1.5" PointX="7.375" PointY="0.75" />
-        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaDocumentos" Width="1.5" PointX="0.75" PointY="7.75" />
-        <EntityTypeShape EntityType="PoloNuevoModel.AuditoriaMovimientos" Width="1.5" PointX="3" PointY="7.875" />
-        <AssociationConnector Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" />
-        <EntityTypeShape EntityType="PoloNuevoModel.NumeracionRangos" Width="1.5" PointX="5.25" PointY="34.125" />
-        <AssociationConnector Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Documentos_Padre" />
-        <EntityTypeShape EntityType="PoloNuevoModel.DocumentoVinculos" Width="1.5" PointX="7.5" PointY="32.625" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Hijo" />
-        <AssociationConnector Association="PoloNuevoModel.FK_Padre" />
+        <AssociationConnector Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

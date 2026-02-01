@@ -39,7 +39,7 @@ Public Class frmMesaEntrada
                 ' =========================================================
                 ' 2. APLICACIÓN DE FILTROS (Buscador y Fechas)
                 ' =========================================================
-                ' A) Buscador Inteligente
+                ' A) Buscador Inteligente (SOLO DOCUMENTOS)
                 Dim texto = txtBuscar.Text.Trim()
                 If Not String.IsNullOrEmpty(texto) Then
                     Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
@@ -47,8 +47,7 @@ Public Class frmMesaEntrada
                         Dim termino = palabra
                         query = query.Where(Function(d) d.ReferenciaExterna.Contains(termino) Or
                                                         d.TiposDocumento.Nombre.Contains(termino) Or
-                                                        d.Descripcion.Contains(termino) Or
-                                                        (d.Reclusos IsNot Nothing AndAlso d.Reclusos.Nombre.Contains(termino)))
+                                                        d.Descripcion.Contains(termino))
                     Next
                 End If
 
@@ -60,7 +59,7 @@ Public Class frmMesaEntrada
                 End If
 
                 ' =========================================================
-                ' 3. EJECUCIÓN Y PROYECCIÓN EN MEMORIA (CORREGIDO)
+                ' 3. EJECUCIÓN Y PROYECCIÓN EN MEMORIA
                 ' =========================================================
                 ' Ejecutamos la consulta base
                 Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga).ToList()
@@ -73,17 +72,11 @@ Public Class frmMesaEntrada
                                                      Dim ultimoMov As MovimientosDocumentos = Nothing
                                                      ultimosMovimientos.TryGetValue(d.Id, ultimoMov)
 
-                                                     ' -------------------------------------------------------
-                                                     ' CORRECCIÓN CRÍTICA: IGUALAR LÓGICA CON DASHBOARD
-                                                     ' -------------------------------------------------------
-                                                     ' Si no hay movimiento (es nuevo) o el destino está vacío,
-                                                     ' ASUMIMOS que está físicamente en la Mesa de Entrada.
+                                                     ' Determinamos ubicación física
                                                      Dim destino As String = "MESA DE ENTRADA"
-
                                                      If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
                                                          destino = ultimoMov.Destino
                                                      End If
-                                                     ' -------------------------------------------------------
 
                                                      Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
 
@@ -96,7 +89,6 @@ Public Class frmMesaEntrada
                                                          .Fecha = d.FechaCarga,
                                                          .Referencia = d.TiposDocumento.Nombre & " " & d.ReferenciaExterna,
                                                          .Asunto = d.Descripcion,
-                                                         .Recluso = If(d.Reclusos IsNot Nothing, d.Reclusos.Nombre, "Sin Vincular"),
                                                          .Estado = estadoFinal,
                                                          .Digital = If(d.Extension <> ".phy", "SI", "NO"),
                                                          .Vencimiento = d.FechaVencimiento
@@ -107,10 +99,8 @@ Public Class frmMesaEntrada
                 ' 4. ASIGNACIÓN A LA GRILLA
                 ' =========================================================
                 If chkPendientes.Checked Then
-                    ' Si el check está activo, solo mostramos lo que calculamos como PENDIENTE
                     dgvMesa.DataSource = displayList.Where(Function(d) d.Estado = "PENDIENTE").ToList()
                 Else
-                    ' Si no, mostramos todo
                     dgvMesa.DataSource = displayList
                 End If
 
@@ -145,9 +135,7 @@ Public Class frmMesaEntrada
                 .Columns("Referencia").Width = 140
                 .Columns("Referencia").HeaderText = "Tipo y Nro."
             End If
-            If .Columns("Recluso") IsNot Nothing Then
-                .Columns("Recluso").Width = 180
-            End If
+            ' Columna RECLUSO eliminada
             If .Columns("Digital") IsNot Nothing Then
                 .Columns("Digital").Width = 50
                 .Columns("Digital").HeaderText = "Dig."
@@ -435,10 +423,10 @@ Public Class frmMesaEntrada
                 .Include("Documentos") _
                 .Where(Function(v) v.IdDocumentoPadre = idDoc) _
                 .OrderByDescending(Function(v) If(v.FechaVinculo.HasValue,
-                                                 v.FechaVinculo.Value,
-                                                 If(v.Documentos IsNot Nothing AndAlso v.Documentos.FechaCarga.HasValue,
-                                                    v.Documentos.FechaCarga.Value,
-                                                    DateTime.MinValue))) _
+                                                  v.FechaVinculo.Value,
+                                                  If(v.Documentos IsNot Nothing AndAlso v.Documentos.FechaCarga.HasValue,
+                                                     v.Documentos.FechaCarga.Value,
+                                                     DateTime.MinValue))) _
                 .FirstOrDefault()
 
             If ultimoVinculo IsNot Nothing Then
@@ -647,7 +635,6 @@ Public Class frmMesaEntrada
             Dim ref As String = Convert.ToString(dgvMesa.SelectedRows(0).Cells("Referencia").Value)
 
             ' 3. Llamamos al formulario nuevo
-            ' Ya no hay código complejo aquí, solo abrir la ventana
             Dim frm As New frmHistorial(idDoc, ref)
             frm.ShowDialog()
 

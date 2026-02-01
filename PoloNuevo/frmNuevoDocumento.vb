@@ -1,94 +1,130 @@
 ﻿Imports System.IO
+Imports System.Data.Entity
 
 Public Class frmNuevoDocumento
 
-    Private _idRecluso As Integer
     Private _rutaArchivo As String = ""
+    Private _archivoBytes As Byte() = Nothing
+    Private _archivoNombre As String = ""
+    Private _archivoExt As String = ""
 
-    ' Constructor que recibe el ID del preso al que le vamos a cargar el documento
-    Public Sub New(idRecluso As Integer)
+    ' =========================================================
+    ' CONSTRUCTOR (Simplificado)
+    ' =========================================================
+    Public Sub New()
         InitializeComponent()
-        _idRecluso = idRecluso
     End Sub
 
     Private Sub frmNuevoDocumento_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarTiposDocumento()
+        lblArchivoSeleccionado.Text = "Ningún archivo seleccionado"
+        lblArchivoSeleccionado.ForeColor = Color.Gray
     End Sub
 
     Private Sub CargarTiposDocumento()
         Using db As New PoloNuevoEntities()
-            ' Llenamos el combo con tu lista oficial
-            cmbTipo.DataSource = db.TiposDocumento.OrderBy(Function(t) t.Nombre).ToList()
+            ' Cargamos los tipos, excluyendo ARCHIVO si es necesario para mantener consistencia
+            cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
         End Using
     End Sub
 
-    ' Botón EXAMINAR: Abre el diálogo para elegir archivo
+    ' =========================================================
+    ' SELECCIÓN DE ARCHIVO
+    ' =========================================================
     Private Sub btnExaminar_Click(sender As Object, e As EventArgs) Handles btnExaminar.Click
-        Dim op As New OpenFileDialog()
-        op.Filter = "Archivos Permitidos|*.pdf;*.jpg;*.jpeg;*.png;*.doc;*.docx|Todos los archivos|*.*"
-        op.Title = "Seleccione el documento o foto"
+        Using op As New OpenFileDialog()
+            op.Filter = "Documentos y Fotos|*.pdf;*.jpg;*.jpeg;*.png;*.doc;*.docx;*.xls;*.xlsx|Todos los archivos|*.*"
+            op.Title = "Seleccione el documento a cargar"
 
-        If op.ShowDialog() = DialogResult.OK Then
-            _rutaArchivo = op.FileName
+            If op.ShowDialog() = DialogResult.OK Then
 
-            ' Validar tamaño (opcional, ej: máximo 10MB)
-            Dim info As New FileInfo(_rutaArchivo)
-            If info.Length > 10 * 1024 * 1024 Then ' 10 MB
-                MessageBox.Show("El archivo es demasiado grande (Máx 10MB).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                _rutaArchivo = ""
-                lblArchivoSeleccionado.Text = "Ningún archivo seleccionado"
-                Return
+                ' Validar tamaño (Ejemplo: Máximo 20MB)
+                Dim info As New FileInfo(op.FileName)
+                If info.Length > 20 * 1024 * 1024 Then
+                    MessageBox.Show("El archivo es demasiado grande (Máx 20MB).", "Tamaño Excedido", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    LimpiarSeleccionArchivo()
+                    Return
+                End If
+
+                Try
+                    ' Leemos el archivo a memoria inmediatamente para evitar bloqueos
+                    _archivoBytes = File.ReadAllBytes(op.FileName)
+                    _archivoNombre = info.Name
+                    _archivoExt = info.Extension.ToLower()
+                    _rutaArchivo = op.FileName ' Solo referencia visual
+
+                    lblArchivoSeleccionado.Text = _archivoNombre
+                    lblArchivoSeleccionado.ForeColor = Color.Black
+                Catch ex As Exception
+                    MessageBox.Show("Error al leer el archivo: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    LimpiarSeleccionArchivo()
+                End Try
             End If
-
-            lblArchivoSeleccionado.Text = info.Name
-            lblArchivoSeleccionado.ForeColor = Color.Black
-        End If
+        End Using
     End Sub
 
-    ' Botón GUARDAR: La lógica Entity Framework
+    Private Sub LimpiarSeleccionArchivo()
+        _rutaArchivo = ""
+        _archivoBytes = Nothing
+        _archivoNombre = ""
+        _archivoExt = ""
+        lblArchivoSeleccionado.Text = "Ningún archivo seleccionado"
+        lblArchivoSeleccionado.ForeColor = Color.Gray
+    End Sub
+
+    ' =========================================================
+    ' GUARDAR
+    ' =========================================================
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         ' 1. Validaciones
-        If String.IsNullOrWhiteSpace(_rutaArchivo) Then
-            MessageBox.Show("Debe seleccionar un archivo.", "Falta archivo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If _archivoBytes Is Nothing OrElse _archivoBytes.Length = 0 Then
+            MessageBox.Show("Debe seleccionar un archivo válido.", "Falta archivo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
         If String.IsNullOrWhiteSpace(txtDescripcion.Text) Then
-            MessageBox.Show("Escriba una breve descripción o referencia.", "Falta descripción", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Escriba una breve descripción del documento.", "Falta descripción", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
         Try
             Me.Cursor = Cursors.WaitCursor
 
-            ' 2. Convertir archivo a Bytes (BLOB)
-            Dim bytesArchivo As Byte() = File.ReadAllBytes(_rutaArchivo)
-            Dim extension As String = Path.GetExtension(_rutaArchivo).ToLower()
-            Dim nombreOriginal As String = Path.GetFileName(_rutaArchivo)
-
-            ' 3. Guardar en Base de Datos
             Using db As New PoloNuevoEntities()
-                ' --- AQUI ESTABA EL ERROR ---
-                ' Cambiamos 'New Documento' por 'New Documentos' (nombre de la tabla)
                 Dim nuevoDoc As New Documentos()
-                ' -----------------------------
 
-                nuevoDoc.ReclusoId = _idRecluso
+                ' Asignación de datos
+                ' Nota: Ya no asignamos ReclusoId
                 nuevoDoc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
                 nuevoDoc.Descripcion = txtDescripcion.Text.Trim()
                 nuevoDoc.FechaCarga = DateTime.Now
 
+                ' Si tu formulario tuviera un campo de Referencia Externa (txtNumero), iría aquí:
+                ' nuevoDoc.ReferenciaExterna = txtNumero.Text.Trim() 
+                ' Por ahora queda NULL o vacío según la base de datos.
+
                 ' Datos del archivo
-                nuevoDoc.Contenido = bytesArchivo
-                nuevoDoc.Extension = extension
-                nuevoDoc.NombreArchivo = nombreOriginal
+                nuevoDoc.Contenido = _archivoBytes
+                nuevoDoc.Extension = _archivoExt
+                nuevoDoc.NombreArchivo = _archivoNombre
 
                 db.Documentos.Add(nuevoDoc)
+
+                ' Opcional: Crear un movimiento de Entrada automático
+                Dim mov As New MovimientosDocumentos()
+                mov.DocumentoId = nuevoDoc.Id ' EF asignará el ID temporalmente
+                mov.FechaMovimiento = nuevoDoc.FechaCarga
+                mov.Origen = "CARGA MANUAL"
+                mov.Destino = "MESA DE ENTRADA"
+                mov.EsSalida = False
+                mov.Observaciones = "Carga directa de archivo"
+                db.MovimientosDocumentos.Add(mov)
+
                 db.SaveChanges()
             End Using
 
-            MessageBox.Show("Documento guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Documento cargado al sistema correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK
             Me.Close()
 
@@ -102,4 +138,5 @@ Public Class frmNuevoDocumento
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         Me.Close()
     End Sub
+
 End Class

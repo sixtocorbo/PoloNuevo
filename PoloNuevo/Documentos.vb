@@ -12,7 +12,6 @@ Imports System.Collections.Generic
 
 Partial Public Class Documentos
     Public Property Id As Integer
-    Public Property ReclusoId As Nullable(Of Integer)
     Public Property TipoDocumentoId As Integer
     Public Property Descripcion As String
     Public Property Contenido As Byte()
@@ -23,12 +22,11 @@ Partial Public Class Documentos
     Public Property FechaVencimiento As Nullable(Of Date)
     Public Property DocumentoPadreId As Nullable(Of Integer)
 
-    Public Overridable Property Reclusos As Reclusos
-    Public Overridable Property TiposDocumento As TiposDocumento
-    Public Overridable Property MovimientosDocumentos As ICollection(Of MovimientosDocumentos) = New HashSet(Of MovimientosDocumentos)
     Public Overridable Property Documentos1 As ICollection(Of Documentos) = New HashSet(Of Documentos)
     Public Overridable Property Documentos2 As Documentos
+    Public Overridable Property TiposDocumento As TiposDocumento
     Public Overridable Property DocumentoVinculos As ICollection(Of DocumentoVinculos) = New HashSet(Of DocumentoVinculos)
+    Public Overridable Property MovimientosDocumentos As ICollection(Of MovimientosDocumentos) = New HashSet(Of MovimientosDocumentos)
     Public Overridable Property DocumentoVinculos1 As ICollection(Of DocumentoVinculos) = New HashSet(Of DocumentoVinculos)
 
 End Class

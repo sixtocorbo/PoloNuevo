@@ -85,19 +85,10 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActividadesObras.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="AuditoriaDocumentos.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="AuditoriaMovimientos.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="CandidatosLaborales.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Comisiones.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Comunicados.vb">
@@ -115,22 +106,10 @@
     <Compile Include="EventosSistema.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="frmAsignarTrabajo.Designer.vb">
-      <DependentUpon>frmAsignarTrabajo.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmAsignarTrabajo.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmAuditoria.Designer.vb">
       <DependentUpon>frmAuditoria.vb</DependentUpon>
     </Compile>
     <Compile Include="frmAuditoria.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmComisiones.Designer.vb">
-      <DependentUpon>frmComisiones.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmComisiones.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmDashboard.Designer.vb">
@@ -149,12 +128,6 @@
       <DependentUpon>frmHistorial.vb</DependentUpon>
     </Compile>
     <Compile Include="frmHistorial.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmLegajo.Designer.vb">
-      <DependentUpon>frmLegajo.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmLegajo.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmLogin.Designer.vb">
@@ -199,18 +172,6 @@
     <Compile Include="frmNuevoPase.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmNuevoRecluso.Designer.vb">
-      <DependentUpon>frmNuevoRecluso.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmNuevoRecluso.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmReclusos.Designer.vb">
-      <DependentUpon>frmReclusos.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmReclusos.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmReportesDocumentos.Designer.vb">
       <DependentUpon>frmReportesDocumentos.vb</DependentUpon>
     </Compile>
@@ -223,15 +184,7 @@
     <Compile Include="frmUsuarios.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GestionObras.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Idoneidades.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Licencias.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
+    <Compile Include="MesaEntradaInteligencia.vb" />
     <Compile Include="Model1.Context.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -247,7 +200,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="MesaEntradaInteligencia.vb" />
     <Compile Include="MotivosAusencia.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -270,38 +222,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Notificaciones.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="NumeracionRangos.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Obras.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="PlanillasLaborales.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Reclusos.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="SalidasTransitorias.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="Sesion.vb" />
-    <Compile Include="Tareas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Tarjetas.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="TiposDocumento.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Usuarios.vb">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="VencimientosLegales.vb">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="vw_DocumentosDetalle.vb">
@@ -315,12 +243,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmComisiones.resx">
-      <DependentUpon>frmComisiones.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmLegajo.resx">
-      <DependentUpon>frmLegajo.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmMenuPrincipal.resx">
       <DependentUpon>frmMenuPrincipal.vb</DependentUpon>
     </EmbeddedResource>
@@ -332,9 +254,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmNuevoPase.resx">
       <DependentUpon>frmNuevoPase.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmReclusos.resx">
-      <DependentUpon>frmReclusos.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

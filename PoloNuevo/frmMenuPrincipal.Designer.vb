@@ -22,21 +22,19 @@ Partial Class frmMenuPrincipal
         Me.SalirToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GestiónToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DashboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ReclusosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MesaDeEntradaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ComisionesLaboralesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReportesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AuditoriaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfiguracionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RangosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SeguridadToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.btnGestionUsuarios = New System.Windows.Forms.ToolStripMenuItem()
+        Me.btnVerLogs = New System.Windows.Forms.ToolStripMenuItem()
         Me.VentanasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CerrarTodasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.lblEstado = New System.Windows.Forms.ToolStripStatusLabel()
         Me.lblUsuarioConectado = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.btnVerLogs = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -63,12 +61,12 @@ Partial Class frmMenuPrincipal
         'SalirToolStripMenuItem
         '
         Me.SalirToolStripMenuItem.Name = "SalirToolStripMenuItem"
-        Me.SalirToolStripMenuItem.Size = New System.Drawing.Size(147, 34)
+        Me.SalirToolStripMenuItem.Size = New System.Drawing.Size(270, 34)
         Me.SalirToolStripMenuItem.Text = "Salir"
         '
         'GestiónToolStripMenuItem
         '
-        Me.GestiónToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DashboardToolStripMenuItem, Me.ReclusosToolStripMenuItem, Me.MesaDeEntradaToolStripMenuItem, Me.ComisionesLaboralesToolStripMenuItem, Me.ReportesToolStripMenuItem, Me.AuditoriaToolStripMenuItem})
+        Me.GestiónToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DashboardToolStripMenuItem, Me.MesaDeEntradaToolStripMenuItem, Me.ReportesToolStripMenuItem, Me.AuditoriaToolStripMenuItem})
         Me.GestiónToolStripMenuItem.Name = "GestiónToolStripMenuItem"
         Me.GestiónToolStripMenuItem.Size = New System.Drawing.Size(88, 29)
         Me.GestiónToolStripMenuItem.Text = "Gestión"
@@ -80,26 +78,12 @@ Partial Class frmMenuPrincipal
         Me.DashboardToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.DashboardToolStripMenuItem.Text = "Panel de Control (Dashboard)"
         '
-        'ReclusosToolStripMenuItem
-        '
-        Me.ReclusosToolStripMenuItem.Name = "ReclusosToolStripMenuItem"
-        Me.ReclusosToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1
-        Me.ReclusosToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
-        Me.ReclusosToolStripMenuItem.Text = "Listado de Reclusos"
-        '
         'MesaDeEntradaToolStripMenuItem
         '
         Me.MesaDeEntradaToolStripMenuItem.Name = "MesaDeEntradaToolStripMenuItem"
         Me.MesaDeEntradaToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2
         Me.MesaDeEntradaToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
         Me.MesaDeEntradaToolStripMenuItem.Text = "Mesa de Entrada"
-        '
-        'ComisionesLaboralesToolStripMenuItem
-        '
-        Me.ComisionesLaboralesToolStripMenuItem.Name = "ComisionesLaboralesToolStripMenuItem"
-        Me.ComisionesLaboralesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3
-        Me.ComisionesLaboralesToolStripMenuItem.Size = New System.Drawing.Size(388, 34)
-        Me.ComisionesLaboralesToolStripMenuItem.Text = "Comisiones Laborales"
         '
         'ReportesToolStripMenuItem
         '
@@ -141,6 +125,12 @@ Partial Class frmMenuPrincipal
         Me.btnGestionUsuarios.Size = New System.Drawing.Size(270, 34)
         Me.btnGestionUsuarios.Text = "Gestionar Usuarios"
         '
+        'btnVerLogs
+        '
+        Me.btnVerLogs.Name = "btnVerLogs"
+        Me.btnVerLogs.Size = New System.Drawing.Size(270, 34)
+        Me.btnVerLogs.Text = "Ver Log de Accesos"
+        '
         'VentanasToolStripMenuItem
         '
         Me.VentanasToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CerrarTodasToolStripMenuItem})
@@ -179,12 +169,6 @@ Partial Class frmMenuPrincipal
         Me.lblUsuarioConectado.Text = "Usuario: ..."
         Me.lblUsuarioConectado.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
-        'btnVerLogs
-        '
-        Me.btnVerLogs.Name = "btnVerLogs"
-        Me.btnVerLogs.Size = New System.Drawing.Size(270, 34)
-        Me.btnVerLogs.Text = "Ver Log de Accesos"
-        '
         'frmMenuPrincipal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -213,9 +197,7 @@ Partial Class frmMenuPrincipal
     Friend WithEvents SalirToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents GestiónToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DashboardToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ReclusosToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MesaDeEntradaToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ComisionesLaboralesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ReportesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AuditoriaToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ConfiguracionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem

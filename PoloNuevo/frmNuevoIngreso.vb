@@ -16,17 +16,11 @@ Public Class frmNuevoIngreso
     Private _ubicacionPadre As String = "MESA DE ENTRADA"
     Private _ajustandoVinculacion As Boolean = False
 
-    Private _listaCompletaReclusos As New List(Of ReclusoItem)
     Private _todosOrigenes As New List(Of String)
 
     Private _archivoBytes As Byte() = Nothing
     Private _archivoNombre As String = ""
     Private _archivoExt As String = ""
-
-    Public Class ReclusoItem
-        Public Property Id As Integer
-        Public Property Texto As String
-    End Class
 
     ' =========================================================
     ' CONSTRUCTORES
@@ -66,6 +60,8 @@ Public Class frmNuevoIngreso
 
         lstSugerenciasOrigen.Visible = False
         lstSugerenciasOrigen.BringToFront()
+
+        ' Ocultar grupo destino si existe, ya que es un ingreso
         If Me.Controls.ContainsKey("grpDestino") Then Me.Controls("grpDestino").Visible = False
 
         If _idPadrePreseleccionado > 0 Then
@@ -81,18 +77,19 @@ Public Class frmNuevoIngreso
 
     Private Sub CargarListas()
         Using db As New PoloNuevoEntities()
+            ' Cargamos Tipos de Documento, excluyendo ARCHIVO si es necesario
             cmbTipo.DataSource = db.TiposDocumento.Where(Function(t) t.Nombre <> "ARCHIVO").OrderBy(Function(t) t.Nombre).ToList()
             cmbTipo.DisplayMember = "Nombre"
             cmbTipo.ValueMember = "Id"
 
-            _listaCompletaReclusos = db.Reclusos.Select(Function(r) New ReclusoItem With {.Id = r.Id, .Texto = r.Nombre & " (" & r.Cedula & ")"}).OrderBy(Function(r) r.Texto).ToList()
-            ActualizarListaReclusos(_listaCompletaReclusos)
-
+            ' Cargamos sugerencias de orígenes basados en el historial y defaults
             Dim listaTemp = db.MovimientosDocumentos.Where(Function(m) m.Origen <> "" And m.Origen <> "SISTEMA").Select(Function(m) m.Origen).Distinct().ToList()
             Dim defaults As String() = {"JUZGADO LETRADO", "MINISTERIO DEL INTERIOR", "FISCALÍA", "DEFENSORÍA", "DIRECCIÓN", "JEFATURA DE SERVICIO", "OGLAST"}
+
             For Each def In defaults
                 If Not listaTemp.Contains(def) Then listaTemp.Add(def)
             Next
+
             listaTemp.Sort()
             _todosOrigenes = listaTemp
         End Using
@@ -123,6 +120,7 @@ Public Class frmNuevoIngreso
             Dim encontrado As Boolean = True
             Dim iteraciones As Integer = 0
 
+            ' Buscamos hacia atrás hasta encontrar el documento raíz (Padre original)
             While encontrado AndAlso iteraciones < 50
                 iteraciones += 1
                 Dim idActual = idRastro
@@ -136,6 +134,7 @@ Public Class frmNuevoIngreso
             End While
 
             Dim padre = db.Documentos.Include("MovimientosDocumentos").Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idPadreFinal)
+
             If padre IsNot Nothing Then
                 Dim ultimoMov = padre.MovimientosDocumentos _
                     .OrderByDescending(Function(m) m.FechaMovimiento) _
@@ -148,6 +147,7 @@ Public Class frmNuevoIngreso
                 End If
 
                 _padreEnMesa = _ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+
                 If Not _padreEnMesa Then
                     _idPadreVerificado = 0
                     lblInfoPadre.Text = $"Ubicación: {_ubicacionPadre}."
@@ -271,11 +271,7 @@ Public Class frmNuevoIngreso
                 nuevoDoc.ReferenciaExterna = txtNumero.Text.Trim()
                 If cmbTipo.SelectedValue IsNot Nothing Then nuevoDoc.TipoDocumentoId = Convert.ToInt32(cmbTipo.SelectedValue)
 
-                If chkVincular.Checked AndAlso lstReclusos.SelectedValue IsNot Nothing AndAlso lstReclusos.SelectedValue > 0 Then
-                    nuevoDoc.ReclusoId = Convert.ToInt32(lstReclusos.SelectedValue)
-                Else
-                    nuevoDoc.ReclusoId = Nothing
-                End If
+                ' *** SECCIÓN RECLUSO ELIMINADA ***
 
                 If chkVencimiento.Checked Then
                     nuevoDoc.FechaVencimiento = dtpVencimiento.Value
@@ -384,7 +380,7 @@ Public Class frmNuevoIngreso
     End Sub
 
     ' =========================================================
-    ' EVENTOS DE INTERFAZ
+    ' EVENTOS DE INTERFAZ (Textos y Autocomplete)
     ' =========================================================
     Private Sub txtOrigen_TextChanged(sender As Object, e As EventArgs) Handles txtOrigen.TextChanged
         Dim texto As String = txtOrigen.Text.Trim().ToLower()
@@ -458,18 +454,16 @@ Public Class frmNuevoIngreso
                     txtNumero.Text = doc.ReferenciaExterna
                     txtAsunto.Text = doc.Descripcion
                     If IsNumeric(doc.TipoDocumentoId) Then cmbTipo.SelectedValue = doc.TipoDocumentoId
-                    If doc.ReclusoId.HasValue Then
-                        chkVincular.Checked = True
-                        ActualizarListaReclusos(_listaCompletaReclusos, doc.ReclusoId.Value)
-                    Else
-                        chkVincular.Checked = False
-                    End If
+
+                    ' Eliminada referencia a doc.ReclusoId
+
                     If doc.FechaVencimiento.HasValue Then
                         chkVencimiento.Checked = True
                         dtpVencimiento.Value = doc.FechaVencimiento.Value
                     Else
                         chkVencimiento.Checked = False
                     End If
+
                     If doc.Extension <> ".phy" Then
                         lblArchivoNombre.Text = "Archivo actual: " & doc.NombreArchivo
                         lblArchivoNombre.ForeColor = Color.Blue
@@ -477,6 +471,7 @@ Public Class frmNuevoIngreso
                     Else
                         lblArchivoNombre.Text = "Registro Físico (Sin digitalizar)"
                     End If
+
                     Dim primerMov = doc.MovimientosDocumentos.OrderBy(Function(m) m.FechaMovimiento).FirstOrDefault()
                     If primerMov IsNot Nothing Then txtOrigen.Text = primerMov.Origen
                 End If
@@ -484,13 +479,6 @@ Public Class frmNuevoIngreso
         Catch ex As Exception
             MessageBox.Show("Error al cargar datos: " & ex.Message)
         End Try
-    End Sub
-
-    Private Sub ActualizarListaReclusos(items As List(Of ReclusoItem), Optional selectedId As Integer? = Nothing)
-        lstReclusos.DataSource = items
-        lstReclusos.DisplayMember = "Texto"
-        lstReclusos.ValueMember = "Id"
-        lstReclusos.SelectedValue = If(selectedId, -1)
     End Sub
 
     Private Sub btnAdjuntar_Click(sender As Object, e As EventArgs) Handles btnAdjuntar.Click
@@ -507,19 +495,6 @@ Public Class frmNuevoIngreso
 
     Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         Me.Close()
-    End Sub
-
-    Private Sub txtBuscarRecluso_TextChanged(sender As Object, e As EventArgs) Handles txtBuscarRecluso.TextChanged
-        Dim filtro = txtBuscarRecluso.Text.ToLower()
-        If _listaCompletaReclusos IsNot Nothing Then
-            Dim filtrada = _listaCompletaReclusos.Where(Function(r) r.Texto.ToLower().Contains(filtro)).ToList()
-            ActualizarListaReclusos(filtrada)
-        End If
-    End Sub
-
-    Private Sub chkVincular_CheckedChanged(sender As Object, e As EventArgs) Handles chkVincular.CheckedChanged
-        txtBuscarRecluso.Enabled = chkVincular.Checked
-        lstReclusos.Enabled = chkVincular.Checked
     End Sub
 
     Private Sub chkVencimiento_CheckedChanged(sender As Object, e As EventArgs) Handles chkVencimiento.CheckedChanged

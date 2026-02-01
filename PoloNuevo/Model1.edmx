@@ -4,17 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="PoloNuevoModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="ActividadesObras">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="GestionObraId" Type="int" Nullable="false" />
-          <Property Name="Fecha" Type="date" Nullable="false" />
-          <Property Name="Motivo" Type="nvarchar(max)" />
-          <Property Name="Activo" Type="bit" />
-        </EntityType>
+      <Schema Namespace="PoloNuevoModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AuditoriaDocumentos">
           <Key>
             <PropertyRef Name="Id" />
@@ -40,34 +30,6 @@
           <Property Name="TipoMovimiento" Type="nvarchar" MaxLength="50" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
         </EntityType>
-        <EntityType Name="CandidatosLaborales">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="IdoneidadId" Type="int" Nullable="false" />
-          <Property Name="FechaVencimientoPena" Type="date" />
-          <Property Name="FechaTercioPena" Type="date" />
-          <Property Name="Estado" Type="nvarchar" MaxLength="50" />
-          <Property Name="Observaciones" Type="nvarchar" MaxLength="500" />
-        </EntityType>
-        <EntityType Name="Comisiones">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="TareaId" Type="int" Nullable="false" />
-          <Property Name="NumeroTarjeta" Type="int" />
-          <Property Name="FechaInicio" Type="date" Nullable="false" />
-          <Property Name="FechaFin" Type="date" />
-          <Property Name="Horario" Type="nvarchar" MaxLength="50" />
-          <Property Name="Activa" Type="bit" />
-          <Property Name="MotivoAlta" Type="nvarchar(max)" />
-          <Property Name="MotivoBaja" Type="nvarchar(max)" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
-        </EntityType>
         <EntityType Name="Comunicados">
           <Key>
             <PropertyRef Name="Id" />
@@ -84,7 +46,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" />
           <Property Name="TipoDocumentoId" Type="int" Nullable="false" />
           <Property Name="Descripcion" Type="nvarchar(max)" />
           <Property Name="Contenido" Type="varbinary(max)" Nullable="false" />
@@ -121,36 +82,6 @@
           <Property Name="Descripcion" Type="nvarchar(max)" />
           <Property Name="UsuarioId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="GestionObras">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="ObraId" Type="int" Nullable="false" />
-          <Property Name="FechaAlta" Type="date" Nullable="false" />
-          <Property Name="Autorizado" Type="bit" />
-          <Property Name="Activo" Type="bit" />
-          <Property Name="NumeroActa" Type="nvarchar" MaxLength="50" />
-        </EntityType>
-        <EntityType Name="Idoneidades">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Descripcion" Type="nvarchar" MaxLength="100" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Licencias">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="MotivoAusenciaId" Type="int" Nullable="false" />
-          <Property Name="FechaInicio" Type="datetime" Nullable="false" />
-          <Property Name="FechaFin" Type="datetime" Nullable="false" />
-          <Property Name="Detalles" Type="nvarchar(max)" />
-        </EntityType>
         <EntityType Name="MotivosAusencia">
           <Key>
             <PropertyRef Name="Id" />
@@ -170,16 +101,6 @@
           <Property Name="EsSalida" Type="bit" Nullable="false" />
           <Property Name="Observaciones" Type="nvarchar(max)" />
         </EntityType>
-        <EntityType Name="Notificaciones">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="Fecha" Type="date" Nullable="false" />
-          <Property Name="Mensaje" Type="nvarchar(max)" />
-          <Property Name="FechaRegistro" Type="date" />
-        </EntityType>
         <EntityType Name="NumeracionRangos">
           <Key>
             <PropertyRef Name="Id" />
@@ -191,73 +112,6 @@
           <Property Name="NumeroFin" Type="int" Nullable="false" />
           <Property Name="UltimoUtilizado" Type="int" Nullable="false" />
           <Property Name="Activo" Type="bit" />
-        </EntityType>
-        <EntityType Name="Obras">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Nombre" Type="nvarchar" MaxLength="500" Nullable="false" />
-          <Property Name="EstadoId" Type="int" Nullable="false" />
-        </EntityType>
-        <EntityType Name="PlanillasLaborales">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="TareaId" Type="int" Nullable="false" />
-          <Property Name="Mes" Type="int" Nullable="false" />
-          <Property Name="Anio" Type="int" Nullable="false" />
-          <Property Name="DiasTrabajados" Type="int" Nullable="false" />
-          <Property Name="CargaHoraria" Type="int" Nullable="false" />
-          <Property Name="TotalHoras" Type="int" Nullable="false" />
-          <Property Name="Remuneracion" Type="nvarchar" MaxLength="50" />
-          <Property Name="Observaciones" Type="nvarchar(max)" />
-        </EntityType>
-        <EntityType Name="Reclusos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Nombre" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Cedula" Type="int" Nullable="false" />
-          <Property Name="Modulo" Type="int" Nullable="false" />
-          <Property Name="FechaNacimiento" Type="date" Nullable="false" />
-          <Property Name="Peculio" Type="nvarchar" MaxLength="10" />
-          <Property Name="EstadoId" Type="int" Nullable="false" />
-          <Property Name="FechaRegistro" Type="datetime" />
-        </EntityType>
-        <EntityType Name="SalidasTransitorias">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="FechaSolicitud" Type="date" Nullable="false" />
-          <Property Name="TipoTransitoria" Type="nvarchar" MaxLength="250" />
-          <Property Name="Domicilio" Type="nvarchar" MaxLength="500" />
-          <Property Name="NombreTutor" Type="nvarchar" MaxLength="250" />
-          <Property Name="TelefonoContacto" Type="nvarchar" MaxLength="50" />
-          <Property Name="EstadoSolicitud" Type="nvarchar" MaxLength="50" />
-        </EntityType>
-        <EntityType Name="Tareas">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Nombre" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="EsTareaPrimaria" Type="bit" />
-        </EntityType>
-        <EntityType Name="Tarjetas">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="NumeroTarjeta" Type="int" Nullable="false" />
-          <Property Name="FechaHoraInicio" Type="datetime" Nullable="false" />
-          <Property Name="FechaHoraFin" Type="datetime" />
         </EntityType>
         <EntityType Name="TiposDocumento">
           <Key>
@@ -274,17 +128,6 @@
           <Property Name="NombreUsuario" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Clave" Type="nvarchar" MaxLength="256" Nullable="false" />
           <Property Name="Rol" Type="nvarchar" MaxLength="50" />
-        </EntityType>
-        <EntityType Name="VencimientosLegales">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ReclusoId" Type="int" Nullable="false" />
-          <Property Name="FechaVencimientoPena" Type="date" />
-          <Property Name="FechaInformeOperativo" Type="date" />
-          <Property Name="FechaEntrevista" Type="date" />
-          <Property Name="FechaOasys" Type="date" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_DocumentosDetalle' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -373,66 +216,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Actividades_Gestion">
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="1" />
-          <End Role="ActividadesObras" Type="Self.ActividadesObras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="GestionObras">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ActividadesObras">
-              <PropertyRef Name="GestionObraId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Candidatos_Idoneidad">
-          <End Role="Idoneidades" Type="Self.Idoneidades" Multiplicity="1" />
-          <End Role="CandidatosLaborales" Type="Self.CandidatosLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Idoneidades">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="CandidatosLaborales">
-              <PropertyRef Name="IdoneidadId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Candidatos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="CandidatosLaborales" Type="Self.CandidatosLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="CandidatosLaborales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Comisiones_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Comisiones" Type="Self.Comisiones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Comisiones">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Comisiones_Tareas">
-          <End Role="Tareas" Type="Self.Tareas" Multiplicity="1" />
-          <End Role="Comisiones" Type="Self.Comisiones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Tareas">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Comisiones">
-              <PropertyRef Name="TareaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Documentos_Padre">
           <End Role="Documentos" Type="Self.Documentos" Multiplicity="0..1" />
           <End Role="Documentos1" Type="Self.Documentos" Multiplicity="*" />
@@ -442,18 +225,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Principal>
             <Dependent Role="Documentos1">
               <PropertyRef Name="DocumentoPadreId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Documentos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="0..1" />
-          <End Role="Documentos" Type="Self.Documentos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Documentos">
-              <PropertyRef Name="ReclusoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -481,30 +252,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_GestionObras_Obras">
-          <End Role="Obras" Type="Self.Obras" Multiplicity="1" />
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Obras">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="GestionObras">
-              <PropertyRef Name="ObraId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_GestionObras_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="GestionObras">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Hijo">
           <End Role="Documentos" Type="Self.Documentos" Multiplicity="1" />
           <End Role="DocumentoVinculos" Type="Self.DocumentoVinculos" Multiplicity="*" />
@@ -514,30 +261,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Principal>
             <Dependent Role="DocumentoVinculos">
               <PropertyRef Name="IdDocumentoHijo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Licencias_Motivos">
-          <End Role="MotivosAusencia" Type="Self.MotivosAusencia" Multiplicity="1" />
-          <End Role="Licencias" Type="Self.Licencias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MotivosAusencia">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Licencias">
-              <PropertyRef Name="MotivoAusenciaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Licencias_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Licencias" Type="Self.Licencias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Licencias">
-              <PropertyRef Name="ReclusoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -553,30 +276,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Notificaciones_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Notificaciones" Type="Self.Notificaciones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notificaciones">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Obras_Estados">
-          <End Role="Estados" Type="Self.Estados" Multiplicity="1" />
-          <End Role="Obras" Type="Self.Obras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Estados">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Obras">
-              <PropertyRef Name="EstadoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Padre">
           <End Role="Documentos" Type="Self.Documentos" Multiplicity="1" />
           <End Role="DocumentoVinculos" Type="Self.DocumentoVinculos" Multiplicity="*" />
@@ -589,105 +288,19 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Planillas_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="PlanillasLaborales" Type="Self.PlanillasLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PlanillasLaborales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Planillas_Tareas">
-          <End Role="Tareas" Type="Self.Tareas" Multiplicity="1" />
-          <End Role="PlanillasLaborales" Type="Self.PlanillasLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Tareas">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PlanillasLaborales">
-              <PropertyRef Name="TareaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Reclusos_Estados">
-          <End Role="Estados" Type="Self.Estados" Multiplicity="1" />
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Estados">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Reclusos">
-              <PropertyRef Name="EstadoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Tarjetas_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Tarjetas" Type="Self.Tarjetas" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Tarjetas">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Transitorias_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="SalidasTransitorias" Type="Self.SalidasTransitorias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="SalidasTransitorias">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Vencimientos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="VencimientosLegales" Type="Self.VencimientosLegales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="VencimientosLegales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="PoloNuevoModelStoreContainer">
-          <EntitySet Name="ActividadesObras" EntityType="Self.ActividadesObras" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AuditoriaDocumentos" EntityType="Self.AuditoriaDocumentos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AuditoriaMovimientos" EntityType="Self.AuditoriaMovimientos" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="CandidatosLaborales" EntityType="Self.CandidatosLaborales" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Comisiones" EntityType="Self.Comisiones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comunicados" EntityType="Self.Comunicados" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Documentos" EntityType="Self.Documentos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DocumentoVinculos" EntityType="Self.DocumentoVinculos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Estados" EntityType="Self.Estados" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EventosSistema" EntityType="Self.EventosSistema" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GestionObras" EntityType="Self.GestionObras" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Idoneidades" EntityType="Self.Idoneidades" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Licencias" EntityType="Self.Licencias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MotivosAusencia" EntityType="Self.MotivosAusencia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MovimientosDocumentos" EntityType="Self.MovimientosDocumentos" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Notificaciones" EntityType="Self.Notificaciones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NumeracionRangos" EntityType="Self.NumeracionRangos" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Obras" EntityType="Self.Obras" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="PlanillasLaborales" EntityType="Self.PlanillasLaborales" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Reclusos" EntityType="Self.Reclusos" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SalidasTransitorias" EntityType="Self.SalidasTransitorias" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Tareas" EntityType="Self.Tareas" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Tarjetas" EntityType="Self.Tarjetas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TiposDocumento" EntityType="Self.TiposDocumento" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="VencimientosLegales" EntityType="Self.VencimientosLegales" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_DocumentosDetalle" EntityType="Self.vw_DocumentosDetalle" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_DocumentosDetalle].[Id] AS [Id], 
@@ -735,33 +348,9 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             <End Role="TiposDocumento" EntitySet="TiposDocumento" />
             <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
           </AssociationSet>
-          <AssociationSet Name="FK_Actividades_Gestion" Association="Self.FK_Actividades_Gestion">
-            <End Role="GestionObras" EntitySet="GestionObras" />
-            <End Role="ActividadesObras" EntitySet="ActividadesObras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Candidatos_Idoneidad" Association="Self.FK_Candidatos_Idoneidad">
-            <End Role="Idoneidades" EntitySet="Idoneidades" />
-            <End Role="CandidatosLaborales" EntitySet="CandidatosLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Candidatos_Reclusos" Association="Self.FK_Candidatos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="CandidatosLaborales" EntitySet="CandidatosLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Comisiones_Reclusos" Association="Self.FK_Comisiones_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Comisiones" EntitySet="Comisiones" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Comisiones_Tareas" Association="Self.FK_Comisiones_Tareas">
-            <End Role="Tareas" EntitySet="Tareas" />
-            <End Role="Comisiones" EntitySet="Comisiones" />
-          </AssociationSet>
           <AssociationSet Name="FK_Documentos_Padre" Association="Self.FK_Documentos_Padre">
             <End Role="Documentos" EntitySet="Documentos" />
             <End Role="Documentos1" EntitySet="Documentos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Documentos_Reclusos" Association="Self.FK_Documentos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Documentos" EntitySet="Documentos" />
           </AssociationSet>
           <AssociationSet Name="FK_Documentos_Tipos" Association="Self.FK_Documentos_Tipos">
             <End Role="TiposDocumento" EntitySet="TiposDocumento" />
@@ -771,113 +360,50 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             <End Role="Usuarios" EntitySet="Usuarios" />
             <End Role="EventosSistema" EntitySet="EventosSistema" />
           </AssociationSet>
-          <AssociationSet Name="FK_GestionObras_Obras" Association="Self.FK_GestionObras_Obras">
-            <End Role="Obras" EntitySet="Obras" />
-            <End Role="GestionObras" EntitySet="GestionObras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_GestionObras_Reclusos" Association="Self.FK_GestionObras_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="GestionObras" EntitySet="GestionObras" />
-          </AssociationSet>
           <AssociationSet Name="FK_Hijo" Association="Self.FK_Hijo">
             <End Role="Documentos" EntitySet="Documentos" />
             <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Licencias_Motivos" Association="Self.FK_Licencias_Motivos">
-            <End Role="MotivosAusencia" EntitySet="MotivosAusencia" />
-            <End Role="Licencias" EntitySet="Licencias" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Licencias_Reclusos" Association="Self.FK_Licencias_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Licencias" EntitySet="Licencias" />
           </AssociationSet>
           <AssociationSet Name="FK_Movimientos_Documentos" Association="Self.FK_Movimientos_Documentos">
             <End Role="Documentos" EntitySet="Documentos" />
             <End Role="MovimientosDocumentos" EntitySet="MovimientosDocumentos" />
           </AssociationSet>
-          <AssociationSet Name="FK_Notificaciones_Reclusos" Association="Self.FK_Notificaciones_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Notificaciones" EntitySet="Notificaciones" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Obras_Estados" Association="Self.FK_Obras_Estados">
-            <End Role="Estados" EntitySet="Estados" />
-            <End Role="Obras" EntitySet="Obras" />
-          </AssociationSet>
           <AssociationSet Name="FK_Padre" Association="Self.FK_Padre">
             <End Role="Documentos" EntitySet="Documentos" />
             <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
           </AssociationSet>
-          <AssociationSet Name="FK_Planillas_Reclusos" Association="Self.FK_Planillas_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="PlanillasLaborales" EntitySet="PlanillasLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Planillas_Tareas" Association="Self.FK_Planillas_Tareas">
-            <End Role="Tareas" EntitySet="Tareas" />
-            <End Role="PlanillasLaborales" EntitySet="PlanillasLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Reclusos_Estados" Association="Self.FK_Reclusos_Estados">
-            <End Role="Estados" EntitySet="Estados" />
-            <End Role="Reclusos" EntitySet="Reclusos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Tarjetas_Reclusos" Association="Self.FK_Tarjetas_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Tarjetas" EntitySet="Tarjetas" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Transitorias_Reclusos" Association="Self.FK_Transitorias_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="SalidasTransitorias" EntitySet="SalidasTransitorias" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Vencimientos_Reclusos" Association="Self.FK_Vencimientos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="VencimientosLegales" EntitySet="VencimientosLegales" />
-          </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PoloNuevoModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="ActividadesObras">
+        <EntityType Name="AuditoriaDocumentos">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="GestionObraId" Type="Int32" Nullable="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Motivo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Activo" Type="Boolean" />
-          <NavigationProperty Name="GestionObras" Relationship="Self.FK_Actividades_Gestion" FromRole="ActividadesObras" ToRole="GestionObras" />
+          <Property Name="FechaEliminacion" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioResponsable" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MotivoEliminacion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DocIdOriginal" Type="Int32" />
+          <Property Name="DocReferencia" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="DocAsunto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DocFechaCarga" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="AuditoriaMovimientos" Relationship="Self.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaDocumentos" ToRole="AuditoriaMovimientos" />
         </EntityType>
-        <EntityType Name="CandidatosLaborales">
+        <EntityType Name="AuditoriaMovimientos">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="IdoneidadId" Type="Int32" Nullable="false" />
-          <Property Name="FechaVencimientoPena" Type="DateTime" Precision="0" />
-          <Property Name="FechaTercioPena" Type="DateTime" Precision="0" />
-          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Observaciones" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Idoneidades" Relationship="Self.FK_Candidatos_Idoneidad" FromRole="CandidatosLaborales" ToRole="Idoneidades" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Candidatos_Reclusos" FromRole="CandidatosLaborales" ToRole="Reclusos" />
-        </EntityType>
-        <EntityType Name="Comisiones">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="TareaId" Type="Int32" Nullable="false" />
-          <Property Name="NumeroTarjeta" Type="Int32" />
-          <Property Name="FechaInicio" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="FechaFin" Type="DateTime" Precision="0" />
-          <Property Name="Horario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Activa" Type="Boolean" />
-          <Property Name="MotivoAlta" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="MotivoBaja" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AuditoriaDocId" Type="Int32" Nullable="false" />
+          <Property Name="FechaMovimientoOriginal" Type="DateTime" Precision="3" />
+          <Property Name="Origen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Destino" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TipoMovimiento" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Comisiones_Reclusos" FromRole="Comisiones" ToRole="Reclusos" />
-          <NavigationProperty Name="Tareas" Relationship="Self.FK_Comisiones_Tareas" FromRole="Comisiones" ToRole="Tareas" />
+          <NavigationProperty Name="AuditoriaDocumentos" Relationship="Self.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaMovimientos" ToRole="AuditoriaDocumentos" />
         </EntityType>
         <EntityType Name="Comunicados">
           <Key>
@@ -895,7 +421,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" />
           <Property Name="TipoDocumentoId" Type="Int32" Nullable="false" />
           <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Contenido" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
@@ -903,15 +428,26 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Extension" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
           <Property Name="FechaCarga" Type="DateTime" Precision="3" />
           <Property Name="ReferenciaExterna" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Documentos_Reclusos" FromRole="Documentos" ToRole="Reclusos" />
-          <NavigationProperty Name="TiposDocumento" Relationship="Self.FK_Documentos_Tipos" FromRole="Documentos" ToRole="TiposDocumento" />
-          <NavigationProperty Name="MovimientosDocumentos" Relationship="Self.FK_Movimientos_Documentos" FromRole="Documentos" ToRole="MovimientosDocumentos" />
           <Property Name="FechaVencimiento" Type="DateTime" Precision="3" />
           <Property Name="DocumentoPadreId" Type="Int32" />
-          <NavigationProperty Name="Documentos1" Relationship="PoloNuevoModel.FK_Documentos_Padre" FromRole="Documentos" ToRole="Documentos1" />
-          <NavigationProperty Name="Documentos2" Relationship="PoloNuevoModel.FK_Documentos_Padre" FromRole="Documentos1" ToRole="Documentos" />
-          <NavigationProperty Name="DocumentoVinculos" Relationship="PoloNuevoModel.FK_Hijo" FromRole="Documentos" ToRole="DocumentoVinculos" />
-          <NavigationProperty Name="DocumentoVinculos1" Relationship="PoloNuevoModel.FK_Padre" FromRole="Documentos" ToRole="DocumentoVinculos" />
+          <NavigationProperty Name="Documentos1" Relationship="Self.FK_Documentos_Padre" FromRole="Documentos" ToRole="Documentos1" />
+          <NavigationProperty Name="Documentos2" Relationship="Self.FK_Documentos_Padre" FromRole="Documentos1" ToRole="Documentos" />
+          <NavigationProperty Name="TiposDocumento" Relationship="Self.FK_Documentos_Tipos" FromRole="Documentos" ToRole="TiposDocumento" />
+          <NavigationProperty Name="DocumentoVinculos" Relationship="Self.FK_Hijo" FromRole="Documentos" ToRole="DocumentoVinculos" />
+          <NavigationProperty Name="MovimientosDocumentos" Relationship="Self.FK_Movimientos_Documentos" FromRole="Documentos" ToRole="MovimientosDocumentos" />
+          <NavigationProperty Name="DocumentoVinculos1" Relationship="Self.FK_Padre" FromRole="Documentos" ToRole="DocumentoVinculos" />
+        </EntityType>
+        <EntityType Name="DocumentoVinculos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdDocumentoPadre" Type="Int32" Nullable="false" />
+          <Property Name="IdDocumentoHijo" Type="Int32" Nullable="false" />
+          <Property Name="TipoRelacion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FechaVinculo" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Documentos" Relationship="Self.FK_Hijo" FromRole="DocumentoVinculos" ToRole="Documentos" />
+          <NavigationProperty Name="Documentos1" Relationship="Self.FK_Padre" FromRole="DocumentoVinculos" ToRole="Documentos" />
         </EntityType>
         <EntityType Name="Estados">
           <Key>
@@ -919,8 +455,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Descripcion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Obras" Relationship="Self.FK_Obras_Estados" FromRole="Estados" ToRole="Obras" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Reclusos_Estados" FromRole="Estados" ToRole="Reclusos" />
         </EntityType>
         <EntityType Name="EventosSistema">
           <Key>
@@ -932,49 +466,12 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="UsuarioId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Usuarios" Relationship="Self.FK_Eventos_Usuarios" FromRole="EventosSistema" ToRole="Usuarios" />
         </EntityType>
-        <EntityType Name="GestionObras">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="ObraId" Type="Int32" Nullable="false" />
-          <Property Name="FechaAlta" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Autorizado" Type="Boolean" />
-          <Property Name="Activo" Type="Boolean" />
-          <Property Name="NumeroActa" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ActividadesObras" Relationship="Self.FK_Actividades_Gestion" FromRole="GestionObras" ToRole="ActividadesObras" />
-          <NavigationProperty Name="Obras" Relationship="Self.FK_GestionObras_Obras" FromRole="GestionObras" ToRole="Obras" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_GestionObras_Reclusos" FromRole="GestionObras" ToRole="Reclusos" />
-        </EntityType>
-        <EntityType Name="Idoneidades">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Descripcion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="CandidatosLaborales" Relationship="Self.FK_Candidatos_Idoneidad" FromRole="Idoneidades" ToRole="CandidatosLaborales" />
-        </EntityType>
-        <EntityType Name="Licencias">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="MotivoAusenciaId" Type="Int32" Nullable="false" />
-          <Property Name="FechaInicio" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Detalles" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="MotivosAusencia" Relationship="Self.FK_Licencias_Motivos" FromRole="Licencias" ToRole="MotivosAusencia" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Licencias_Reclusos" FromRole="Licencias" ToRole="Reclusos" />
-        </EntityType>
         <EntityType Name="MotivosAusencia">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Descripcion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Licencias" Relationship="Self.FK_Licencias_Motivos" FromRole="MotivosAusencia" ToRole="Licencias" />
         </EntityType>
         <EntityType Name="MovimientosDocumentos">
           <Key>
@@ -986,105 +483,21 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Origen" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Destino" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="EsSalida" Type="Boolean" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Documentos" Relationship="Self.FK_Movimientos_Documentos" FromRole="MovimientosDocumentos" ToRole="Documentos" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="Notificaciones">
+        <EntityType Name="NumeracionRangos">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Mensaje" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="FechaRegistro" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Notificaciones_Reclusos" FromRole="Notificaciones" ToRole="Reclusos" />
-        </EntityType>
-        <EntityType Name="Obras">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Nombre" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="EstadoId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Estados" Relationship="Self.FK_Obras_Estados" FromRole="Obras" ToRole="Estados" />
-          <NavigationProperty Name="GestionObras" Relationship="Self.FK_GestionObras_Obras" FromRole="Obras" ToRole="GestionObras" />
-        </EntityType>
-        <EntityType Name="PlanillasLaborales">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="TareaId" Type="Int32" Nullable="false" />
-          <Property Name="Mes" Type="Int32" Nullable="false" />
-          <Property Name="Anio" Type="Int32" Nullable="false" />
-          <Property Name="DiasTrabajados" Type="Int32" Nullable="false" />
-          <Property Name="CargaHoraria" Type="Int32" Nullable="false" />
-          <Property Name="TotalHoras" Type="Int32" Nullable="false" />
-          <Property Name="Remuneracion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Planillas_Reclusos" FromRole="PlanillasLaborales" ToRole="Reclusos" />
-          <NavigationProperty Name="Tareas" Relationship="Self.FK_Planillas_Tareas" FromRole="PlanillasLaborales" ToRole="Tareas" />
-        </EntityType>
-        <EntityType Name="Reclusos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Nombre" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Cedula" Type="Int32" Nullable="false" />
-          <Property Name="Modulo" Type="Int32" Nullable="false" />
-          <Property Name="FechaNacimiento" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Peculio" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
-          <Property Name="EstadoId" Type="Int32" Nullable="false" />
-          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="CandidatosLaborales" Relationship="Self.FK_Candidatos_Reclusos" FromRole="Reclusos" ToRole="CandidatosLaborales" />
-          <NavigationProperty Name="Comisiones" Relationship="Self.FK_Comisiones_Reclusos" FromRole="Reclusos" ToRole="Comisiones" />
-          <NavigationProperty Name="Documentos" Relationship="Self.FK_Documentos_Reclusos" FromRole="Reclusos" ToRole="Documentos" />
-          <NavigationProperty Name="Estados" Relationship="Self.FK_Reclusos_Estados" FromRole="Reclusos" ToRole="Estados" />
-          <NavigationProperty Name="GestionObras" Relationship="Self.FK_GestionObras_Reclusos" FromRole="Reclusos" ToRole="GestionObras" />
-          <NavigationProperty Name="Licencias" Relationship="Self.FK_Licencias_Reclusos" FromRole="Reclusos" ToRole="Licencias" />
-          <NavigationProperty Name="Notificaciones" Relationship="Self.FK_Notificaciones_Reclusos" FromRole="Reclusos" ToRole="Notificaciones" />
-          <NavigationProperty Name="PlanillasLaborales" Relationship="Self.FK_Planillas_Reclusos" FromRole="Reclusos" ToRole="PlanillasLaborales" />
-          <NavigationProperty Name="Tarjetas" Relationship="Self.FK_Tarjetas_Reclusos" FromRole="Reclusos" ToRole="Tarjetas" />
-          <NavigationProperty Name="SalidasTransitorias" Relationship="Self.FK_Transitorias_Reclusos" FromRole="Reclusos" ToRole="SalidasTransitorias" />
-          <NavigationProperty Name="VencimientosLegales" Relationship="Self.FK_Vencimientos_Reclusos" FromRole="Reclusos" ToRole="VencimientosLegales" />
-        </EntityType>
-        <EntityType Name="SalidasTransitorias">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="FechaSolicitud" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="TipoTransitoria" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="Domicilio" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="NombreTutor" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="TelefonoContacto" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="EstadoSolicitud" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Transitorias_Reclusos" FromRole="SalidasTransitorias" ToRole="Reclusos" />
-        </EntityType>
-        <EntityType Name="Tareas">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Nombre" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="EsTareaPrimaria" Type="Boolean" />
-          <NavigationProperty Name="Comisiones" Relationship="Self.FK_Comisiones_Tareas" FromRole="Tareas" ToRole="Comisiones" />
-          <NavigationProperty Name="PlanillasLaborales" Relationship="Self.FK_Planillas_Tareas" FromRole="Tareas" ToRole="PlanillasLaborales" />
-        </EntityType>
-        <EntityType Name="Tarjetas">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="NumeroTarjeta" Type="Int32" Nullable="false" />
-          <Property Name="FechaHoraInicio" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="FechaHoraFin" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Tarjetas_Reclusos" FromRole="Tarjetas" ToRole="Reclusos" />
+          <Property Name="TipoDocumentoId" Type="Int32" Nullable="false" />
+          <Property Name="NombreRango" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NumeroInicio" Type="Int32" Nullable="false" />
+          <Property Name="NumeroFin" Type="Int32" Nullable="false" />
+          <Property Name="UltimoUtilizado" Type="Int32" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" />
+          <NavigationProperty Name="TiposDocumento" Relationship="Self.FK__Numeracio__TipoD__778AC167" FromRole="NumeracionRangos" ToRole="TiposDocumento" />
         </EntityType>
         <EntityType Name="TiposDocumento">
           <Key>
@@ -1093,7 +506,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Documentos" Relationship="Self.FK_Documentos_Tipos" FromRole="TiposDocumento" ToRole="Documentos" />
-          <NavigationProperty Name="NumeracionRangos" Relationship="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" FromRole="TiposDocumento" ToRole="NumeracionRangos" />
+          <NavigationProperty Name="NumeracionRangos" Relationship="Self.FK__Numeracio__TipoD__778AC167" FromRole="TiposDocumento" ToRole="NumeracionRangos" />
         </EntityType>
         <EntityType Name="Usuarios">
           <Key>
@@ -1105,17 +518,41 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="Rol" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="EventosSistema" Relationship="Self.FK_Eventos_Usuarios" FromRole="Usuarios" ToRole="EventosSistema" />
         </EntityType>
-        <EntityType Name="VencimientosLegales">
+        <EntityType Name="vw_DocumentosDetalle">
           <Key>
             <PropertyRef Name="Id" />
+            <PropertyRef Name="Tipo" />
+            <PropertyRef Name="Formato" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ReclusoId" Type="Int32" Nullable="false" />
-          <Property Name="FechaVencimientoPena" Type="DateTime" Precision="0" />
-          <Property Name="FechaInformeOperativo" Type="DateTime" Precision="0" />
-          <Property Name="FechaEntrevista" Type="DateTime" Precision="0" />
-          <Property Name="FechaOasys" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Reclusos" Relationship="Self.FK_Vencimientos_Reclusos" FromRole="VencimientosLegales" ToRole="Reclusos" />
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="ReclusoId" Type="Int32" />
+          <Property Name="Tipo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FechaCarga" Type="DateTime" Precision="3" />
+          <Property Name="Extension" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Formato" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NombreArchivo" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_PlanillaMensual">
+          <Key>
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Recluso" />
+            <PropertyRef Name="Cedula" />
+            <PropertyRef Name="Tarea" />
+            <PropertyRef Name="Mes" />
+            <PropertyRef Name="Anio" />
+            <PropertyRef Name="DiasTrabajados" />
+            <PropertyRef Name="TotalHoras" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Recluso" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Cedula" Type="Int32" Nullable="false" />
+          <Property Name="Tarea" Type="String" MaxLength="250" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Mes" Type="Int32" Nullable="false" />
+          <Property Name="Anio" Type="Int32" Nullable="false" />
+          <Property Name="DiasTrabajados" Type="Int32" Nullable="false" />
+          <Property Name="TotalHoras" Type="Int32" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="vw_ReclusosMaestro">
           <Key>
@@ -1138,75 +575,27 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <Property Name="CantDocumentos" Type="Int32" />
           <Property Name="SituacionLaboral" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
-        <Association Name="FK_Actividades_Gestion">
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="1" />
-          <End Role="ActividadesObras" Type="Self.ActividadesObras" Multiplicity="*" />
+        <Association Name="FK__Auditoria__Audit__73BA3083">
+          <End Role="AuditoriaDocumentos" Type="Self.AuditoriaDocumentos" Multiplicity="1" />
+          <End Role="AuditoriaMovimientos" Type="Self.AuditoriaMovimientos" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="GestionObras">
+            <Principal Role="AuditoriaDocumentos">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ActividadesObras">
-              <PropertyRef Name="GestionObraId" />
+            <Dependent Role="AuditoriaMovimientos">
+              <PropertyRef Name="AuditoriaDocId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Candidatos_Idoneidad">
-          <End Role="Idoneidades" Type="Self.Idoneidades" Multiplicity="1" />
-          <End Role="CandidatosLaborales" Type="Self.CandidatosLaborales" Multiplicity="*" />
+        <Association Name="FK_Documentos_Padre">
+          <End Role="Documentos" Type="Self.Documentos" Multiplicity="0..1" />
+          <End Role="Documentos1" Type="Self.Documentos" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Idoneidades">
+            <Principal Role="Documentos">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="CandidatosLaborales">
-              <PropertyRef Name="IdoneidadId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Candidatos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="CandidatosLaborales" Type="Self.CandidatosLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="CandidatosLaborales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Comisiones_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Comisiones" Type="Self.Comisiones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Comisiones">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Comisiones_Tareas">
-          <End Role="Tareas" Type="Self.Tareas" Multiplicity="1" />
-          <End Role="Comisiones" Type="Self.Comisiones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Tareas">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Comisiones">
-              <PropertyRef Name="TareaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Documentos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="0..1" />
-          <End Role="Documentos" Type="Self.Documentos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Documentos">
-              <PropertyRef Name="ReclusoId" />
+            <Dependent Role="Documentos1">
+              <PropertyRef Name="DocumentoPadreId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1222,6 +611,18 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Hijo">
+          <End Role="Documentos" Type="Self.Documentos" Multiplicity="1" />
+          <End Role="DocumentoVinculos" Type="Self.DocumentoVinculos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Documentos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DocumentoVinculos">
+              <PropertyRef Name="IdDocumentoHijo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Movimientos_Documentos">
           <End Role="Documentos" Type="Self.Documentos" Multiplicity="1" />
           <End Role="MovimientosDocumentos" Type="Self.MovimientosDocumentos" Multiplicity="*" />
@@ -1234,27 +635,15 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Obras_Estados">
-          <End Role="Estados" Type="Self.Estados" Multiplicity="1" />
-          <End Role="Obras" Type="Self.Obras" Multiplicity="*" />
+        <Association Name="FK_Padre">
+          <End Role="Documentos" Type="Self.Documentos" Multiplicity="1" />
+          <End Role="DocumentoVinculos" Type="Self.DocumentoVinculos" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Estados">
+            <Principal Role="Documentos">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Obras">
-              <PropertyRef Name="EstadoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Reclusos_Estados">
-          <End Role="Estados" Type="Self.Estados" Multiplicity="1" />
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Estados">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Reclusos">
-              <PropertyRef Name="EstadoId" />
+            <Dependent Role="DocumentoVinculos">
+              <PropertyRef Name="IdDocumentoPadre" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1270,352 +659,9 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_GestionObras_Obras">
-          <End Role="Obras" Type="Self.Obras" Multiplicity="1" />
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Obras">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="GestionObras">
-              <PropertyRef Name="ObraId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_GestionObras_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="GestionObras" Type="Self.GestionObras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="GestionObras">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Licencias_Motivos">
-          <End Role="MotivosAusencia" Type="Self.MotivosAusencia" Multiplicity="1" />
-          <End Role="Licencias" Type="Self.Licencias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MotivosAusencia">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Licencias">
-              <PropertyRef Name="MotivoAusenciaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Licencias_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Licencias" Type="Self.Licencias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Licencias">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Notificaciones_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Notificaciones" Type="Self.Notificaciones" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notificaciones">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Planillas_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="PlanillasLaborales" Type="Self.PlanillasLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PlanillasLaborales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Planillas_Tareas">
-          <End Role="Tareas" Type="Self.Tareas" Multiplicity="1" />
-          <End Role="PlanillasLaborales" Type="Self.PlanillasLaborales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Tareas">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PlanillasLaborales">
-              <PropertyRef Name="TareaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Tarjetas_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="Tarjetas" Type="Self.Tarjetas" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Tarjetas">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Transitorias_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="SalidasTransitorias" Type="Self.SalidasTransitorias" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="SalidasTransitorias">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Vencimientos_Reclusos">
-          <End Role="Reclusos" Type="Self.Reclusos" Multiplicity="1" />
-          <End Role="VencimientosLegales" Type="Self.VencimientosLegales" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Reclusos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="VencimientosLegales">
-              <PropertyRef Name="ReclusoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityContainer Name="PoloNuevoEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="ActividadesObras" EntityType="Self.ActividadesObras" />
-          <EntitySet Name="CandidatosLaborales" EntityType="Self.CandidatosLaborales" />
-          <EntitySet Name="Comisiones" EntityType="Self.Comisiones" />
-          <EntitySet Name="Comunicados" EntityType="Self.Comunicados" />
-          <EntitySet Name="Documentos" EntityType="Self.Documentos" />
-          <EntitySet Name="Estados" EntityType="Self.Estados" />
-          <EntitySet Name="EventosSistema" EntityType="Self.EventosSistema" />
-          <EntitySet Name="GestionObras" EntityType="Self.GestionObras" />
-          <EntitySet Name="Idoneidades" EntityType="Self.Idoneidades" />
-          <EntitySet Name="Licencias" EntityType="Self.Licencias" />
-          <EntitySet Name="MotivosAusencia" EntityType="Self.MotivosAusencia" />
-          <EntitySet Name="MovimientosDocumentos" EntityType="Self.MovimientosDocumentos" />
-          <EntitySet Name="Notificaciones" EntityType="Self.Notificaciones" />
-          <EntitySet Name="Obras" EntityType="Self.Obras" />
-          <EntitySet Name="PlanillasLaborales" EntityType="Self.PlanillasLaborales" />
-          <EntitySet Name="Reclusos" EntityType="Self.Reclusos" />
-          <EntitySet Name="SalidasTransitorias" EntityType="Self.SalidasTransitorias" />
-          <EntitySet Name="Tareas" EntityType="Self.Tareas" />
-          <EntitySet Name="Tarjetas" EntityType="Self.Tarjetas" />
-          <EntitySet Name="TiposDocumento" EntityType="Self.TiposDocumento" />
-          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" />
-          <EntitySet Name="VencimientosLegales" EntityType="Self.VencimientosLegales" />
-          <EntitySet Name="vw_ReclusosMaestro" EntityType="Self.vw_ReclusosMaestro" />
-          <AssociationSet Name="FK_Actividades_Gestion" Association="Self.FK_Actividades_Gestion">
-            <End Role="GestionObras" EntitySet="GestionObras" />
-            <End Role="ActividadesObras" EntitySet="ActividadesObras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Candidatos_Idoneidad" Association="Self.FK_Candidatos_Idoneidad">
-            <End Role="Idoneidades" EntitySet="Idoneidades" />
-            <End Role="CandidatosLaborales" EntitySet="CandidatosLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Candidatos_Reclusos" Association="Self.FK_Candidatos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="CandidatosLaborales" EntitySet="CandidatosLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Comisiones_Reclusos" Association="Self.FK_Comisiones_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Comisiones" EntitySet="Comisiones" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Comisiones_Tareas" Association="Self.FK_Comisiones_Tareas">
-            <End Role="Tareas" EntitySet="Tareas" />
-            <End Role="Comisiones" EntitySet="Comisiones" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Documentos_Reclusos" Association="Self.FK_Documentos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Documentos" EntitySet="Documentos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Documentos_Tipos" Association="Self.FK_Documentos_Tipos">
-            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
-            <End Role="Documentos" EntitySet="Documentos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Movimientos_Documentos" Association="Self.FK_Movimientos_Documentos">
-            <End Role="Documentos" EntitySet="Documentos" />
-            <End Role="MovimientosDocumentos" EntitySet="MovimientosDocumentos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Obras_Estados" Association="Self.FK_Obras_Estados">
-            <End Role="Estados" EntitySet="Estados" />
-            <End Role="Obras" EntitySet="Obras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Reclusos_Estados" Association="Self.FK_Reclusos_Estados">
-            <End Role="Estados" EntitySet="Estados" />
-            <End Role="Reclusos" EntitySet="Reclusos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Eventos_Usuarios" Association="Self.FK_Eventos_Usuarios">
-            <End Role="Usuarios" EntitySet="Usuarios" />
-            <End Role="EventosSistema" EntitySet="EventosSistema" />
-          </AssociationSet>
-          <AssociationSet Name="FK_GestionObras_Obras" Association="Self.FK_GestionObras_Obras">
-            <End Role="Obras" EntitySet="Obras" />
-            <End Role="GestionObras" EntitySet="GestionObras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_GestionObras_Reclusos" Association="Self.FK_GestionObras_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="GestionObras" EntitySet="GestionObras" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Licencias_Motivos" Association="Self.FK_Licencias_Motivos">
-            <End Role="MotivosAusencia" EntitySet="MotivosAusencia" />
-            <End Role="Licencias" EntitySet="Licencias" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Licencias_Reclusos" Association="Self.FK_Licencias_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Licencias" EntitySet="Licencias" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Notificaciones_Reclusos" Association="Self.FK_Notificaciones_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Notificaciones" EntitySet="Notificaciones" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Planillas_Reclusos" Association="Self.FK_Planillas_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="PlanillasLaborales" EntitySet="PlanillasLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Planillas_Tareas" Association="Self.FK_Planillas_Tareas">
-            <End Role="Tareas" EntitySet="Tareas" />
-            <End Role="PlanillasLaborales" EntitySet="PlanillasLaborales" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Tarjetas_Reclusos" Association="Self.FK_Tarjetas_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="Tarjetas" EntitySet="Tarjetas" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Transitorias_Reclusos" Association="Self.FK_Transitorias_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="SalidasTransitorias" EntitySet="SalidasTransitorias" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Vencimientos_Reclusos" Association="Self.FK_Vencimientos_Reclusos">
-            <End Role="Reclusos" EntitySet="Reclusos" />
-            <End Role="VencimientosLegales" EntitySet="VencimientosLegales" />
-          </AssociationSet>
-          <EntitySet Name="vw_DocumentosDetalle" EntityType="PoloNuevoModel.vw_DocumentosDetalle" />
-          <EntitySet Name="vw_PlanillaMensual" EntityType="PoloNuevoModel.vw_PlanillaMensual" />
-          <EntitySet Name="AuditoriaDocumentos" EntityType="PoloNuevoModel.AuditoriaDocumentos" />
-          <EntitySet Name="AuditoriaMovimientos" EntityType="PoloNuevoModel.AuditoriaMovimientos" />
-          <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="PoloNuevoModel.FK__Auditoria__Audit__73BA3083">
-            <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
-            <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
-          </AssociationSet>
-          <EntitySet Name="NumeracionRangos" EntityType="PoloNuevoModel.NumeracionRangos" />
-          <AssociationSet Name="FK__Numeracio__TipoD__778AC167" Association="PoloNuevoModel.FK__Numeracio__TipoD__778AC167">
-            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
-            <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Documentos_Padre" Association="PoloNuevoModel.FK_Documentos_Padre">
-            <End Role="Documentos" EntitySet="Documentos" />
-            <End Role="Documentos1" EntitySet="Documentos" />
-          </AssociationSet>
-          <EntitySet Name="DocumentoVinculos" EntityType="PoloNuevoModel.DocumentoVinculos" />
-          <AssociationSet Name="FK_Hijo" Association="PoloNuevoModel.FK_Hijo">
-            <End Role="Documentos" EntitySet="Documentos" />
-            <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Padre" Association="PoloNuevoModel.FK_Padre">
-            <End Role="Documentos" EntitySet="Documentos" />
-            <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
-          </AssociationSet>
-        </EntityContainer>
-        <EntityType Name="vw_DocumentosDetalle">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Tipo" />
-            <PropertyRef Name="Formato" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="ReclusoId" Type="Int32" />
-          <Property Name="Tipo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Descripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="FechaCarga" Type="DateTime" Precision="3" />
-          <Property Name="Extension" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
-          <Property Name="Formato" Type="String" Nullable="false" MaxLength="14" FixedLength="false" Unicode="false" />
-          <Property Name="NombreArchivo" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="vw_PlanillaMensual">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Recluso" />
-            <PropertyRef Name="Cedula" />
-            <PropertyRef Name="Tarea" />
-            <PropertyRef Name="Mes" />
-            <PropertyRef Name="Anio" />
-            <PropertyRef Name="DiasTrabajados" />
-            <PropertyRef Name="TotalHoras" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Recluso" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="Cedula" Type="Int32" Nullable="false" />
-          <Property Name="Tarea" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="Mes" Type="Int32" Nullable="false" />
-          <Property Name="Anio" Type="Int32" Nullable="false" />
-          <Property Name="DiasTrabajados" Type="Int32" Nullable="false" />
-          <Property Name="TotalHoras" Type="Int32" Nullable="false" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="AuditoriaDocumentos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FechaEliminacion" Type="DateTime" Precision="3" />
-          <Property Name="UsuarioResponsable" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="MotivoEliminacion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="DocIdOriginal" Type="Int32" />
-          <Property Name="DocReferencia" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="DocAsunto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="DocFechaCarga" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="AuditoriaMovimientos" Relationship="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaDocumentos" ToRole="AuditoriaMovimientos" />
-        </EntityType>
-        <EntityType Name="AuditoriaMovimientos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="AuditoriaDocId" Type="Int32" Nullable="false" />
-          <Property Name="FechaMovimientoOriginal" Type="DateTime" Precision="3" />
-          <Property Name="Origen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Destino" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="TipoMovimiento" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AuditoriaDocumentos" Relationship="PoloNuevoModel.FK__Auditoria__Audit__73BA3083" FromRole="AuditoriaMovimientos" ToRole="AuditoriaDocumentos" />
-        </EntityType>
-        <Association Name="FK__Auditoria__Audit__73BA3083">
-          <End Type="PoloNuevoModel.AuditoriaDocumentos" Role="AuditoriaDocumentos" Multiplicity="1" />
-          <End Type="PoloNuevoModel.AuditoriaMovimientos" Role="AuditoriaMovimientos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AuditoriaDocumentos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AuditoriaMovimientos">
-              <PropertyRef Name="AuditoriaDocId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="NumeracionRangos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TipoDocumentoId" Type="Int32" Nullable="false" />
-          <Property Name="NombreRango" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="NumeroInicio" Type="Int32" Nullable="false" />
-          <Property Name="NumeroFin" Type="Int32" Nullable="false" />
-          <Property Name="UltimoUtilizado" Type="Int32" Nullable="false" />
-          <Property Name="Activo" Type="Boolean" />
-          <NavigationProperty Name="TiposDocumento" Relationship="PoloNuevoModel.FK__Numeracio__TipoD__778AC167" FromRole="NumeracionRangos" ToRole="TiposDocumento" />
-        </EntityType>
         <Association Name="FK__Numeracio__TipoD__778AC167">
-          <End Type="PoloNuevoModel.TiposDocumento" Role="TiposDocumento" Multiplicity="1" />
-          <End Type="PoloNuevoModel.NumeracionRangos" Role="NumeracionRangos" Multiplicity="*" />
+          <End Role="TiposDocumento" Type="Self.TiposDocumento" Multiplicity="1" />
+          <End Role="NumeracionRangos" Type="Self.NumeracionRangos" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="TiposDocumento">
               <PropertyRef Name="Id" />
@@ -1625,97 +671,84 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Documentos_Padre">
-          <End Type="PoloNuevoModel.Documentos" Role="Documentos" Multiplicity="0..1" />
-          <End Type="PoloNuevoModel.Documentos" Role="Documentos1" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Documentos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Documentos1">
-              <PropertyRef Name="DocumentoPadreId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="DocumentoVinculos">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IdDocumentoPadre" Type="Int32" Nullable="false" />
-          <Property Name="IdDocumentoHijo" Type="Int32" Nullable="false" />
-          <Property Name="TipoRelacion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="FechaVinculo" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Documentos" Relationship="PoloNuevoModel.FK_Hijo" FromRole="DocumentoVinculos" ToRole="Documentos" />
-          <NavigationProperty Name="Documentos1" Relationship="PoloNuevoModel.FK_Padre" FromRole="DocumentoVinculos" ToRole="Documentos" />
-        </EntityType>
-        <Association Name="FK_Hijo">
-          <End Type="PoloNuevoModel.Documentos" Role="Documentos" Multiplicity="1" />
-          <End Type="PoloNuevoModel.DocumentoVinculos" Role="DocumentoVinculos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Documentos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="DocumentoVinculos">
-              <PropertyRef Name="IdDocumentoHijo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Padre">
-          <End Type="PoloNuevoModel.Documentos" Role="Documentos" Multiplicity="1" />
-          <End Type="PoloNuevoModel.DocumentoVinculos" Role="DocumentoVinculos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Documentos">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="DocumentoVinculos">
-              <PropertyRef Name="IdDocumentoPadre" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
+        <EntityContainer Name="PoloNuevoEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AuditoriaDocumentos" EntityType="Self.AuditoriaDocumentos" />
+          <EntitySet Name="AuditoriaMovimientos" EntityType="Self.AuditoriaMovimientos" />
+          <EntitySet Name="Comunicados" EntityType="Self.Comunicados" />
+          <EntitySet Name="Documentos" EntityType="Self.Documentos" />
+          <EntitySet Name="DocumentoVinculos" EntityType="Self.DocumentoVinculos" />
+          <EntitySet Name="Estados" EntityType="Self.Estados" />
+          <EntitySet Name="EventosSistema" EntityType="Self.EventosSistema" />
+          <EntitySet Name="MotivosAusencia" EntityType="Self.MotivosAusencia" />
+          <EntitySet Name="MovimientosDocumentos" EntityType="Self.MovimientosDocumentos" />
+          <EntitySet Name="NumeracionRangos" EntityType="Self.NumeracionRangos" />
+          <EntitySet Name="TiposDocumento" EntityType="Self.TiposDocumento" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" />
+          <EntitySet Name="vw_DocumentosDetalle" EntityType="Self.vw_DocumentosDetalle" />
+          <EntitySet Name="vw_PlanillaMensual" EntityType="Self.vw_PlanillaMensual" />
+          <EntitySet Name="vw_ReclusosMaestro" EntityType="Self.vw_ReclusosMaestro" />
+          <AssociationSet Name="FK__Auditoria__Audit__73BA3083" Association="Self.FK__Auditoria__Audit__73BA3083">
+            <End Role="AuditoriaDocumentos" EntitySet="AuditoriaDocumentos" />
+            <End Role="AuditoriaMovimientos" EntitySet="AuditoriaMovimientos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Documentos_Padre" Association="Self.FK_Documentos_Padre">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="Documentos1" EntitySet="Documentos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Documentos_Tipos" Association="Self.FK_Documentos_Tipos">
+            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
+            <End Role="Documentos" EntitySet="Documentos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Hijo" Association="Self.FK_Hijo">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Movimientos_Documentos" Association="Self.FK_Movimientos_Documentos">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="MovimientosDocumentos" EntitySet="MovimientosDocumentos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Padre" Association="Self.FK_Padre">
+            <End Role="Documentos" EntitySet="Documentos" />
+            <End Role="DocumentoVinculos" EntitySet="DocumentoVinculos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Eventos_Usuarios" Association="Self.FK_Eventos_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="EventosSistema" EntitySet="EventosSistema" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Numeracio__TipoD__778AC167" Association="Self.FK__Numeracio__TipoD__778AC167">
+            <End Role="TiposDocumento" EntitySet="TiposDocumento" />
+            <End Role="NumeracionRangos" EntitySet="NumeracionRangos" />
+          </AssociationSet>
+        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="PoloNuevoModelStoreContainer" CdmEntityContainer="PoloNuevoEntities">
-          <EntitySetMapping Name="ActividadesObras">
-            <EntityTypeMapping TypeName="PoloNuevoModel.ActividadesObras">
-              <MappingFragment StoreEntitySet="ActividadesObras">
+          <EntitySetMapping Name="AuditoriaDocumentos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaDocumentos">
+              <MappingFragment StoreEntitySet="AuditoriaDocumentos">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="GestionObraId" ColumnName="GestionObraId" />
-                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
-                <ScalarProperty Name="Motivo" ColumnName="Motivo" />
-                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="FechaEliminacion" ColumnName="FechaEliminacion" />
+                <ScalarProperty Name="UsuarioResponsable" ColumnName="UsuarioResponsable" />
+                <ScalarProperty Name="MotivoEliminacion" ColumnName="MotivoEliminacion" />
+                <ScalarProperty Name="DocIdOriginal" ColumnName="DocIdOriginal" />
+                <ScalarProperty Name="DocReferencia" ColumnName="DocReferencia" />
+                <ScalarProperty Name="DocAsunto" ColumnName="DocAsunto" />
+                <ScalarProperty Name="DocFechaCarga" ColumnName="DocFechaCarga" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="CandidatosLaborales">
-            <EntityTypeMapping TypeName="PoloNuevoModel.CandidatosLaborales">
-              <MappingFragment StoreEntitySet="CandidatosLaborales">
+          <EntitySetMapping Name="AuditoriaMovimientos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaMovimientos">
+              <MappingFragment StoreEntitySet="AuditoriaMovimientos">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="IdoneidadId" ColumnName="IdoneidadId" />
-                <ScalarProperty Name="FechaVencimientoPena" ColumnName="FechaVencimientoPena" />
-                <ScalarProperty Name="FechaTercioPena" ColumnName="FechaTercioPena" />
-                <ScalarProperty Name="Estado" ColumnName="Estado" />
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Comisiones">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Comisiones">
-              <MappingFragment StoreEntitySet="Comisiones">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="TareaId" ColumnName="TareaId" />
-                <ScalarProperty Name="NumeroTarjeta" ColumnName="NumeroTarjeta" />
-                <ScalarProperty Name="FechaInicio" ColumnName="FechaInicio" />
-                <ScalarProperty Name="FechaFin" ColumnName="FechaFin" />
-                <ScalarProperty Name="Horario" ColumnName="Horario" />
-                <ScalarProperty Name="Activa" ColumnName="Activa" />
-                <ScalarProperty Name="MotivoAlta" ColumnName="MotivoAlta" />
-                <ScalarProperty Name="MotivoBaja" ColumnName="MotivoBaja" />
+                <ScalarProperty Name="AuditoriaDocId" ColumnName="AuditoriaDocId" />
+                <ScalarProperty Name="FechaMovimientoOriginal" ColumnName="FechaMovimientoOriginal" />
+                <ScalarProperty Name="Origen" ColumnName="Origen" />
+                <ScalarProperty Name="Destino" ColumnName="Destino" />
+                <ScalarProperty Name="TipoMovimiento" ColumnName="TipoMovimiento" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1735,10 +768,7 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySetMapping Name="Documentos">
             <EntityTypeMapping TypeName="PoloNuevoModel.Documentos">
               <MappingFragment StoreEntitySet="Documentos">
-                <ScalarProperty Name="DocumentoPadreId" ColumnName="DocumentoPadreId" />
-                <ScalarProperty Name="FechaVencimiento" ColumnName="FechaVencimiento" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
                 <ScalarProperty Name="TipoDocumentoId" ColumnName="TipoDocumentoId" />
                 <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
                 <ScalarProperty Name="Contenido" ColumnName="Contenido" />
@@ -1746,6 +776,19 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
                 <ScalarProperty Name="Extension" ColumnName="Extension" />
                 <ScalarProperty Name="FechaCarga" ColumnName="FechaCarga" />
                 <ScalarProperty Name="ReferenciaExterna" ColumnName="ReferenciaExterna" />
+                <ScalarProperty Name="FechaVencimiento" ColumnName="FechaVencimiento" />
+                <ScalarProperty Name="DocumentoPadreId" ColumnName="DocumentoPadreId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DocumentoVinculos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.DocumentoVinculos">
+              <MappingFragment StoreEntitySet="DocumentoVinculos">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IdDocumentoPadre" ColumnName="IdDocumentoPadre" />
+                <ScalarProperty Name="IdDocumentoHijo" ColumnName="IdDocumentoHijo" />
+                <ScalarProperty Name="TipoRelacion" ColumnName="TipoRelacion" />
+                <ScalarProperty Name="FechaVinculo" ColumnName="FechaVinculo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1767,39 +810,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="GestionObras">
-            <EntityTypeMapping TypeName="PoloNuevoModel.GestionObras">
-              <MappingFragment StoreEntitySet="GestionObras">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="ObraId" ColumnName="ObraId" />
-                <ScalarProperty Name="FechaAlta" ColumnName="FechaAlta" />
-                <ScalarProperty Name="Autorizado" ColumnName="Autorizado" />
-                <ScalarProperty Name="Activo" ColumnName="Activo" />
-                <ScalarProperty Name="NumeroActa" ColumnName="NumeroActa" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Idoneidades">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Idoneidades">
-              <MappingFragment StoreEntitySet="Idoneidades">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Licencias">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Licencias">
-              <MappingFragment StoreEntitySet="Licencias">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="MotivoAusenciaId" ColumnName="MotivoAusenciaId" />
-                <ScalarProperty Name="FechaInicio" ColumnName="FechaInicio" />
-                <ScalarProperty Name="FechaFin" ColumnName="FechaFin" />
-                <ScalarProperty Name="Detalles" ColumnName="Detalles" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="MotivosAusencia">
             <EntityTypeMapping TypeName="PoloNuevoModel.MotivosAusencia">
               <MappingFragment StoreEntitySet="MotivosAusencia">
@@ -1811,97 +821,26 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
           <EntitySetMapping Name="MovimientosDocumentos">
             <EntityTypeMapping TypeName="PoloNuevoModel.MovimientosDocumentos">
               <MappingFragment StoreEntitySet="MovimientosDocumentos">
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="DocumentoId" ColumnName="DocumentoId" />
                 <ScalarProperty Name="FechaMovimiento" ColumnName="FechaMovimiento" />
                 <ScalarProperty Name="Origen" ColumnName="Origen" />
                 <ScalarProperty Name="Destino" ColumnName="Destino" />
                 <ScalarProperty Name="EsSalida" ColumnName="EsSalida" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Notificaciones">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Notificaciones">
-              <MappingFragment StoreEntitySet="Notificaciones">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="Fecha" ColumnName="Fecha" />
-                <ScalarProperty Name="Mensaje" ColumnName="Mensaje" />
-                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Obras">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Obras">
-              <MappingFragment StoreEntitySet="Obras">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PlanillasLaborales">
-            <EntityTypeMapping TypeName="PoloNuevoModel.PlanillasLaborales">
-              <MappingFragment StoreEntitySet="PlanillasLaborales">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="TareaId" ColumnName="TareaId" />
-                <ScalarProperty Name="Mes" ColumnName="Mes" />
-                <ScalarProperty Name="Anio" ColumnName="Anio" />
-                <ScalarProperty Name="DiasTrabajados" ColumnName="DiasTrabajados" />
-                <ScalarProperty Name="CargaHoraria" ColumnName="CargaHoraria" />
-                <ScalarProperty Name="TotalHoras" ColumnName="TotalHoras" />
-                <ScalarProperty Name="Remuneracion" ColumnName="Remuneracion" />
                 <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Reclusos">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Reclusos">
-              <MappingFragment StoreEntitySet="Reclusos">
+          <EntitySetMapping Name="NumeracionRangos">
+            <EntityTypeMapping TypeName="PoloNuevoModel.NumeracionRangos">
+              <MappingFragment StoreEntitySet="NumeracionRangos">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
-                <ScalarProperty Name="Modulo" ColumnName="Modulo" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="Peculio" ColumnName="Peculio" />
-                <ScalarProperty Name="EstadoId" ColumnName="EstadoId" />
-                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SalidasTransitorias">
-            <EntityTypeMapping TypeName="PoloNuevoModel.SalidasTransitorias">
-              <MappingFragment StoreEntitySet="SalidasTransitorias">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="FechaSolicitud" ColumnName="FechaSolicitud" />
-                <ScalarProperty Name="TipoTransitoria" ColumnName="TipoTransitoria" />
-                <ScalarProperty Name="Domicilio" ColumnName="Domicilio" />
-                <ScalarProperty Name="NombreTutor" ColumnName="NombreTutor" />
-                <ScalarProperty Name="TelefonoContacto" ColumnName="TelefonoContacto" />
-                <ScalarProperty Name="EstadoSolicitud" ColumnName="EstadoSolicitud" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Tareas">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Tareas">
-              <MappingFragment StoreEntitySet="Tareas">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="EsTareaPrimaria" ColumnName="EsTareaPrimaria" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Tarjetas">
-            <EntityTypeMapping TypeName="PoloNuevoModel.Tarjetas">
-              <MappingFragment StoreEntitySet="Tarjetas">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="NumeroTarjeta" ColumnName="NumeroTarjeta" />
-                <ScalarProperty Name="FechaHoraInicio" ColumnName="FechaHoraInicio" />
-                <ScalarProperty Name="FechaHoraFin" ColumnName="FechaHoraFin" />
+                <ScalarProperty Name="TipoDocumentoId" ColumnName="TipoDocumentoId" />
+                <ScalarProperty Name="NombreRango" ColumnName="NombreRango" />
+                <ScalarProperty Name="NumeroInicio" ColumnName="NumeroInicio" />
+                <ScalarProperty Name="NumeroFin" ColumnName="NumeroFin" />
+                <ScalarProperty Name="UltimoUtilizado" ColumnName="UltimoUtilizado" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1923,15 +862,32 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="VencimientosLegales">
-            <EntityTypeMapping TypeName="PoloNuevoModel.VencimientosLegales">
-              <MappingFragment StoreEntitySet="VencimientosLegales">
+          <EntitySetMapping Name="vw_DocumentosDetalle">
+            <EntityTypeMapping TypeName="PoloNuevoModel.vw_DocumentosDetalle">
+              <MappingFragment StoreEntitySet="vw_DocumentosDetalle">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="FechaVencimientoPena" ColumnName="FechaVencimientoPena" />
-                <ScalarProperty Name="FechaInformeOperativo" ColumnName="FechaInformeOperativo" />
-                <ScalarProperty Name="FechaEntrevista" ColumnName="FechaEntrevista" />
-                <ScalarProperty Name="FechaOasys" ColumnName="FechaOasys" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="FechaCarga" ColumnName="FechaCarga" />
+                <ScalarProperty Name="Extension" ColumnName="Extension" />
+                <ScalarProperty Name="Formato" ColumnName="Formato" />
+                <ScalarProperty Name="NombreArchivo" ColumnName="NombreArchivo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_PlanillaMensual">
+            <EntityTypeMapping TypeName="PoloNuevoModel.vw_PlanillaMensual">
+              <MappingFragment StoreEntitySet="vw_PlanillaMensual">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Recluso" ColumnName="Recluso" />
+                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
+                <ScalarProperty Name="Tarea" ColumnName="Tarea" />
+                <ScalarProperty Name="Mes" ColumnName="Mes" />
+                <ScalarProperty Name="Anio" ColumnName="Anio" />
+                <ScalarProperty Name="DiasTrabajados" ColumnName="DiasTrabajados" />
+                <ScalarProperty Name="TotalHoras" ColumnName="TotalHoras" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1948,86 +904,6 @@ advertencia 6002: La tabla o vista 'PoloNuevo.dbo.vw_ReclusosMaestro' no tiene d
                 <ScalarProperty Name="Peculio" ColumnName="Peculio" />
                 <ScalarProperty Name="CantDocumentos" ColumnName="CantDocumentos" />
                 <ScalarProperty Name="SituacionLaboral" ColumnName="SituacionLaboral" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_DocumentosDetalle">
-            <EntityTypeMapping TypeName="PoloNuevoModel.vw_DocumentosDetalle">
-              <MappingFragment StoreEntitySet="vw_DocumentosDetalle">
-                <ScalarProperty Name="NombreArchivo" ColumnName="NombreArchivo" />
-                <ScalarProperty Name="Formato" ColumnName="Formato" />
-                <ScalarProperty Name="Extension" ColumnName="Extension" />
-                <ScalarProperty Name="FechaCarga" ColumnName="FechaCarga" />
-                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
-                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
-                <ScalarProperty Name="ReclusoId" ColumnName="ReclusoId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="vw_PlanillaMensual">
-            <EntityTypeMapping TypeName="PoloNuevoModel.vw_PlanillaMensual">
-              <MappingFragment StoreEntitySet="vw_PlanillaMensual">
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="TotalHoras" ColumnName="TotalHoras" />
-                <ScalarProperty Name="DiasTrabajados" ColumnName="DiasTrabajados" />
-                <ScalarProperty Name="Anio" ColumnName="Anio" />
-                <ScalarProperty Name="Mes" ColumnName="Mes" />
-                <ScalarProperty Name="Tarea" ColumnName="Tarea" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
-                <ScalarProperty Name="Recluso" ColumnName="Recluso" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AuditoriaDocumentos">
-            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaDocumentos">
-              <MappingFragment StoreEntitySet="AuditoriaDocumentos">
-                <ScalarProperty Name="DocFechaCarga" ColumnName="DocFechaCarga" />
-                <ScalarProperty Name="DocAsunto" ColumnName="DocAsunto" />
-                <ScalarProperty Name="DocReferencia" ColumnName="DocReferencia" />
-                <ScalarProperty Name="DocIdOriginal" ColumnName="DocIdOriginal" />
-                <ScalarProperty Name="MotivoEliminacion" ColumnName="MotivoEliminacion" />
-                <ScalarProperty Name="UsuarioResponsable" ColumnName="UsuarioResponsable" />
-                <ScalarProperty Name="FechaEliminacion" ColumnName="FechaEliminacion" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AuditoriaMovimientos">
-            <EntityTypeMapping TypeName="PoloNuevoModel.AuditoriaMovimientos">
-              <MappingFragment StoreEntitySet="AuditoriaMovimientos">
-                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
-                <ScalarProperty Name="TipoMovimiento" ColumnName="TipoMovimiento" />
-                <ScalarProperty Name="Destino" ColumnName="Destino" />
-                <ScalarProperty Name="Origen" ColumnName="Origen" />
-                <ScalarProperty Name="FechaMovimientoOriginal" ColumnName="FechaMovimientoOriginal" />
-                <ScalarProperty Name="AuditoriaDocId" ColumnName="AuditoriaDocId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="NumeracionRangos">
-            <EntityTypeMapping TypeName="PoloNuevoModel.NumeracionRangos">
-              <MappingFragment StoreEntitySet="NumeracionRangos">
-                <ScalarProperty Name="Activo" ColumnName="Activo" />
-                <ScalarProperty Name="UltimoUtilizado" ColumnName="UltimoUtilizado" />
-                <ScalarProperty Name="NumeroFin" ColumnName="NumeroFin" />
-                <ScalarProperty Name="NumeroInicio" ColumnName="NumeroInicio" />
-                <ScalarProperty Name="NombreRango" ColumnName="NombreRango" />
-                <ScalarProperty Name="TipoDocumentoId" ColumnName="TipoDocumentoId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DocumentoVinculos">
-            <EntityTypeMapping TypeName="PoloNuevoModel.DocumentoVinculos">
-              <MappingFragment StoreEntitySet="DocumentoVinculos">
-                <ScalarProperty Name="FechaVinculo" ColumnName="FechaVinculo" />
-                <ScalarProperty Name="TipoRelacion" ColumnName="TipoRelacion" />
-                <ScalarProperty Name="IdDocumentoHijo" ColumnName="IdDocumentoHijo" />
-                <ScalarProperty Name="IdDocumentoPadre" ColumnName="IdDocumentoPadre" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -14,6 +14,4 @@ Partial Public Class MotivosAusencia
     Public Property Id As Integer
     Public Property Descripcion As String
 
-    Public Overridable Property Licencias As ICollection(Of Licencias) = New HashSet(Of Licencias)
-
 End Class

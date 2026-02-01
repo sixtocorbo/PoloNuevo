@@ -44,20 +44,12 @@ Public Class frmMenuPrincipal
         AbrirFormulario(Of frmDashboard)()
     End Sub
 
-    ' 2. LISTADO DE RECLUSOS (F1)
-    Private Sub ReclusosToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReclusosToolStripMenuItem.Click
-        AbrirFormulario(Of frmReclusos)()
-    End Sub
 
     ' 3. MESA DE ENTRADA (F2)
     Private Sub MesaDeEntradaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MesaDeEntradaToolStripMenuItem.Click
         AbrirFormulario(Of frmMesaEntrada)()
     End Sub
 
-    ' 4. COMISIONES LABORALES (F3)
-    Private Sub ComisionesLaboralesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ComisionesLaboralesToolStripMenuItem.Click
-        AbrirFormulario(Of frmComisiones)()
-    End Sub
 
     ' 5. REPORTES DOCUMENTALES (F4)
     Private Sub ReportesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReportesToolStripMenuItem.Click
