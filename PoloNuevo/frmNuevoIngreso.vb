@@ -12,6 +12,9 @@ Public Class frmNuevoIngreso
     Private _idDocumentoEditar As Integer = 0
     Private _idPadrePreseleccionado As Integer = 0
     Private _idPadreVerificado As Integer = 0
+    Private _padreEnMesa As Boolean = True
+    Private _ubicacionPadre As String = "MESA DE ENTRADA"
+    Private _ajustandoVinculacion As Boolean = False
 
     Private _listaCompletaReclusos As New List(Of ReclusoItem)
     Private _todosOrigenes As New List(Of String)
@@ -98,6 +101,7 @@ Public Class frmNuevoIngreso
     ' LÓGICA DE VINCULACIÓN INTELIGENTE
     ' =========================================================
     Private Sub chkEsRespuesta_CheckedChanged(sender As Object, e As EventArgs) Handles chkEsRespuesta.CheckedChanged
+        If _ajustandoVinculacion Then Return
         If chkEsRespuesta.Checked Then
             If _idPadrePreseleccionado > 0 Then
                 VerificarPadreLogica(_idPadrePreseleccionado)
@@ -106,6 +110,8 @@ Public Class frmNuevoIngreso
             lblInfoPadre.Text = "Marque la casilla para vincular con el documento seleccionado."
             lblInfoPadre.ForeColor = Color.DimGray
             _idPadreVerificado = 0
+            _padreEnMesa = True
+            _ubicacionPadre = "MESA DE ENTRADA"
         End If
     End Sub
 
@@ -128,8 +134,29 @@ Public Class frmNuevoIngreso
                 End If
             End While
 
-            Dim padre = db.Documentos.Find(idPadreFinal)
+            Dim padre = db.Documentos.Include("MovimientosDocumentos").Include("TiposDocumento").FirstOrDefault(Function(d) d.Id = idPadreFinal)
             If padre IsNot Nothing Then
+                Dim ultimoMov = padre.MovimientosDocumentos _
+                    .OrderByDescending(Function(m) m.FechaMovimiento) _
+                    .ThenByDescending(Function(m) m.Id) _
+                    .FirstOrDefault()
+
+                _ubicacionPadre = "MESA DE ENTRADA"
+                If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
+                    _ubicacionPadre = ultimoMov.Destino.Trim()
+                End If
+
+                _padreEnMesa = _ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+                If Not _padreEnMesa Then
+                    _idPadreVerificado = 0
+                    lblInfoPadre.Text = $"No se puede vincular: el expediente principal está en {_ubicacionPadre}."
+                    lblInfoPadre.ForeColor = Color.Red
+                    _ajustandoVinculacion = True
+                    chkEsRespuesta.Checked = False
+                    _ajustandoVinculacion = False
+                    Return
+                End If
+
                 _idPadreVerificado = padre.Id
                 If idPadreFinal <> idDoc Then
                     lblInfoPadre.Text = $"SE VINCULA AL PRINCIPAL: {padre.TiposDocumento.Nombre} {padre.ReferenciaExterna}"
@@ -142,6 +169,8 @@ Public Class frmNuevoIngreso
                 lblInfoPadre.Text = "Error: No se pudo identificar el documento raíz."
                 lblInfoPadre.ForeColor = Color.Red
                 _idPadreVerificado = 0
+                _padreEnMesa = True
+                _ubicacionPadre = "MESA DE ENTRADA"
             End If
         End Using
     End Sub
@@ -163,7 +192,6 @@ Public Class frmNuevoIngreso
             Me.Cursor = Cursors.WaitCursor
             Using db As New PoloNuevoEntities()
 
-                ' A) LÓGICA DE RETORNO DEL EXPEDIENTE (PADRE Y FAMILIA)
                 Dim referenciaPadre As String = ""
 
                 If _idPadreVerificado > 0 And _idDocumentoEditar = 0 Then
@@ -171,49 +199,12 @@ Public Class frmNuevoIngreso
 
                     If docPadre IsNot Nothing Then
                         referenciaPadre = docPadre.TiposDocumento.Nombre & " " & docPadre.ReferenciaExterna
-
-                        ' Averiguamos dónde está el PADRE SUPREMO
-                        Dim ultimoMovPadre = docPadre.MovimientosDocumentos _
-                                                     .OrderByDescending(Function(m) m.FechaMovimiento) _
-                                                     .ThenByDescending(Function(m) m.Id) _
-                                                     .FirstOrDefault()
-
-                        Dim ubicacionPadre As String = "MESA DE ENTRADA"
-                        Dim fechaUltimoMov As Date = DateTime.Now.AddSeconds(-10)
-
-                        If ultimoMovPadre IsNot Nothing Then
-                            If ultimoMovPadre.Destino IsNot Nothing Then
-                                ubicacionPadre = ultimoMovPadre.Destino.Trim().ToUpper()
-                            End If
-                            fechaUltimoMov = ultimoMovPadre.FechaMovimiento
-                        End If
-
-                        ' Si el Padre NO está en Mesa, lo traemos a él y a TODA su familia
-                        If ubicacionPadre <> "MESA DE ENTRADA" Then
-
-                            ' Calculamos fecha segura (siempre adelante)
-                            Dim fechaRetorno As Date = DateTime.Now
-                            If fechaUltimoMov >= fechaRetorno Then
-                                fechaRetorno = fechaUltimoMov.AddSeconds(1)
-                            End If
-
-                            ' 1. Retornamos al Padre Supremo
-                            Dim retorno As New MovimientosDocumentos With {
-                                .DocumentoId = _idPadreVerificado,
-                                .FechaMovimiento = fechaRetorno,
-                                .Origen = ubicacionPadre,
-                                .Destino = "MESA DE ENTRADA",
-                                .EsSalida = False,
-                                .Observaciones = "RETORNO AUTOMÁTICO POR GESTIÓN (Vinculación)"
-                            }
-                            db.MovimientosDocumentos.Add(retorno)
-
-                            ' 2. ¡NUEVO! Arrastramos a todos los HIJOS y NIETOS (Recursivo)
-                            TraerFamiliaCompleta(db, _idPadreVerificado, ubicacionPadre, fechaRetorno)
-
-                            db.SaveChanges()
-                        End If
                     End If
+                End If
+
+                If _idPadreVerificado > 0 AndAlso Not _padreEnMesa Then
+                    MessageBox.Show($"No se puede vincular porque el expediente principal está en {_ubicacionPadre}.", "Vinculación no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return
                 End If
 
                 ' B) CREACIÓN O EDICIÓN DEL DOCUMENTO
