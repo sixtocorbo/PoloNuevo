@@ -211,6 +211,12 @@ Public Class frmMesaEntrada
         Dim idCandidatoPadre As Integer = 0
         If dgvMesa.SelectedRows.Count > 0 Then
             idCandidatoPadre = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+            Dim idPadreSupremo As Integer = 0
+            Dim ubicacionPadre As String = ""
+            If Not PadreEnMesaDeEntrada(idCandidatoPadre, idPadreSupremo, ubicacionPadre) Then
+                MessageBox.Show($"No es posible vincular el ingreso porque el expediente principal fue llevado a {ubicacionPadre}.", "Vinculación no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
         End If
         Dim frm As New frmNuevoIngreso(idCandidatoPadre, esVinculacion:=True)
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
@@ -222,6 +228,12 @@ Public Class frmMesaEntrada
             Return
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        Dim idPadreSupremo As Integer = 0
+        Dim ubicacionPadre As String = ""
+        If Not PadreEnMesaDeEntrada(idDoc, idPadreSupremo, ubicacionPadre) Then
+            MessageBox.Show($"No es posible dar pase porque el expediente principal fue llevado a {ubicacionPadre}.", "Pase no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
         Dim idDocPase As Integer = ObtenerDocumentoPase(idDoc)
         Dim frm As New frmNuevoPase(idDocPase)
         If frm.ShowDialog() = DialogResult.OK Then
@@ -439,6 +451,45 @@ Public Class frmMesaEntrada
         End Using
 
         Return idDoc
+    End Function
+
+    Private Function PadreEnMesaDeEntrada(idDoc As Integer, ByRef idPadreSupremo As Integer, ByRef ubicacionPadre As String) As Boolean
+        Using db As New PoloNuevoEntities()
+            Dim idRastro As Integer = idDoc
+            Dim encontrado As Boolean = True
+            Dim iteraciones As Integer = 0
+
+            While encontrado AndAlso iteraciones < 50
+                iteraciones += 1
+                Dim idActual = idRastro
+                Dim vinculo = db.DocumentoVinculos.FirstOrDefault(Function(v) v.IdDocumentoHijo = idActual)
+                If vinculo IsNot Nothing Then
+                    idRastro = vinculo.IdDocumentoPadre
+                Else
+                    encontrado = False
+                End If
+            End While
+
+            idPadreSupremo = idRastro
+
+            Dim docPadre = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idPadreSupremo)
+            If docPadre Is Nothing Then
+                ubicacionPadre = "MESA DE ENTRADA"
+                Return True
+            End If
+
+            Dim ultimoMov = docPadre.MovimientosDocumentos _
+                .OrderByDescending(Function(m) m.FechaMovimiento) _
+                .ThenByDescending(Function(m) m.Id) _
+                .FirstOrDefault()
+
+            ubicacionPadre = "MESA DE ENTRADA"
+            If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
+                ubicacionPadre = ultimoMov.Destino.Trim()
+            End If
+
+            Return ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+        End Using
     End Function
 
     Private Sub btnVerDigital_Click(sender As Object, e As EventArgs) Handles btnVerDigital.Click
