@@ -212,7 +212,14 @@ Public Class frmMesaEntrada
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
         Dim ubicacionActual As String = ""
         If Not DocumentoEnMesaDeEntrada(idDoc, ubicacionActual) Then
-            MessageBox.Show($"No es posible actuar porque el documento se encuentra en {ubicacionActual}.", "Documento fuera de oficina", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Dim row = dgvMesa.SelectedRows(0)
+            Dim referencia As String = Convert.ToString(row.Cells("Referencia").Value)
+            Dim asunto As String = Convert.ToString(row.Cells("Asunto").Value)
+            Dim detalleDocumento As String = referencia
+            If Not String.IsNullOrWhiteSpace(asunto) Then
+                detalleDocumento = $"{detalleDocumento} ({asunto})"
+            End If
+            MessageBox.Show($"No es posible actuar porque el documento {detalleDocumento} se encuentra localizado en {ubicacionActual}.", "Documento fuera de oficina", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Return
         End If
         If DocumentoTienePadre(idDoc) Then
