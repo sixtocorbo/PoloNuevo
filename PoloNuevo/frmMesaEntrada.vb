@@ -196,12 +196,17 @@ Public Class frmMesaEntrada
     ' =========================================================
 
     Private Sub btnNuevo_Click(sender As Object, e As EventArgs) Handles btnNuevo.Click
-        Dim idCandidatoPadre As Integer = 0
-        If dgvMesa.SelectedRows.Count > 0 Then
-            idCandidatoPadre = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
+        ' Creamos una instancia del nuevo Asistente
+        Dim wizard As New frmAsistenteDocumento()
+
+        ' Lo mostramos como un cuadro de diálogo (modal)
+        ' Esto detiene la ejecución aquí hasta que el usuario termine o cancele el asistente.
+        Dim resultado As DialogResult = wizard.ShowDialog()
+
+        ' Si el usuario completó el asistente exitosamente (guardó), recargamos la lista
+        If resultado = DialogResult.OK Then
+            CargarMesa()
         End If
-        Dim frm As New frmNuevoIngreso(idCandidatoPadre, esVinculacion:=True)
-        If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
     End Sub
 
     Private Sub btnActuar_Click(sender As Object, e As EventArgs) Handles btnActuar.Click
