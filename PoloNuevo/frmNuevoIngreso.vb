@@ -73,6 +73,7 @@ Public Class frmNuevoIngreso
             chkEsRespuesta.Checked = False
             lblInfoPadre.Text = "Marque la casilla para vincular con el documento seleccionado."
             lblInfoPadre.ForeColor = Color.DimGray
+            PrepararEstadoVinculacion(_idPadrePreseleccionado)
         End If
 
         If _idDocumentoEditar > 0 Then CargarDatosEdicion()
@@ -174,6 +175,58 @@ Public Class frmNuevoIngreso
             End If
         End Using
     End Sub
+
+    Private Sub PrepararEstadoVinculacion(idDoc As Integer)
+        Dim ubicacion As String = ""
+        _padreEnMesa = PadreEstaEnMesaDeEntrada(idDoc, ubicacion)
+        _ubicacionPadre = If(String.IsNullOrWhiteSpace(ubicacion), "MESA DE ENTRADA", ubicacion)
+
+        If Not _padreEnMesa Then
+            lblInfoPadre.Text = $"No se puede vincular: el expediente principal está en {_ubicacionPadre}."
+            lblInfoPadre.ForeColor = Color.Red
+            chkEsRespuesta.Enabled = False
+            _idPadreVerificado = 0
+        Else
+            chkEsRespuesta.Enabled = True
+        End If
+    End Sub
+
+    Private Function PadreEstaEnMesaDeEntrada(idDoc As Integer, ByRef ubicacionPadre As String) As Boolean
+        Using db As New PoloNuevoEntities()
+            Dim idRastro As Integer = idDoc
+            Dim encontrado As Boolean = True
+            Dim iteraciones As Integer = 0
+
+            While encontrado AndAlso iteraciones < 50
+                iteraciones += 1
+                Dim idActual = idRastro
+                Dim vinculo = db.DocumentoVinculos.FirstOrDefault(Function(v) v.IdDocumentoHijo = idActual)
+                If vinculo IsNot Nothing Then
+                    idRastro = vinculo.IdDocumentoPadre
+                Else
+                    encontrado = False
+                End If
+            End While
+
+            Dim docPadre = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idRastro)
+            If docPadre Is Nothing Then
+                ubicacionPadre = "MESA DE ENTRADA"
+                Return True
+            End If
+
+            Dim ultimoMov = docPadre.MovimientosDocumentos _
+                .OrderByDescending(Function(m) m.FechaMovimiento) _
+                .ThenByDescending(Function(m) m.Id) _
+                .FirstOrDefault()
+
+            ubicacionPadre = "MESA DE ENTRADA"
+            If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(ultimoMov.Destino) Then
+                ubicacionPadre = ultimoMov.Destino.Trim()
+            End If
+
+            Return ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+        End Using
+    End Function
 
     ' =========================================================
     ' GUARDAR (CON RETORNO FAMILIAR COMPLETO)

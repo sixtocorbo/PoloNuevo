@@ -211,12 +211,6 @@ Public Class frmMesaEntrada
         Dim idCandidatoPadre As Integer = 0
         If dgvMesa.SelectedRows.Count > 0 Then
             idCandidatoPadre = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-            Dim idPadreSupremo As Integer = 0
-            Dim ubicacionPadre As String = ""
-            If Not PadreEnMesaDeEntrada(idCandidatoPadre, idPadreSupremo, ubicacionPadre) Then
-                MessageBox.Show($"No es posible vincular el ingreso porque el expediente principal fue llevado a {ubicacionPadre}.", "Vinculación no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Return
-            End If
         End If
         Dim frm As New frmNuevoIngreso(idCandidatoPadre, esVinculacion:=True)
         If frm.ShowDialog() = DialogResult.OK Then CargarMesa()
@@ -228,11 +222,13 @@ Public Class frmMesaEntrada
             Return
         End If
         Dim idDoc As Integer = Convert.ToInt32(dgvMesa.SelectedRows(0).Cells("Id").Value)
-        Dim idPadreSupremo As Integer = 0
-        Dim ubicacionPadre As String = ""
-        If Not PadreEnMesaDeEntrada(idDoc, idPadreSupremo, ubicacionPadre) Then
-            MessageBox.Show($"No es posible dar pase porque el expediente principal fue llevado a {ubicacionPadre}.", "Pase no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Return
+        If DocumentoTienePadre(idDoc) Then
+            Dim idPadreSupremo As Integer = 0
+            Dim ubicacionPadre As String = ""
+            If Not PadreEnMesaDeEntrada(idDoc, idPadreSupremo, ubicacionPadre) Then
+                MessageBox.Show($"No es posible dar pase porque el expediente principal fue llevado a {ubicacionPadre}.", "Pase no disponible", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
         End If
         Dim idDocPase As Integer = ObtenerDocumentoPase(idDoc)
         Dim frm As New frmNuevoPase(idDocPase)
@@ -490,6 +486,12 @@ Public Class frmMesaEntrada
             End If
 
             Return ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
+        End Using
+    End Function
+
+    Private Function DocumentoTienePadre(idDoc As Integer) As Boolean
+        Using db As New PoloNuevoEntities()
+            Return db.DocumentoVinculos.Any(Function(v) v.IdDocumentoHijo = idDoc)
         End Using
     End Function
 
