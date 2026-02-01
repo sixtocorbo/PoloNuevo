@@ -150,7 +150,7 @@ Public Class frmNuevoIngreso
                 _padreEnMesa = _ubicacionPadre.Trim().ToUpper() = "MESA DE ENTRADA"
                 If Not _padreEnMesa Then
                     _idPadreVerificado = 0
-                    lblInfoPadre.Text = $"No se puede vincular: el expediente principal está en {_ubicacionPadre}."
+                    lblInfoPadre.Text = $"Ubicación: {_ubicacionPadre}."
                     lblInfoPadre.ForeColor = Color.Red
                     _ajustandoVinculacion = True
                     chkEsRespuesta.Checked = False
@@ -182,7 +182,7 @@ Public Class frmNuevoIngreso
         _ubicacionPadre = If(String.IsNullOrWhiteSpace(ubicacion), "MESA DE ENTRADA", ubicacion)
 
         If Not _padreEnMesa Then
-            lblInfoPadre.Text = $"No se puede vincular: el expediente principal está en {_ubicacionPadre}."
+            lblInfoPadre.Text = $"Ubicación: {_ubicacionPadre}."
             lblInfoPadre.ForeColor = Color.Red
             chkEsRespuesta.Enabled = False
             _idPadreVerificado = 0
