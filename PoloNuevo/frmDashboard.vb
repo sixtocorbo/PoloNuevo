@@ -1,5 +1,5 @@
 ﻿Imports System.Data.Entity
-Imports System.Linq ' Necesario para las consultas avanzadas
+Imports System.Linq
 
 Public Class frmDashboard
 
@@ -30,19 +30,38 @@ Public Class frmDashboard
                 Dim manana As Date = hoy.AddDays(1)
 
                 ' =========================================================
-                ' 1. LÓGICA DE PENDIENTES (CORREGIDA CON DESEMPATE POR ID)
+                ' 1. LÓGICA DE PENDIENTES (CORREGIDA - CONTEO FÍSICO REAL)
                 ' =========================================================
+                ' Obtenemos todos los documentos activos
                 Dim listaDocs = db.Documentos _
                                   .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO") _
                                   .Include("MovimientosDocumentos") _
                                   .ToList()
 
-                Dim vinculos = db.DocumentoVinculos.ToList()
+                ' Obtenemos solo el último movimiento de cada uno para ver dónde están
                 Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(listaDocs)
-                Dim padreSupremoPorDoc = MesaEntradaInteligencia.ObtenerPadreSupremoPorDoc(listaDocs, vinculos)
-                Dim pendientePorPadre = MesaEntradaInteligencia.ObtenerPendientesPorPadre(listaDocs, ultimosMovimientos, padreSupremoPorDoc)
 
-                Dim conteoPendientes As Integer = pendientePorPadre.Count
+                Dim conteoPendientes As Integer = 0
+
+                For Each doc In listaDocs
+                    Dim ultimoMov As MovimientosDocumentos = Nothing
+
+                    ' Si tiene movimientos, revisamos el destino del último.
+                    ' Si NO tiene movimientos, asumimos que acaba de nacer en MESA DE ENTRADA.
+                    Dim ubicacionActual As String = "MESA DE ENTRADA"
+
+                    If ultimosMovimientos.TryGetValue(doc.Id, ultimoMov) Then
+                        If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
+                            ubicacionActual = ultimoMov.Destino
+                        End If
+                    End If
+
+                    ' Si la ubicación es Mesa, suma al contador
+                    If ubicacionActual.Trim().ToUpper() = "MESA DE ENTRADA" Then
+                        conteoPendientes += 1
+                    End If
+                Next
+
                 lblNumPendientes.Text = conteoPendientes.ToString()
 
                 ' Alerta visual
@@ -65,8 +84,8 @@ Public Class frmDashboard
                 ' =========================================================
                 Dim salidasHoy = db.MovimientosDocumentos _
                                    .Where(Function(m) m.EsSalida = True And
-                                                      m.FechaMovimiento >= hoy And
-                                                      m.FechaMovimiento < manana) _
+                                                     m.FechaMovimiento >= hoy And
+                                                     m.FechaMovimiento < manana) _
                                    .Count()
                 lblNumLaboral.Text = salidasHoy.ToString()
 

@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Drawing.Printing
-Imports System.Data.Entity ' Necesario para Include y consultas avanzadas
+Imports System.Data.Entity
 
 Public Class frmMesaEntrada
 
@@ -13,17 +13,6 @@ Public Class frmMesaEntrada
     Private _impDestino As String
     Private _impFecha As String
     Private _impUsuario As String = "Operador de Mesa"
-
-    ' =========================================================
-    ' CLASE AUXILIAR INTERNA PARA ORDENAR EL TIMELINE 360°
-    ' =========================================================
-    Private Class EventoTimeline
-        Public Property Fecha As DateTime
-        Public Property Icono As String
-        Public Property TextoPrincipal As String
-        Public Property Detalle As String
-        Public Property EsHijo As Boolean ' Para saber si es un evento externo
-    End Class
 
     Private Sub frmMesaEntrada_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ConfigurarGrillaMovimientos()
@@ -41,11 +30,16 @@ Public Class frmMesaEntrada
     Private Sub CargarMesa()
         Try
             Using db As New PoloNuevoEntities()
-                ' 1. CONSULTA BASE
+                ' =========================================================
+                ' 1. CONSULTA BASE (Traemos todo menos lo archivado)
+                ' =========================================================
                 Dim query = db.Documentos.Include("MovimientosDocumentos") _
                                          .Where(Function(d) d.TiposDocumento.Nombre <> "ARCHIVO")
 
-                ' 3. Buscador Inteligente
+                ' =========================================================
+                ' 2. APLICACIÓN DE FILTROS (Buscador y Fechas)
+                ' =========================================================
+                ' A) Buscador Inteligente
                 Dim texto = txtBuscar.Text.Trim()
                 If Not String.IsNullOrEmpty(texto) Then
                     Dim palabras As String() = texto.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries)
@@ -58,37 +52,44 @@ Public Class frmMesaEntrada
                     Next
                 End If
 
-                ' 4. Filtro Fechas
+                ' B) Filtro de Fechas
                 If chkFechas.Checked Then
                     Dim fDesde = dtpDesde.Value.Date
                     Dim fHasta = dtpHasta.Value.Date.AddDays(1).AddSeconds(-1)
                     query = query.Where(Function(d) d.FechaCarga >= fDesde And d.FechaCarga <= fHasta)
                 End If
 
-                ' 5. Ejecución RÁPIDA
-                Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga) _
-                                   .ToList()
+                ' =========================================================
+                ' 3. EJECUCIÓN Y PROYECCIÓN EN MEMORIA (CORREGIDO)
+                ' =========================================================
+                ' Ejecutamos la consulta base
+                Dim rawList = query.OrderByDescending(Function(d) d.FechaCarga).ToList()
 
-                ' 6. PROYECCIÓN EN MEMORIA (CON DESEMPATE POR ID)
-                Dim vinculos = db.DocumentoVinculos.ToList()
+                ' Obtenemos los últimos movimientos para saber dónde está cada documento
                 Dim ultimosMovimientos = MesaEntradaInteligencia.ObtenerUltimosMovimientos(rawList)
-                Dim padreSupremoPorDoc = MesaEntradaInteligencia.ObtenerPadreSupremoPorDoc(rawList, vinculos)
-                Dim pendientePorPadre = MesaEntradaInteligencia.ObtenerPendientesPorPadre(rawList, ultimosMovimientos, padreSupremoPorDoc)
 
+                ' Proyectamos los datos para la grilla
                 Dim displayList = rawList.Select(Function(d)
-                                                     Dim ultimoMov = ultimosMovimientos(d.Id)
-                                                     Dim destino As String = If(ultimoMov IsNot Nothing, If(ultimoMov.Destino, ""), "MESA DE ENTRADA")
-                                                     Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
-                                                     Dim estadoFinal As String = "MOVIDO"
+                                                     Dim ultimoMov As MovimientosDocumentos = Nothing
+                                                     ultimosMovimientos.TryGetValue(d.Id, ultimoMov)
 
-                                                     If enMesa Then
-                                                         Dim idPadre = padreSupremoPorDoc(d.Id)
-                                                         If pendientePorPadre.ContainsKey(idPadre) AndAlso pendientePorPadre(idPadre) = d.Id Then
-                                                             estadoFinal = "PENDIENTE"
-                                                         Else
-                                                             estadoFinal = "EN MESA"
-                                                         End If
+                                                     ' -------------------------------------------------------
+                                                     ' CORRECCIÓN CRÍTICA: IGUALAR LÓGICA CON DASHBOARD
+                                                     ' -------------------------------------------------------
+                                                     ' Si no hay movimiento (es nuevo) o el destino está vacío,
+                                                     ' ASUMIMOS que está físicamente en la Mesa de Entrada.
+                                                     Dim destino As String = "MESA DE ENTRADA"
+
+                                                     If ultimoMov IsNot Nothing AndAlso Not String.IsNullOrEmpty(ultimoMov.Destino) Then
+                                                         destino = ultimoMov.Destino
                                                      End If
+                                                     ' -------------------------------------------------------
+
+                                                     Dim enMesa As Boolean = destino.Trim().ToUpper() = "MESA DE ENTRADA"
+
+                                                     ' Determinamos el estado para la columna visual
+                                                     Dim estadoFinal As String = "DERIVADO"
+                                                     If enMesa Then estadoFinal = "PENDIENTE"
 
                                                      Return New With {
                                                          .Id = d.Id,
@@ -102,24 +103,32 @@ Public Class frmMesaEntrada
                                                      }
                                                  End Function).ToList()
 
-                ' 7. Asignación a la Grilla
+                ' =========================================================
+                ' 4. ASIGNACIÓN A LA GRILLA
+                ' =========================================================
                 If chkPendientes.Checked Then
+                    ' Si el check está activo, solo mostramos lo que calculamos como PENDIENTE
                     dgvMesa.DataSource = displayList.Where(Function(d) d.Estado = "PENDIENTE").ToList()
                 Else
+                    ' Si no, mostramos todo
                     dgvMesa.DataSource = displayList
                 End If
 
-                ' 8. Configuración Visual
+                ' =========================================================
+                ' 5. CONFIGURACIÓN VISUAL
+                ' =========================================================
                 If dgvMesa.Columns("Id") IsNot Nothing Then dgvMesa.Columns("Id").Visible = False
                 If dgvMesa.Columns("Vencimiento") IsNot Nothing Then dgvMesa.Columns("Vencimiento").Visible = False
 
                 ConfigurarColumnas()
                 ColorearPendientes()
 
+                ' Limpiamos la grilla de historial si no hay documentos listados
                 If displayList.Count = 0 Then dgvMovimientos.DataSource = Nothing
+
             End Using
         Catch ex As Exception
-            MessageBox.Show("Error al cargar datos: " & ex.Message)
+            MessageBox.Show("Error al cargar datos: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
