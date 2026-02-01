@@ -472,7 +472,8 @@ Public Class frmMesaEntrada
 
             idPadreSupremo = idRastro
 
-            Dim docPadre = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idPadreSupremo)
+            Dim idPadreSupremoLocal = idPadreSupremo
+            Dim docPadre = db.Documentos.Include("MovimientosDocumentos").FirstOrDefault(Function(d) d.Id = idPadreSupremoLocal)
             If docPadre Is Nothing Then
                 ubicacionPadre = "MESA DE ENTRADA"
                 Return True
